@@ -1,2 +1,81 @@
-<h2>Hugosmoon</h2>
-<p>那无阿弥陀佛</p>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>未完成实验</title>
+     {% load staticfiles %}
+    <!-- 模块css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'import/css/index.css' %}">
+    <style>
+            .el-header, .el-footer {
+              background-color: #B3C0D1;
+              color: #333;
+              text-align: center;
+              font-size: 28px;
+              line-height: 80px;
+            }
+            
+            .el-aside {
+              background-color: #D3DCE6;
+              color: #333;
+              text-align: center;
+              line-height: 200px;
+            }
+            
+            .el-main {
+              background-color: #E9EEF3;
+              color: #333;
+              text-align: center;
+              line-height: 60px;
+              height: 1000px;
+            }
+            
+            body > .el-container {
+              margin-bottom: 40px;
+            }
+            
+            .el-container:nth-child(5) .el-aside,
+            .el-container:nth-child(6) .el-aside {
+              line-height: 260px;
+            }
+            
+            .el-container:nth-child(7) .el-aside {
+              line-height: 320px;
+            }
+            .el-button{
+                width: 250px;
+            }
+          </style>
+    
+</head>
+<body >
+        
+    
+    <div id="app">
+            <el-container>
+                    <el-header height='80px'><i class="el-icon-ship" style="margin-right: 20px;"></i></el-icon-picture-outline-round> Hugosmoon · VirtualMachining</el-header>
+                    <el-main height='500px'>
+                            <el-button @click="visible = true">车刀的主要几何角度</el-button>
+                            <br>
+                            <el-button @click="visible = true">切削力与切削用量的关系</el-button>
+                    </el-main>
+                    <el-footer></el-footer>
+            </el-container>
+        
+        <el-dialog :visible.sync="visible" title="Hello world">
+          <p>Try Element</p>
+        </el-dialog>
+      </div>
+</body>
+<script src="{% static 'import/vue.js' %}"></script>
+<script src="{% static 'import/element_index.js' %}"></script>
+<script>
+    new Vue({
+      el: '#app',
+      data: function() {
+        return { visible: false }
+      }
+    })
+  </script>
+</html>
+
