@@ -432,8 +432,9 @@ var Main = {
         },
         submit:function () {
             //60,=15,=0,=30,=10,=10;
-            let url='qxyl-2.html?';
+            let url='/vmm/qxyl/2/';
             let daojujiaodubuchang=w1*5;
+            url+='?';
             url+=('main_angle='+this.$refs.main_angle.value)+'&';
             url+=('tool_minor_cutting_edge_angle='+this.$refs.tool_minor_cutting_edge_angle.value)+'&';
             url+=('edge_inclination_angle='+this.$refs.edge_inclination_angle.value)+'&';
@@ -443,7 +444,8 @@ var Main = {
             url+=('bangliao_r='+this.$refs.bangdliao_r.value)+'&';
             url+=('bangliao_length='+(this.$refs.bangliao_length.value+100))+'&';
             url+=('daojujiaodubuchang='+daojujiaodubuchang)+'&';
-            window.location.href=url;
+            url+=('bangliao_material='+this.$refs.bangliao_material.value)+'&';
+            location.href=url;
         }
     }
 
@@ -467,3 +469,4 @@ function trig(method,value) {
         return (1/(Math.tan(degre)))
     }
 }
+

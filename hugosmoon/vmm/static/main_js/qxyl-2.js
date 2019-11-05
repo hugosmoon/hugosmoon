@@ -208,7 +208,7 @@ function initObject() {
 
 
     var loader = new THREE.STLLoader();
-    loader.load("../../../model/6140.STL", function (geometry) {
+    loader.load("/static/model/6140.STL", function (geometry) {
         geometry.center();
 
 
@@ -266,7 +266,7 @@ function initObject() {
     });
 
 
-    loader.load("../../../model/szjp_pan.STL", function (geometry) {
+    loader.load("/static/model/szjp_pan.STL", function (geometry) {
         geometry.center();
         szjp_pan = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_szjp_pan);
         szjp_pan.rotation.x = 0.5 * Math.PI;
@@ -279,7 +279,7 @@ function initObject() {
         model_number+=1;
     });
 
-    loader.load("../../../model/szjp_zhua.STL", function (geometry) {
+    loader.load("/static/model/szjp_zhua.STL", function (geometry) {
         geometry.center();
         szjp_zhua1 = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_szjp_zhua);
         szjp_zhua1.rotation.x =  0.5 *Math.PI;
@@ -304,7 +304,7 @@ function initObject() {
 
     });
 
-    loader.load("../../../model/weizuo.STL", function (geometry) {
+    loader.load("/static/model/weizuo.STL", function (geometry) {
         geometry.center();
         weizuo = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_weizuo);
         weizuo.rotation.x =  0.5 *Math.PI;
@@ -342,7 +342,7 @@ function initObject() {
 
     });
 
-    loader.load("../../../model/daojia1.STL", function (geometry) {
+    loader.load("/static/model/daojia1.STL", function (geometry) {
         geometry.center();
         daojia1 = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_weizuo);
         daojia1.rotation.x =  0.5 *Math.PI;
@@ -361,7 +361,7 @@ function initObject() {
         model_number+=1;
     });
 
-    loader.load("../../../model/daojia2.STL", function (geometry) {
+    loader.load("/static/model/daojia2.STL", function (geometry) {
         geometry.center();
         daojia2 = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_weizuo);
         daojia2.rotation.x =  0.5 *Math.PI;
@@ -381,7 +381,7 @@ function initObject() {
         model_number+=1;
     });
 
-    loader.load("../../../model/sigang.STL", function (geometry) {
+    loader.load("/static/model/sigang.STL", function (geometry) {
         geometry.center();
         sigang = THREE.SceneUtils.createMultiMaterialObject(geometry, materials_sigang);
 
@@ -538,17 +538,17 @@ function render() {
         
 
         
-            if(cut_length>0&&machine_speed>0){
-                let x=(count!=0)?Math.round(cut_length*10)/10:0;
-                let y=x+Math.round(Math.random()*100);
-                if(count%10==0){
-                    if(count%50==0){
-                        draw_chart(chart_line1,2000,x,y);
-                    }
-                    draw_chart(chart_line2,30,x,y);
+        if(cut_length>0&&machine_speed>0){
+            let x=(count!=0)?Math.round(cut_length*10)/10:0;
+            let y=x+Math.round(Math.random()*100);
+            if(count%10==0){
+                if(count%50==0){
+                    draw_chart(chart_line1,2000,x,y);
                 }
-                count+=1;
-            }  
+                draw_chart(chart_line2,30,x,y);
+            }
+            count+=1;
+        }  
         
 
 
@@ -586,8 +586,6 @@ function threeStart() {
     initObject();
     loadAutoScreen(camera, renderer);
     render();
-    
-
 }
 
 var Main = {

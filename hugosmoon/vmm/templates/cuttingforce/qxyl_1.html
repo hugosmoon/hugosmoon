@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load staticfiles %}
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'logo.ico' %}">
+    <title>切削用量和切削力的关系</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
+    <!-- 引入组件库 -->
+    <script src="{% static 'import/vue.js' %}"></script>
+    <script src="{% static 'import/element_index.js' %}"></script>
+    <script src="{% static 'import/three.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/Setting.js' %}"></script>
+    <script src="{% static 'import/OrbitControls.js' %}"></script>
+    <script src="{% static 'import/dat.gui.min.js' %}"></script>
+    <script src="{% static 'import/SceneUtils.js' %}"></script>
+    <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/ConvexGeometry.js' %}"></script>
+</head>
+<body onload="threeStart()">
+
+<div>
+<!--加载动画的div-->
+<div id="render" >
+</div>
+
+
+        <!--<button id="control-8">刀尖向前</button>-->
+
+        <div id="app">
+            <div id="control" >
+                <div id="control-inner">
+                    <p id="title1">车刀参数</p>
+            <template>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">主偏角</span>
+                    <el-slider ref="main_angle" v-model="value1" :marks="marks_main_angle" :min=5 :max=90 @input="greet" @change="greet"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">副偏角</span>
+                    <el-slider ref="tool_minor_cutting_edge_angle" v-model="value2" :marks="marks_tool_minor_cutting_edge_angle" :min=0 :max=20 @input="greet" @change="greet"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">刃倾角</span>
+                    <el-slider ref="edge_inclination_angle" v-model="value3" :marks="marks_edge_inclination_angle" :min=-15 :max=5 @input="greet" @change="greet"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">前角</span>
+                    <el-slider ref="rake_angle" v-model="value4" :marks="marks_rake_angle" :min=-15 :max=45 @input="greet" @change="greet"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">后角</span>
+                    <el-slider ref="back_angle" v-model="value5" :marks="marks_back_angle" :min=0 :max=20 @input="greet" @change="greet"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">副刃后角</span>
+                    <el-slider ref="secondary_edge_back_angl" v-model="value6" :marks="marks_secondary_edge_back_angle" :min=0 :max=20 @input="greet" @change="greet"></el-slider>
+                </div>
+                <!--<div class="block con-ang">-->
+                    <!--<span class="demonstration" style="color:#C0C4CC">刀尖圆弧半径</span>-->
+                    <!--<el-slider v-model="value7" :marks="marks_tip_radius" :step="0.01" :min=0.25 :max=2></el-slider>-->
+                <!--</div>-->
+            </template>
+        </div>
+        </div>
+            <div id="pla_control">
+                <div id="control-inner">
+                    <p id="title1">棒料参数</p>
+                </div>
+                <div id="control-inner">
+                    <el-select ref="bangliao_material" v-model="value" placeholder="请选择材料">
+                        <el-option
+                                v-for="item in bangliao_materials"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div id="control-inner">
+                    <div class="block con-ang">
+                        <span class="demonstration" style="color:#C0C4CC">坯料半径(mm)</span>
+                        <el-slider ref="bangdliao_r" v-model="bangliao_r" :marks="marks_bangliao_r" :min=60 :max=100></el-slider>
+                    </div>
+                </div>
+                <div id="control-inner">
+                    <div class="block con-ang">
+                        <span class="demonstration" style="color:#C0C4CC">坯料长度(mm)</span>
+                        <el-slider ref="bangliao_length" v-model="bangdliao_length" :marks="marks_bangdliao_length" :min=300 :max=700></el-slider>
+                    </div>
+                </div>
+                <div id="control-inner">
+
+                    <el-button id="alert1" type="primary" v-on:click="submit">进入实验</el-button>
+                    <!-- <a href="{% url 'qxyl' 2 %}">123333</a> -->
+                </div>
+
+
+            </div>
+        </div>
+</div>
+</div>
+<script src="{% static 'main_js/qxyl-1.js' %}"></script>
+</body>
+</html>

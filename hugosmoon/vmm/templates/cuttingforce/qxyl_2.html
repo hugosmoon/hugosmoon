@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load staticfiles %}
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'logo.ico' %}">
+    <title>切削用量和切削力的关系</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
+    <!-- 引入组件库 -->
+    <script src="{% static 'import/vue.js' %}"></script>
+    <script src="{% static 'import/element_index.js' %}"></script>
+    <script src="{% static 'import/three.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/Setting.js' %}"></script>
+    <script src="{% static 'import/OrbitControls.js' %}"></script>
+    <script src="{% static 'import/dat.gui.min.js' %}"></script>
+    <script src="{% static 'import/SceneUtils.js' %}"></script>
+    <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/STLLoader.js' %}"></script>
+    <script src="{% static 'import/dat.gui.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/echarts.min.js' %}"></script>
+    <script src="{% static 'import/echarts-gl.min.js' %}"></script>
+    
+</head>
+<body onload="threeStart()">
+<div id="Stats-output"></div>
+            
+
+<el-row :gutter="20" v-loading='loading'>
+    <!-- ... -->
+</el-row>
+
+<div>
+<!--加载动画的div-->
+<div id="render" >
+</div>
+
+
+        <!--<button id="control-8">刀尖向前</button>-->
+
+        <div id="app">
+            <div id="control" >
+                <div id="control-inner">
+                    <!-- <p id="title1">车床参数</p> -->
+            <template>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">主轴转速(r/min)</span>
+                    <el-slider ref="machine_speed" v-model="value1" :marks="marks_machine_speed" :min=0 :max=1400 :step="10"   :disabled="adjustable"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">背吃刀量(mm)</span>
+                    <el-slider ref="cutting_depth" v-model="value2" :marks="marks_cutting_depth" :min=0 :max=6 :step="0.1" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
+                </div>
+                <div class="block con-ang">
+                    <span class="demonstration" style="color:#C0C4CC">进给量(mm/r)</span>
+                    <el-slider ref="feed" v-model="value3" :marks="marks_feed" :min=0.1 :max=0.5 :step="0.01" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
+                </div>
+
+            </template>
+
+                    <el-row>
+                        <el-button type="warning" plain @click="reload">复位实验</el-button>
+                    </el-row>
+                    <br>
+                    <el-row>
+                        <el-button type="primary" @click="start">启动机床</el-button>
+
+                        <el-button type="danger" @click="end">关闭机床</el-button>
+
+                    </el-row>
+
+        </div>
+        </div>
+            <div id="qxyl2-charts">
+                <div id="control-inner">
+                <div class="demo-image__placeholder">
+                    
+                    <div id="container" style="height:200px;width: 100%;"></div>
+                    <div id="container2" style="height:300px;width: 100%;margin-top: -120px;"></div>
+                        
+                
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+<script src="{% static 'main_js/chart_line.js' %}"></script>
+<script src="{% static 'main_js/create_cylinder.js' %}"></script>
+<script src="{% static 'main_js/tool.js' %}"></script>
+<script src="{% static 'main_js/qxyl-2.js' %}"></script>
+
+</body>
+</html>
