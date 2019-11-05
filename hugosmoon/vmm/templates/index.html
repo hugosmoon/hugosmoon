@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -55,16 +55,13 @@
             <el-container>
                     <el-header height='80px'><i class="el-icon-ship" style="margin-right: 20px;"></i></el-icon-picture-outline-round> Hugosmoon · VirtualMachining</el-header>
                     <el-main height='500px'>
-                            <el-button @click="visible = true">车刀的主要几何角度</el-button>
+                            <el-button  onclick="jumpto('/vmm/tool_display/');">车刀的主要几何角度</el-button>
                             <br>
-                            <el-button @click="visible = true">切削力与切削用量的关系</el-button>
+                            <el-button  onclick="jumpto('/vmm/qxyl/1/');">切削力与切削用量的关系</el-button>
                     </el-main>
                     <el-footer></el-footer>
             </el-container>
         
-        <el-dialog :visible.sync="visible" title="Hello world">
-          <p>Try Element</p>
-        </el-dialog>
       </div>
 </body>
 <script src="{% static 'import/vue.js' %}"></script>
@@ -72,10 +69,11 @@
 <script>
     new Vue({
       el: '#app',
-      data: function() {
-        return { visible: false }
-      }
     })
+
+    function jumpto(url) {
+         location.href=url;
+    }
   </script>
 </html>
 
