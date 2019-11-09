@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,40 +27,40 @@
     
 </head>
 <body onload="threeStart()">
-<div id="Stats-output"></div>
-            
+    <div id="Stats-output"></div>
 
-<el-row :gutter="20" v-loading='loading'>
-    <!-- ... -->
-</el-row>
 
-<div>
-<!--加载动画的div-->
-<div id="render" >
-</div>
+    <el-row :gutter="20" v-loading='loading'>
+        <!-- ... -->
+    </el-row>
+
+    <div>
+        <!--加载动画的div-->
+        <div id="render">
+        </div>
 
 
         <!--<button id="control-8">刀尖向前</button>-->
 
         <div id="app">
-            <div id="control" >
+            <div id="control">
                 <div id="control-inner">
                     <!-- <p id="title1">车床参数</p> -->
-            <template>
-                <div class="block con-ang">
-                    <span class="demonstration" style="color:#C0C4CC">主轴转速(r/min)</span>
-                    <el-slider ref="machine_speed" v-model="value1" :marks="marks_machine_speed" :min=0 :max=1400 :step="10"   :disabled="adjustable"></el-slider>
-                </div>
-                <div class="block con-ang">
-                    <span class="demonstration" style="color:#C0C4CC">背吃刀量(mm)</span>
-                    <el-slider ref="cutting_depth" v-model="value2" :marks="marks_cutting_depth" :min=0 :max=6 :step="0.1" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
-                </div>
-                <div class="block con-ang">
-                    <span class="demonstration" style="color:#C0C4CC">进给量(mm/r)</span>
-                    <el-slider ref="feed" v-model="value3" :marks="marks_feed" :min=0.1 :max=0.5 :step="0.01" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
-                </div>
+                    <template>
+                        <div class="block con-ang">
+                            <span class="demonstration" style="color:#C0C4CC">主轴转速(r/min)</span>
+                            <el-slider ref="machine_speed" v-model="value1" :marks="marks_machine_speed" :min=0 :max=1400 :step="10" :disabled="adjustable"></el-slider>
+                        </div>
+                        <div class="block con-ang">
+                            <span class="demonstration" style="color:#C0C4CC">背吃刀量(mm)</span>
+                            <el-slider ref="cutting_depth" v-model="value2" :marks="marks_cutting_depth" :min=0 :max=6 :step="0.1" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
+                        </div>
+                        <div class="block con-ang">
+                            <span class="demonstration" style="color:#C0C4CC">进给量(mm/r)</span>
+                            <el-slider ref="feed" v-model="value3" :marks="marks_feed" :min=0.1 :max=0.5 :step="0.01" @input="greet" @change="greet" :disabled="adjustable"></el-slider>
+                        </div>
 
-            </template>
+                    </template>
 
                     <el-row>
                         <el-button type="warning" plain @click="reload">复位实验</el-button>
@@ -70,28 +70,102 @@
                         <el-button type="primary" @click="start">启动机床</el-button>
 
                         <el-button type="danger" @click="end">关闭机床</el-button>
+                        <button onclick="get_cutting_force()">get_force</button>
 
                     </el-row>
 
-        </div>
-        </div>
+                </div>
+            </div>
             <div id="qxyl2-charts">
                 <div id="control-inner">
-                <div class="demo-image__placeholder">
-                    
-                    <div id="container" style="height:200px;width: 100%;"></div>
-                    <div id="container2" style="height:300px;width: 100%;margin-top: -120px;"></div>
-                        
-                
+                    <div class="demo-image__placeholder">
+
+                        <div id="container" style="height:200px;width: 100%;"></div>
+                        <div id="container2" style="height:300px;width: 100%;margin-top: -120px;"></div>
+
+
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
-</div>
-<script src="{% static 'main_js/chart_line.js' %}"></script>
-<script src="{% static 'main_js/create_cylinder.js' %}"></script>
-<script src="{% static 'main_js/tool.js' %}"></script>
-<script src="{% static 'main_js/qxyl-2.js' %}"></script>
+    </div>
+
+    <script>
+        //csrf验证
+        jQuery(document).ajaxSend(function (event, xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            function sameOrigin(url) {
+                // url could be relative or scheme relative or absolute
+                var host = document.location.host; // host + port
+                var protocol = document.location.protocol;
+                var sr_origin = '//' + host;
+                var origin = protocol + sr_origin;
+                // Allow absolute or scheme relative URLs to same origin
+                return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                    (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                    // or any other URL that isn't scheme relative or absolute i.e relative.
+                    !(/^(\/\/|http:|https:).*/.test(url));
+            }
+            function safeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        });
+    </script>
+    <script src="{% static 'main_js/chart_line.js' %}"></script>
+    <script src="{% static 'main_js/create_cylinder.js' %}"></script>
+    <script src="{% static 'main_js/tool.js' %}"></script>
+    <script src="{% static 'main_js/qxyl-2.js' %}"></script>
+    <script>
+        
+//获得切削力
+let cutting_force = 0;
+
+function get_cutting_force() {
+    let url = "/vmm/cuttingforce_cal/";
+    let form_data = new FormData();
+
+    form_data.append('workpiece_material', parseInt(GetQueryString('secondary_edge_back_angl')));
+    //form_data.append('feed_rate',feed_rate);
+    //form_data.append('cutting_depth',cutting_depth);
+    //form_data.append('cutting_speed',rot_speed*6.28*workpiece_r/1000);
+    //form_data.append('tool_cutting_edge_angle',tool_cutting_edge_angle);
+    //form_data.append('rake_angle',rake_angle);
+    //form_data.append('tool_cutting_edge_inclination_angle',tool_cutting_edge_inclination_angle);
+    //   form_data.append('corner_radius',corner_radius);
+    //   form_data.append('minor_clearance_angle',minor_clearance_angle);
+    //   form_data.append('clearance_angle',clearance_angle);
+    //   form_data.append('tool_minor_cutting_edge_angle',tool_minor_cutting_edge_angle);
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: form_data,
+        processData: false,  // tell jquery not to process the data
+        contentType: false, // tell jquery not to set contentType
+        success: function (callback) {
+            console.log(callback);
+            cutting_force = callback;
+        }
+    });
+}
+    </script>
 
 </body>
 </html>

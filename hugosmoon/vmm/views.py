@@ -15,4 +15,5 @@ def qxyl(request,id):
 
 # 计算切削力
 def cuttingforce_cal(request):
+
     return HttpResponse(79)
