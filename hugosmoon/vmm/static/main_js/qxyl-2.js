@@ -658,11 +658,9 @@ var Main = {
             this.adjustable=true;
         },
         end:function () {
-            machine_speed=0;
+            machine_speed = 0;
         },
-        reload:function () {
-            location.reload();
-        },
+        
         openFullScreen:function(time) {
             const loading = this.$loading({
                 lock: true,
@@ -679,7 +677,17 @@ var Main = {
                 }
 
             }, time);
+        },
+        reload: function () {
+            location.reload();
+        },
+        getforce: function () {
+            location.reload();
         }
+        //getforce: function () {
+        //    location.reload();
+        //    //machine_speed = 0;
+        //}
 
     }
 
