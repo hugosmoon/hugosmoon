@@ -49,20 +49,9 @@ back_angle=parseFloat(GetQueryString('back_angle'));
 secondary_edge_back_angl=parseFloat(GetQueryString('secondary_edge_back_angl'));
 daojujiaodubuchang=parseFloat(GetQueryString('daojujiaodubuchang'));
 
-let stats = initStats();
+//let stats = initStats();
 let chart_line1,chart_line2;
-//
-// let controls = new function () {
-//
-//     this.x=0;
-//     this.y=0;
-//     this.z=0
-// };
-//
-// let gui=new dat.GUI();
-// gui.add(controls,"x",-100,100);
-// gui.add(controls,"y",-100,100);
-// gui.add(controls,"z",-100,100);
+
 
 
 
@@ -410,7 +399,7 @@ function initObject() {
 //动画
 function render() {
 
-    stats.update();
+    //stats.update();
 
     szjp_distance=bangliao_r1+45;
     bangliao_r2=bangliao_r1-bcdl;
@@ -669,11 +658,9 @@ var Main = {
             this.adjustable=true;
         },
         end:function () {
-            machine_speed=0;
+            machine_speed = 0;
         },
-        reload:function () {
-            location.reload();
-        },
+        
         openFullScreen:function(time) {
             const loading = this.$loading({
                 lock: true,
@@ -690,7 +677,17 @@ var Main = {
                 }
 
             }, time);
+        },
+        reload: function () {
+            location.reload();
+        },
+        getforce: function () {
+            location.reload();
         }
+        //getforce: function () {
+        //    location.reload();
+        //    //machine_speed = 0;
+        //}
 
     }
 
@@ -700,19 +697,6 @@ var Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')
 
 
-//删除group
-function deleteGroup(group) {
-
-    group.traverse(function (item) {
-        if (item instanceof THREE.Mesh) {
-            item.geometry.dispose(); //删除几何体
-            item.material.dispose(); //删除材质
-        }
-    });
-
-    scene.remove(group);
-    console.log("释放内存")
-}
 //获取url参数
 function GetQueryString(name)
 {
@@ -735,8 +719,6 @@ function initStats() {
 
     return stats;
 }
-
-
 
 
 
