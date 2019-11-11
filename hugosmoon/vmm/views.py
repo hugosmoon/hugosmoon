@@ -1,4 +1,6 @@
 from django.shortcuts import render,HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
  
 def home(request):
@@ -14,6 +16,7 @@ def qxyl(request,id):
         return render(request, 'cuttingforce/qxyl_2.html')
 
 # 计算切削力
+@csrf_exempt
 def cuttingforce_cal(request):
 
     return HttpResponse(79)
@@ -21,7 +24,7 @@ def cuttingforce_cal(request):
 
 
 # 计算切削力
-
+# @csrf_exempt
 def cutting_force_cal(request):
     #接收基础参数
     if request.method == 'POST':

@@ -682,12 +682,12 @@ var Main = {
             location.reload();
         },
         getforce: function () {
-            location.reload();
+            //发送 post 请求
+            this.$http.post(
+                '/vmm/cuttingforce_cal/',{name:"菜鸟教程",url:"http://www.runoob.com"},{emulateJSON:true}).then(function(res){
+                console.log(res);
+            });
         }
-        //getforce: function () {
-        //    location.reload();
-        //    //machine_speed = 0;
-        //}
 
     }
 
