@@ -21,7 +21,7 @@ let daojujiaodubuchang=0;
 
 let rot_angle=0;
 
-let materials_bangliao;
+let bangliao_material;
 let plane;
 
 let weizuo;
@@ -49,8 +49,8 @@ edge_inclination_angle=parseFloat(GetQueryString('edge_inclination_angle'));
 rake_angle=parseFloat(GetQueryString('rake_angle'));
 back_angle=parseFloat(GetQueryString('back_angle'));
 secondary_edge_back_angl=parseFloat(GetQueryString('secondary_edge_back_angl'));
-daojujiaodubuchang=parseFloat(GetQueryString('daojujiaodubuchang'));
-
+daojujiaodubuchang = parseFloat(GetQueryString('daojujiaodubuchang'));
+bangliao_material = GetQueryString('bangliao_material');
 //let stats = initStats();
 let chart_line1,chart_line2;
 
@@ -530,8 +530,8 @@ function render() {
 
         
         if(cut_length>0&&machine_speed>0){
-            let x=(count!=0)?Math.round(cut_length*10)/10:0;
-            let y=x+Math.round(Math.random()*100);
+            let x = (count != 0) ? Math.round(cut_length * 10) / 10 : 0;
+            let y = cutting_force * (0.85+0.3*Math.random());
             if(count%10==0){
                 if(count%50==0){
                     draw_chart(chart_line1,2000,x,y);
@@ -540,11 +540,6 @@ function render() {
             }
             count+=1;
         }  
-        
-
-
-        
-
         
     }
     catch (e) {
@@ -685,17 +680,38 @@ var Main = {
         },
         // 更新切削力
         getforce: function () {
+            //let abc = "12345";
             //发送 post 请求
             this.$http.post(
-                '/vmm/cuttingforce_cal/',{name:"菜鸟教程",url:"http://www.runoob.com"},{emulateJSON:true}).then(function(res){
-                cutting_force=parseFloat(res.body);
+                '/vmm/cuttingforce_cal/',
+                {
+                    bangliao_material: bangliao_material,
+                    feed_rate: this.$refs.feed.value,
+                    cutting_depth: this.$refs.cutting_depth.value,
+                    cutting_speed: machine_speed * bangliao_r1 * Math.PI / 1000,
+                    tool_cutting_edge_angle: main_angle,
+                    rake_angle: rake_angle,
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                cutting_force=res.body;
                 console.log('切削力:'+cutting_force);
-            });
+                });
         }
 
     }
 
 }
+
+//bangliao_r1 = parseFloat(GetQueryString('bangliao_r'));
+//bangliao_length = parseFloat(GetQueryString('bangliao_length'));
+//main_angle = parseFloat(GetQueryString('main_angle'));
+//tool_minor_cutting_edge_angle = parseFloat(GetQueryString('tool_minor_cutting_edge_angle'));
+//edge_inclination_angle = parseFloat(GetQueryString('edge_inclination_angle'));
+//rake_angle = parseFloat(GetQueryString('rake_angle'));
+//back_angle = parseFloat(GetQueryString('back_angle'));
+//secondary_edge_back_angl = parseFloat(GetQueryString('secondary_edge_back_angl'));
+//daojujiaodubuchang = parseFloat(GetQueryString('daojujiaodubuchang'));
 
 var Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')

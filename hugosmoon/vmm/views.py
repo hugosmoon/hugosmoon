@@ -1,5 +1,7 @@
 from django.shortcuts import render,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import math
+import random
 
 
  
@@ -20,37 +22,14 @@ def qxyl(request,id):
 def cuttingforce_cal(request):
     #接收基础参数
     if request.method == 'POST':
-        workpiece_material=request.POST.get('workpiece_material')
+        workpiece_material=request.POST.get('bangliao_material')
         feed_rate = float(request.POST.get('feed_rate'))
         cutting_depth = float(request.POST.get('cutting_depth'))
         cutting_speed = float(request.POST.get('cutting_speed'))
-        tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
-        rake_angle = (request.POST.get('rake_angle'))
-        tool_cutting_edge_inclination_angle = (request.POST.get('tool_cutting_edge_inclination_angle'))
-        corner_radius = (request.POST.get('corner_radius'))
+        tool_cutting_edge_angle = float(request.POST.get('tool_cutting_edge_angle'))
+        rake_angle = float(request.POST.get('rake_angle'))
     else:
         return HttpResponse(False)
-    return HttpResponse(79.43)
-
-
-
-# 计算切削力
-# @csrf_exempt
-def cutting_force_cal(request):
-    #接收基础参数
-    if request.method == 'POST':
-        workpiece_material=request.POST.get('workpiece_material')
-        feed_rate = float(request.POST.get('feed_rate'))
-        cutting_depth = float(request.POST.get('cutting_depth'))
-        cutting_speed = float(request.POST.get('cutting_speed'))
-        tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
-        rake_angle = (request.POST.get('rake_angle'))
-        tool_cutting_edge_inclination_angle = (request.POST.get('tool_cutting_edge_inclination_angle'))
-        corner_radius = (request.POST.get('corner_radius'))
-    else:
-        return HttpResponse(False)
-
-
     #定义各种参数
     c_fc=x_fc=y_fc=k_tool_cutting_edge_angle=k_rake_angle=k_tool_cutting_edge_inclination_angle=k_corner_radius=k_strength=0
     k_cutting_speed=1
@@ -90,45 +69,28 @@ def cutting_force_cal(request):
 
     #依据刀具角度修改参数
     #主偏角
-    if(tool_cutting_edge_angle=="30"):
-        k_tool_cutting_edge_angle=1.08
-    elif(tool_cutting_edge_angle=="45"):
-        k_tool_cutting_edge_angle=1.0
-    elif(tool_cutting_edge_angle=="60"):
-        k_tool_cutting_edge_angle=0.94
-    elif(tool_cutting_edge_angle=="75"):
-        k_tool_cutting_edge_angle=0.92
-    elif (tool_cutting_edge_angle == "90"):
-        k_tool_cutting_edge_angle = 0.89
+    k_tool_cutting_edge_angle=(0.004949*tool_cutting_edge_angle*tool_cutting_edge_angle-0.9112*tool_cutting_edge_angle+130.9)/100
 
     #前角
-    if(rake_angle=="-15"):
-        k_rake_angle=1.25
-    elif(rake_angle=="-10"):
-        k_rake_angle=1.2
-    elif(rake_angle=="0"):
-        k_rake_angle=1.1
-    elif(rake_angle=="10"):
-        k_rake_angle=1.0
-    elif(rake_angle=="20"):
-        k_rake_angle=0.9
+    k_rake_angle=1.25-((rake_angle+15)/100)
 
-    #刃倾角
-    # if(tool_cutting_edge_inclination_angle=="5"):
-    #     k_tool_cutting_edge_inclination_angle=0.75
-    # elif(tool_cutting_edge_inclination_angle=="0"):
-    #     k_tool_cutting_edge_inclination_angle=1.0
-    # elif (tool_cutting_edge_inclination_angle == "-5"):
-    #     k_tool_cutting_edge_inclination_angle = 1.25
-    # elif (tool_cutting_edge_inclination_angle == "-10"):
-    #     k_tool_cutting_edge_inclination_angle = 1.5
-    # elif (tool_cutting_edge_inclination_angle == "-15"):
+    #刃倾角系数
     k_tool_cutting_edge_inclination_angle = 1
 
-    #刀尖圆弧半径
+    #刀尖圆弧半径系数
     k_corner_radius=1
 
     #计算切削力
-    cutting_force=(random.uniform(0.98, 1.02))*9.81*c_fc*(math.pow(cutting_depth,x_fc))*(math.pow(feed_rate,y_fc))*k_tool_cutting_edge_angle*k_rake_angle*k_tool_cutting_edge_inclination_angle*k_corner_radius*k_strength*k_cutting_speed
+    cutting_force=9.81*c_fc*(math.pow(cutting_depth,x_fc))*(math.pow(feed_rate,y_fc))*k_tool_cutting_edge_angle*k_rake_angle*k_tool_cutting_edge_inclination_angle*k_corner_radius*k_strength*k_cutting_speed
 
     return HttpResponse(cutting_force)
+
+ #workpiece_material=request.POST.get('bangliao_material')
+ #       feed_rate = float(request.POST.get('feed_rate'))
+ #       cutting_depth = float(request.POST.get('cutting_depth'))
+ #       cutting_speed = float(request.POST.get('cutting_speed'))
+ #       tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
+ #       rake_angle = (request.POST.get('rake_angle'))
+
+
+    
