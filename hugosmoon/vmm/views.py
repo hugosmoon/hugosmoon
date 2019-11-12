@@ -18,8 +18,19 @@ def qxyl(request,id):
 # 计算切削力
 @csrf_exempt
 def cuttingforce_cal(request):
-
-    return HttpResponse(79)
+    #接收基础参数
+    if request.method == 'POST':
+        workpiece_material=request.POST.get('workpiece_material')
+        feed_rate = float(request.POST.get('feed_rate'))
+        cutting_depth = float(request.POST.get('cutting_depth'))
+        cutting_speed = float(request.POST.get('cutting_speed'))
+        tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
+        rake_angle = (request.POST.get('rake_angle'))
+        tool_cutting_edge_inclination_angle = (request.POST.get('tool_cutting_edge_inclination_angle'))
+        corner_radius = (request.POST.get('corner_radius'))
+    else:
+        return HttpResponse(False)
+    return HttpResponse(79.43)
 
 
 

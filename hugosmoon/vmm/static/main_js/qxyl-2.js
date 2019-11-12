@@ -39,6 +39,8 @@ let frame_time=20;//当前时间戳
 
 let cut_corner_end=false;//切削棒料角是否结束，与棒料2的长度及两端半径确定有关
 
+let cutting_force=0;//切削力
+
 bangliao_r1=parseFloat(GetQueryString('bangliao_r'));
 bangliao_length=parseFloat(GetQueryString('bangliao_length'));
 main_angle=parseFloat(GetQueryString('main_angle'));
@@ -681,11 +683,13 @@ var Main = {
         reload: function () {
             location.reload();
         },
+        // 更新切削力
         getforce: function () {
             //发送 post 请求
             this.$http.post(
                 '/vmm/cuttingforce_cal/',{name:"菜鸟教程",url:"http://www.runoob.com"},{emulateJSON:true}).then(function(res){
-                console.log(res);
+                cutting_force=parseFloat(res.body);
+                console.log('切削力:'+cutting_force);
             });
         }
 

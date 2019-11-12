@@ -264,17 +264,17 @@ var Main = {
             bangliao_r: 80,
             bangdliao_length:600,
             bangliao_materials: [{
-                value: '0',
+                value: '45_steel',
                 label: '45钢'
               }, {
-                value: '1',
+                value: 'stainless_steel',
                 label: '不锈钢'
               }, {
-                value: '2',
+                value: 'gray_iron',
                 label: '灰铸铁'
               }, {
-                value: '3',
-                label: '黄铜'
+                value: 'malleable_cast_iron',
+                label: '可锻铸铁'
               }],
               value: '',
 
