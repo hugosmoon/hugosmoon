@@ -531,7 +531,7 @@ function render() {
         
         if(cut_length>0&&machine_speed>0){
             let x = (count != 0) ? Math.round(cut_length * 10) / 10 : 0;
-            let y = cutting_force * (0.85+0.3*Math.random());
+            let y = cutting_force * (getNumberInNormalDistribution(1,0.03));
             if(count%10==0){
                 if(count%50==0){
                     draw_chart(chart_line1,2000,x,y);
@@ -574,7 +574,7 @@ function threeStart() {
     render();
 }
 
-var Main = {
+let Main = {
     data() {
         this.openFullScreen(200);
         return {
@@ -617,42 +617,26 @@ var Main = {
 
     methods: {
         greet: function (xx) {
-            // machine_speed=this.$refs.machine_speed.value;
             bcdl=this.$refs.cutting_depth.value;
-            // jjl=0.1*this.$refs.feed.value;
-
         },
         start: function(){
             if(this.$refs.machine_speed.value==0){
                 this.$alert('主轴转速不能为0', '操作提示', {
                     confirmButtonText: '确定',
-                    // callback: action => {
-                    //     this.$message({
-                    //         type: 'info',
-                    //         message: `action: ${ action }`
-                    //     });
-                    // }
                 });
                 return false;
             }
             if(this.$refs.cutting_depth.value==0){
                 this.$alert('背吃刀量不能为0', '操作提示', {
                     confirmButtonText: '确定',
-                    // callback: action => {
-                    //     this.$message({
-                    //         type: 'info',
-                    //         message: `action: ${ action }`
-                    //     });
-                    // }
                 });
                 return false;
             }
             machine_speed=this.$refs.machine_speed.value;
             bcdl=this.$refs.cutting_depth.value;
             jjl=this.$refs.feed.value;
-            
-            // this.$refs.machine_speed.disable=true;
-            this.adjustable=true;
+            this.adjustable = true;
+            this.getforce();
         },
         end:function () {
             machine_speed = 0;
@@ -662,7 +646,6 @@ var Main = {
             const loading = this.$loading({
                 lock: true,
                 text: '实验加载中',
-                // spinner: 'el-icon-loading',
                 background: 'rgba(0, 0, 0, 0.92)'
             });
             setTimeout(() => {
@@ -702,17 +685,6 @@ var Main = {
     }
 
 }
-
-//bangliao_r1 = parseFloat(GetQueryString('bangliao_r'));
-//bangliao_length = parseFloat(GetQueryString('bangliao_length'));
-//main_angle = parseFloat(GetQueryString('main_angle'));
-//tool_minor_cutting_edge_angle = parseFloat(GetQueryString('tool_minor_cutting_edge_angle'));
-//edge_inclination_angle = parseFloat(GetQueryString('edge_inclination_angle'));
-//rake_angle = parseFloat(GetQueryString('rake_angle'));
-//back_angle = parseFloat(GetQueryString('back_angle'));
-//secondary_edge_back_angl = parseFloat(GetQueryString('secondary_edge_back_angl'));
-//daojujiaodubuchang = parseFloat(GetQueryString('daojujiaodubuchang'));
-
 var Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')
 
@@ -738,6 +710,27 @@ function initStats() {
     document.getElementById("Stats-output").appendChild(stats.domElement);
 
     return stats;
+}
+
+//正态分布随机数
+function getNumberInNormalDistribution(mean, std_dev) {
+    return mean + (randomNormalDistribution() * std_dev);
+
+    function randomNormalDistribution() {
+        var u = 0.0, v = 0.0, w = 0.0, c = 0.0;
+        do {
+            //获得两个（-1,1）的独立随机变量
+            u = Math.random() * 2 - 1.0;
+            v = Math.random() * 2 - 1.0;
+            w = u * u + v * v;
+        } while (w == 0.0 || w >= 1.0)
+        //这里就是 Box-Muller转换
+        c = Math.sqrt((-2 * Math.log(w)) / w);
+        //返回2个标准正态分布的随机数，封装进一个数组返回
+        //当然，因为这个函数运行较快，也可以扔掉一个
+        //return [u*c,v*c];
+        return u * c;
+    }
 }
 
 
