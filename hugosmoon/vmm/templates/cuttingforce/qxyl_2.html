@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    {% load staticfiles %}
+    {% load static %}
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="icon" href="{% static 'logo.ico' %}">
     <title>切削用量和切削力的关系</title>
@@ -70,10 +70,10 @@
 
                         <el-button type="danger" @click="end">关闭机床</el-button>
                     </el-row>
-                    <br>
+                    <!-- <br>
                     <el-row>
                         <el-button type="danger" @click="getforce">计算切削力</el-button>
-                    </el-row>
+                    </el-row> -->
 
                 </div>
             </div>

@@ -732,7 +732,3 @@ function getNumberInNormalDistribution(mean, std_dev) {
         return u * c;
     }
 }
-
-
-
-

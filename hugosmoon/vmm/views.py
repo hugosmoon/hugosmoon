@@ -16,6 +16,8 @@ def qxyl(request,id):
         return render(request, 'cuttingforce/qxyl_1.html')
     elif id =='2':
         return render(request, 'cuttingforce/qxyl_2.html')
+def model_debugger(request):
+    return render(request, 'test/model_debugger.html')
 
 # 计算切削力
 @csrf_exempt
@@ -84,13 +86,3 @@ def cuttingforce_cal(request):
     cutting_force=9.81*c_fc*(math.pow(cutting_depth,x_fc))*(math.pow(feed_rate,y_fc))*k_tool_cutting_edge_angle*k_rake_angle*k_tool_cutting_edge_inclination_angle*k_corner_radius*k_strength*k_cutting_speed
 
     return HttpResponse(cutting_force)
-
- #workpiece_material=request.POST.get('bangliao_material')
- #       feed_rate = float(request.POST.get('feed_rate'))
- #       cutting_depth = float(request.POST.get('cutting_depth'))
- #       cutting_speed = float(request.POST.get('cutting_speed'))
- #       tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
- #       rake_angle = (request.POST.get('rake_angle'))
-
-
-    
