@@ -27,8 +27,7 @@
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
     
 </head>
-<body >
-<!-- onload="threeStart()"> -->
+<body onload="threeStart()">
     <div id="Stats-output"></div>
     
 
@@ -39,10 +38,58 @@
         <div id="app">
             <div id="control" >
                 <div id="control-inner">
+                    <p id="title1">模型添加</p>
+                    <p id="title2" style="color: aqua;">场景名称</p>
+                    <el-input v-model="view_name" placeholder="输入场景名称" :disabled="enter_view_name"></el-input>
+                    <br><br>
+                    <el-button type="primary" v-on:click="save_view_name">确定名称</el-button>
+                    <br><br><br>
+                    <p id="title2" style="color: aqua;">添加模型</p>
+                    <el-input v-model="model_name" placeholder="输入模型名称"></el-input>
+                    <br><br>
+                    <el-button type="primary" v-on:click="add_model">载入模型</el-button>
+                    <br><br><br>
                     <p id="title1">模型调试</p>
-                    <el-input v-model="model_name" placeholder="模型名称"></el-input>
+                    <el-select v-model="model_selected" placeholder="请选择模型" @change="select_model">
+                        <el-option
+                        v-for="item in model_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <br><br>
+                    <el-button type="primary" v-on:click="save_model">存储数据</el-button>   
                 </div>
             </div>
+            <!-- <div id="pla_control">
+                <div id="control-inner"> 
+                    <p id="title1">模型调试</p>
+                    
+                    <el-select v-model="model_selected" placeholder="请选择模型">
+                        <el-option
+                        v-for="item in model_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                  </el-select>
+                  <p id="title2" style="color: aqua;">位置调整</p> 
+                    <span class="demonstration" style="color:aquamarine;">X轴</span>
+                    <el-input
+                        size="mini"
+                        placeholder="x轴"
+                        v-model="X_loc">
+                    </el-input>
+                    <el-slider v-model="X_loc" :min='-100' :max='100' :step='0.1'></el-slider>
+                  <p id="title2" style="color: aqua;">角度调整</p>
+                  <p id="title2" style="color: aqua;">材质调整</p>
+                </div>
+                
+            </div> -->
+        </div>
+        </div>
+            
         </div>
     </div>
     <script src="{% static 'main_js/model_debugger.js' %}"></script>

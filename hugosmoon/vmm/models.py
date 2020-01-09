@@ -1,3 +1,20 @@
 from django.db import models
+import django.utils.timezone as timezone
 
 # Create your models here.
+
+class Load_models_conf(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    view_name = models.CharField(max_length=255, db_column="view_name")
+    model_index= models.CharField(max_length=255, db_column="model_index")
+    model_name= models.CharField(max_length=255, db_column="model_name")
+    model_url=models.CharField(max_length=255, db_column="model_url")
+    position_x=models.FloatField(db_column="position_x")
+    position_y=models.FloatField(db_column="position_y")
+    position_z=models.FloatField(db_column="position_z")
+    rotation_x=models.FloatField(db_column="rotation_x")
+    rotation_y=models.FloatField(db_column="rotation_y")
+    rotation_z=models.FloatField(db_column="rotation_z")
+    isdelete = models.BooleanField(default=False, db_column="f_is_delete")
+    createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
+    updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")

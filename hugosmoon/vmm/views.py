@@ -2,6 +2,8 @@ from django.shortcuts import render,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import math
 import random
+import json
+from vmm.models import Load_models_conf
 
 
  
@@ -86,3 +88,37 @@ def cuttingforce_cal(request):
     cutting_force=9.81*c_fc*(math.pow(cutting_depth,x_fc))*(math.pow(feed_rate,y_fc))*k_tool_cutting_edge_angle*k_rake_angle*k_tool_cutting_edge_inclination_angle*k_corner_radius*k_strength*k_cutting_speed
 
     return HttpResponse(cutting_force)
+    
+@csrf_exempt
+def save_models(request):
+    #接收基础参数
+    if request.method == 'POST':
+        models=request.POST.getlist('models')
+        models= json.loads(models[0])
+        for model in models:
+            print(model)
+            
+            view_name=model['view_name']
+            model_index=model['index']
+            model_name=model['name']
+            model_url=model['url']
+            position_x=model['position_x']
+            position_y=model['position_y']
+            position_z=model['position_z']
+            rotation_x=model['rotation_x']
+            rotation_y=model['rotation_y']
+            rotation_z=model['rotation_z']
+            models_in=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
+            if len(models_in) > 0:
+                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z)
+            else:
+                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z)
+        # models=json.loads(models)
+        # print(models)
+        # for model in models:
+        #     # model_data=data = json.loads(model)
+        #     # print(type(model_data[0]))
+        #     print(model)
+        return HttpResponse('ok')
+    else:
+        return HttpResponse(0)
