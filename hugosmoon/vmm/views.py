@@ -1,4 +1,5 @@
 from django.shortcuts import render,HttpResponse
+from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import math
 import random
@@ -88,7 +89,8 @@ def cuttingforce_cal(request):
     cutting_force=9.81*c_fc*(math.pow(cutting_depth,x_fc))*(math.pow(feed_rate,y_fc))*k_tool_cutting_edge_angle*k_rake_angle*k_tool_cutting_edge_inclination_angle*k_corner_radius*k_strength*k_cutting_speed
 
     return HttpResponse(cutting_force)
-    
+
+#将模型的配置信息存入数据库  
 @csrf_exempt
 def save_models(request):
     #接收基础参数
@@ -108,17 +110,40 @@ def save_models(request):
             rotation_x=model['rotation_x']
             rotation_y=model['rotation_y']
             rotation_z=model['rotation_z']
+            materials_color_r=model['materials_color_r']
+            materials_color_g=model['materials_color_g']
+            materials_color_b=model['materials_color_b']
+
             models_in=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
             if len(models_in) > 0:
-                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z)
+                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b)
             else:
-                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z)
-        # models=json.loads(models)
-        # print(models)
-        # for model in models:
-        #     # model_data=data = json.loads(model)
-        #     # print(type(model_data[0]))
-        #     print(model)
+                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b)
         return HttpResponse('ok')
-    else:
-        return HttpResponse(0)
+#根据场景名称获取模型组数据
+@csrf_exempt
+def get_models_by_view_name(request):
+    if request.method == 'POST':
+        view_name=request.POST.get('view_name')
+        print(view_name)
+        models=Load_models_conf.objects.filter(view_name=view_name,isdelete=False).values()
+        data={}
+        data['models'] = list(models)
+        return JsonResponse(data)
+
+#根据模型场景名称和index删除模型
+@csrf_exempt
+def delete_model(request):
+    # return HttpResponse('success')
+    if request.method == 'POST':
+        view_name=request.POST.get('view_name')
+        model_index=request.POST.get('model_index')
+        print(view_name)
+        print(model_index)
+        model=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
+        model.update(isdelete=True)
+        return HttpResponse('delete_success')
+
+
+
+    

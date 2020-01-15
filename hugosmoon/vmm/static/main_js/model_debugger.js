@@ -30,6 +30,7 @@ let Main = {
             Y_rot: 0,
             Z_rot: 0,
             enter_view_name:false,
+            model_information: '',
         }
     },
 
@@ -41,17 +42,20 @@ let Main = {
             }
             view_name=this.view_name;
             this.enter_view_name=true;
+            this.get_models();
         },
         add_model: function () {
-            if(view_name==""){
+            if(view_name==undefined){
                 alert("场景名不能为空")
                 return false;
             }
             if(this.model_name!=''){
-                models_info[index]=new Model(this.model_name,index);
+                index+=1;
+                models_info[index]=new Model(view_name,this.model_name,index);
                 this.model_list.push({value: index,label: this.model_name})
                 this.model_name='';
-                initObject();  
+                initObject(index);  
+                
             }
             else{
                 alert('模型名称不能为空')
@@ -59,10 +63,28 @@ let Main = {
         },
         select_model:function(sel){
             selected_model_index=sel;
+            this.model_information=''
+            this.model_information+='模型尺寸：'+"<br>"
+            this.model_information+='X:'+(models[selected_model_index].children[0].geometry.boundingBox.max.x*2).toFixed(3) +" <br> "
+            this.model_information+='--X/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.x).toFixed(3) +"  <br> "
+            this.model_information+='Y:'+(models[selected_model_index].children[0].geometry.boundingBox.max.y*2).toFixed(3) +" <br>"
+            this.model_information+='--Y/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.y).toFixed(3) +" <br>"
+            this.model_information+='Z:'+(models[selected_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +" <br>"
+            this.model_information+='--Z/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +" <br>"
+
+            console.log(this.model_information);
         },
         save_model:function(){
-            let info=JSON.stringify(models_info);
-            console.log(info);
+            // console.log(models_info);
+            let info_list=[];
+            for(i=0;i<models_info.length;i++){
+                if(models_info[i] != null){
+                    info_list.push(models_info[i])
+                }
+            }
+            // console.log(info_list);
+            let info=JSON.stringify(info_list);
+            
             this.$http.post(
                 '/vmm/save_models/',
                 {
@@ -70,12 +92,70 @@ let Main = {
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                console.log(res);
+                // console.log(res);
                 });
-        }
-    }
+        },
+        get_models:function(){
+            let models_got_list=[];
+            this.$http.post(
+                '/vmm/get_models_by_view_name/',
+                {
+                    view_name:this.view_name
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                    models_got=res.body.models;
+                    models_got.forEach(model => {
+                        index=Number(model.model_index);
+                        models_info[index]=new Model(model.view_name,model.model_name,index);
+                        // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
+                        models_info[index].change_po_x(model.position_x);
+                        models_info[index].change_po_y(model.position_y)
+                        models_info[index].change_po_z(model.position_z)
 
+                        // models_info[index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
+                        models_info[index].change_ro_x(model.rotation_x)
+                        models_info[index].change_ro_y(model.rotation_y)
+                        models_info[index].change_ro_z(model.rotation_z)
+                        models_info[index].change_materials_color_r(model.materials_color_r)
+                        models_info[index].change_materials_color_g(model.materials_color_g)
+                        models_info[index].change_materials_color_b(model.materials_color_b)
+                        
+                        console.log(models_info)
+                        // console.log('~~~')      
+                        models_got_list.push({value: index,label: model.model_name})
+                        initObject(index);
+                        // console.log(index)
+                    });        
+                });
+            this.model_list=models_got_list;
+
+        },
+        delete_model:function(){
+            scene.remove(models[selected_model_index]);
+            this.model_list.forEach(function(item, index, arr) {
+                if(item.value==selected_model_index) {
+                    arr.splice(index, 1);
+                }
+            });
+            // remove({value: selected_model_index,label: models_info[selected_model_index].name})
+            models_info[selected_model_index]=null;
+            this.$http.post(
+                '/vmm/delete_model/',
+                {
+                    view_name:this.view_name,
+                    model_index:selected_model_index
+                },
+                { emulateJSON: true }
+            ).then(function (res){
+                // console.log(res)
+            })
+
+        }
+
+    }
 }
+
 var Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')
 
@@ -142,29 +222,62 @@ function initThree() {
     plane.receiveShadow = true;//开启地面的接收阴影
     scene.add(plane);//添加到场景中
 
+    //坐标轴
+    let x_zhou_Geometry = new THREE.PlaneGeometry(5000, 10, 20, 20);
+    let x_zhou_Material =
+        new THREE.MeshLambertMaterial({color:0xff0000})
+        x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
+    x_zhou.position.z = -900;
+    x_zhou.receiveShadow = true;//开启地面的接收阴影
+    scene.add(x_zhou);//添加到场景中
+
+    let y_zhou_Geometry = new THREE.PlaneGeometry(5000, 10, 20, 20);
+    let y_zhou_Material =
+        new THREE.MeshLambertMaterial({color:0x0000ff})
+        y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
+    y_zhou.position.z = -900;
+    y_zhou.rotation.z = Math.PI*0.5;
+    y_zhou.receiveShadow = true;//开启地面的接收阴影
+    scene.add(y_zhou);//添加到场景中
+
+
 }
 
 //初始化一个模型
-function initObject() {
+function initObject(index) {
     //模型材质
+    let color=new THREE.Color(models_info[index].materials_color_r,models_info[index].materials_color_g,models_info[index].materials_color_b);
     let materials = [
         new THREE.MeshPhongMaterial({
             opacity: 0.6,
-            color: 0x212121,
+            color: color,
             transparent: false,
             specular: 0x545454,
             metal: true
         }),
     ];
+
     
     let loader = new THREE.STLLoader();
     loader.load(models_info[index].url, function (geometry) {
+        // console.log(geometry);
         geometry.center();
         models[index] = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
         models[index].receiveShadow = true; 
+        models[index].position.x=models_info[index].position_x;
+        models[index].position.y=models_info[index].position_y;
+        models[index].position.z=models_info[index].position_z;
+        models[index].rotation.x=models_info[index].rotation_x;
+        models[index].rotation.y=models_info[index].rotation_y;
+        models[index].rotation.z=models_info[index].rotation_z;
+        models[index].scale.x=models_info[index].scale_x;
+        models[index].scale.y=models_info[index].scale_y;
+        models[index].scale.z=models_info[index].scale_z;
+
+        
         scene.add(models[index]);
+        // console.log(models)
         console.log(this.name+'加载完成');
-        index+=1;
     });  
 }
 
@@ -175,7 +288,7 @@ function render() {
 }
 
 //模型对象
-function Model(name,index){
+function Model(view_name,name,index){
     this.view_name=view_name;
     this.index=index;
     this.name=name;
@@ -186,16 +299,54 @@ function Model(name,index){
     this.rotation_x=0;
     this.rotation_y=0;
     this.rotation_z=0;
+    this.materials_color=0x212121;
+    this.materials_color_r=0.12941176470588237;
+    this.materials_color_g=0.12941176470588237;
+    this.materials_color_b=0.12941176470588237;
+    // 缩放比例
+    this.scale_x=1;
+    this.scale_y=1;
+    this.scale_z=1;
 
-    this.change_po=function(x,y,z){
+   
+    this.change_po_x=function(x){
         this.position_x=x;
+    };
+    this.change_po_y=function(y){
         this.position_y=y;
+    };
+    this.change_po_z=function(z){
         this.position_z=z;
     };
-    this.change_ro=function(x,y,z){
+   
+    this.change_ro_x=function(x){
         this.rotation_x=x;
+    };
+    this.change_ro_y=function(y){
         this.rotation_y=y;
+    };
+    this.change_ro_z=function(z){
         this.rotation_z=z;
+    };
+
+    this.change_materials_color_r=function(x){
+        this.materials_color_r=x;
+    };
+    this.change_materials_color_g=function(x){
+        this.materials_color_g=x;
+    };
+    this.change_materials_color_b=function(x){
+        this.materials_color_b=x;
+    };
+
+    this.change_scale_x=function(x){
+        this.scale_x=x;
+    };
+    this.change_scale_y=function(x){
+        this.scale_y=x;
+    };
+    this.change_scale_z=function(x){
+        this.scale_z=x;
     };
 }
 
@@ -212,11 +363,34 @@ function change_model(){
         this.rx=0;
         this.ry=0;
         this.rz=0;
+        this.m_color_r=0.12941176470588237;
+        this.m_color_g=0.12941176470588237;
+        this.m_color_b=0.12941176470588237;
+        this.scale_x=1;
+        this.scale_y=1;
+        this.scale_z=1;
+
+        this.move_x = function () {
+            models[selected_model_index].position.x=controls.x+controls.mini_x;
+            models_info[selected_model_index].change_po_x(controls.x+controls.mini_x)
+        };
+        this.move_y = function () {
+            models[selected_model_index].position.y=controls.y+controls.mini_y;
+            models_info[selected_model_index].change_po_y(controls.y+controls.mini_y)
+           
+        };
+        this.move_z = function () {
+            models[selected_model_index].position.z=controls.z+controls.mini_z;
+            models_info[selected_model_index].change_po_z(controls.z+controls.mini_z)
+        };
         this.move = function () {
             models[selected_model_index].position.x=controls.x+controls.mini_x;
             models[selected_model_index].position.y=controls.y+controls.mini_y;
             models[selected_model_index].position.z=controls.z+controls.mini_z;
             models_info[selected_model_index].change_po(controls.x+controls.mini_x,controls.y+controls.mini_y,controls.z+controls.mini_z)
+            models_info[selected_model_index].change_po_x(controls.x+controls.mini_x)
+            models_info[selected_model_index].change_po_y(controls.y+controls.mini_y)
+            models_info[selected_model_index].change_po_z(controls.z+controls.mini_z)
         };
         this.rotate = function () {
             models[selected_model_index].rotation.x=(Math.PI/180)*controls.rx;
@@ -224,17 +398,69 @@ function change_model(){
             models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
             models_info[selected_model_index].change_ro((Math.PI/180)*controls.rx,(Math.PI/180)*controls.ry,(Math.PI/180)*controls.rz)
         };
+        this.rotate_x = function () {
+            models[selected_model_index].rotation.x=(Math.PI/180)*controls.rx;
+            models_info[selected_model_index].change_ro_x((Math.PI/180)*controls.rx)
+        };
+        this.rotate_y = function () {
+            models[selected_model_index].rotation.y=(Math.PI/180)*controls.ry;
+            models_info[selected_model_index].change_ro_y((Math.PI/180)*controls.ry)
+        };
+        this.rotate_z = function () {
+            models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
+            models_info[selected_model_index].change_ro_z((Math.PI/180)*controls.rz)
+        };
+        this.materials_color_r = function () {
+            models[selected_model_index].children[0].material.color.r=controls.m_color_r;
+            models_info[selected_model_index].materials_color_r=controls.m_color_r;
+        };
+        this.materials_color_g = function () {
+            models[selected_model_index].children[0].material.color.g=controls.m_color_g;
+            models_info[selected_model_index].materials_color_g=controls.m_color_g;
+        };
+        this.materials_color_b = function () {
+            models[selected_model_index].children[0].material.color.b=controls.m_color_b;
+            models_info[selected_model_index].materials_color_b=controls.m_color_b;
+        };
+        // this.materials_color = function () {
+        //     models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
+        //     models_info[selected_model_index].change_ro_z((Math.PI/180)*controls.rz)
+        // };
+
+        this.change_scale_x=function(x){
+            models[selected_model_index].scale.x=controls.scale_x;
+            models_info[selected_model_index].scale_x=controls.scale_x;
+        };
+        this.change_scale_y=function(x){
+            models[selected_model_index].scale.y=controls.scale_y;
+            models_info[selected_model_index].scale_y=controls.scale_y;
+        };
+        this.change_scale_z=function(x){
+            models[selected_model_index].scale.z=controls.scale_z;
+            models_info[selected_model_index].scale_z=controls.scale_z;
+        };
     };
-    gui.add(controls, 'x', -200, 200).onChange(controls.move);
-    gui.add(controls, 'mini_x', -10, 10).onChange(controls.move);
-    gui.add(controls, 'y', -200, 200).onChange(controls.move);
-    gui.add(controls, 'mini_y', -10, 10).onChange(controls.move);
-    gui.add(controls, 'z', -200, 200).onChange(controls.move);
-    gui.add(controls, 'mini_z', -10, 10).onChange(controls.move);
-    gui.add(controls, 'rx', -180, 180).onChange(controls.rotate);
-    gui.add(controls, 'ry', -180, 180).onChange(controls.rotate);
-    gui.add(controls, 'rz', -180, 180).onChange(controls.rotate);
+    gui.add(controls, 'x', -1000, 1000).onChange(controls.move_x);
+    gui.add(controls, 'mini_x', -10, 10).onChange(controls.move_x);
+    gui.add(controls, 'y', -1000, 1000).onChange(controls.move_y);
+    gui.add(controls, 'mini_y', -10, 10).onChange(controls.move_y);
+    gui.add(controls, 'z', -1000, 1000).onChange(controls.move_z);
+    gui.add(controls, 'mini_z', -10, 10).onChange(controls.move_z);
+    gui.add(controls, 'rx', -180, 180).onChange(controls.rotate_x);
+    gui.add(controls, 'ry', -180, 180).onChange(controls.rotate_y);
+    gui.add(controls, 'rz', -180, 180).onChange(controls.rotate_z);
+    gui.add(controls, 'm_color_r', 0, 1).onChange(controls.materials_color_r);
+    gui.add(controls, 'm_color_g', 0, 1).onChange(controls.materials_color_g);
+    gui.add(controls, 'm_color_b', 0, 1).onChange(controls.materials_color_b);
+
+    gui.add(controls, 'scale_x', 0, 1).onChange(controls.change_scale_x);
+    gui.add(controls, 'scale_y', 0, 1).onChange(controls.change_scale_y);
+    gui.add(controls, 'scale_z', 0, 1).onChange(controls.change_scale_z);
+    // gui.add(controls, 'materials_specular', 0x000000, 0xffffff).onChange(controls.materials_specular);
 
 }
+
+
+
 
 

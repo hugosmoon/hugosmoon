@@ -43,12 +43,12 @@
                     <el-input v-model="view_name" placeholder="输入场景名称" :disabled="enter_view_name"></el-input>
                     <br><br>
                     <el-button type="primary" v-on:click="save_view_name">确定名称</el-button>
-                    <br><br><br>
+                    <br><br>
                     <p id="title2" style="color: aqua;">添加模型</p>
                     <el-input v-model="model_name" placeholder="输入模型名称"></el-input>
                     <br><br>
                     <el-button type="primary" v-on:click="add_model">载入模型</el-button>
-                    <br><br><br>
+                    <br><br>
                     <p id="title1">模型调试</p>
                     <el-select v-model="model_selected" placeholder="请选择模型" @change="select_model">
                         <el-option
@@ -59,7 +59,11 @@
                         </el-option>
                     </el-select>
                     <br><br>
-                    <el-button type="primary" v-on:click="save_model">存储数据</el-button>   
+                    <el-button type="primary" v-on:click="delete_model">删除模型</el-button>
+                    <br>
+                    <p style="color: aqua;" v-html="model_information"></p>
+                    <br><br><br>
+                    <el-button type="primary" v-on:click="save_model">存储调试数据</el-button>   
                 </div>
             </div>
             <!-- <div id="pla_control">

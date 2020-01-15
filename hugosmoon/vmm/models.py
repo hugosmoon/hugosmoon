@@ -15,6 +15,11 @@ class Load_models_conf(models.Model):
     rotation_x=models.FloatField(db_column="rotation_x")
     rotation_y=models.FloatField(db_column="rotation_y")
     rotation_z=models.FloatField(db_column="rotation_z")
+    materials_color_r=models.FloatField(default=0.13,db_column="materials_color_r")
+    materials_color_g=models.FloatField(default=0.13,db_column="materials_color_g")
+    materials_color_b=models.FloatField(default=0.13,db_column="materials_color_b")
+    materials_type=models.IntegerField(default=1,db_column="materials_type")
+
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
