@@ -11,6 +11,8 @@ urlpatterns = [
     path('save_models/',views.save_models,name='save_models'),
     path('get_models_by_view_name/',views.get_models_by_view_name,name='get_models_by_view_name'),
     path('delete_model/',views.delete_model,name='delete_model'),
+    path('get_views/',views.get_views,name='get_views'),
+    
     
 
 

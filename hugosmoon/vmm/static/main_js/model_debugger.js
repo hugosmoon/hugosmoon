@@ -19,7 +19,9 @@ let Main = {
     data() {
         // this.openFullScreen(200);
         return {
+            views_list:[],
             view_name: '',
+            view_selected: '',
             model_name: '',
             model_list: [],
             model_selected: '',
@@ -33,14 +35,60 @@ let Main = {
             model_information: '',
         }
     },
+    mounted:function(){
+        this.get_views();
+
+    },
 
     methods: {
+        get_views:function(){
+            this.$http.get(
+                '/vmm/get_views/'
+                ).then(function (res) {
+                console.log(res);
+                console.log(res.body);
+                res.body.views.forEach(view => {
+                    console.log(view.view_name);
+                    this.views_list.push({value: view.view_name,label: view.view_name});
+                })
+
+            });
+        },
+        add_view:function(){
+            let success=true;
+            this.$prompt('输入场景名称（不能与现有场景名称重复，不要使用汉字）', '新建场景', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]/,
+                inputErrorMessage: '名称格式不正确'
+            }).then(({ value }) => {
+                this.views_list.forEach(view =>{
+                    console.log(view.value);
+                    if(view.value==value){
+                        alert("与现有场景名重复")
+                        success=false;
+                    }
+                });
+                if(success){
+                    this.view_selected=value;
+                    this.$message({
+                        type: 'success',
+                        message: '成功新建场景: ' + this.view_name
+                    });
+                }
+                
+              });
+        },
+        select_view:function(){
+            console.log(this.view_selected);
+
+        },
         save_view_name:function(){
-            if(this.view_name==""){
-                alert("场景名不能为空")
-                return false;
-            }
-            view_name=this.view_name;
+            // if(this.view_name==""){
+            //     alert("场景名不能为空")
+            //     return false;
+            // }
+            view_name=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
         },
@@ -100,7 +148,7 @@ let Main = {
             this.$http.post(
                 '/vmm/get_models_by_view_name/',
                 {
-                    view_name:this.view_name
+                    view_name:this.view_selected
                 },
                 { emulateJSON: true }
                 ).then(function (res) {

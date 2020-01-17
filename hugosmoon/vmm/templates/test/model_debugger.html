@@ -39,15 +39,27 @@
             <div id="control" >
                 <div id="control-inner">
                     <p id="title1">模型添加</p>
-                    <p id="title2" style="color: aqua;">场景名称</p>
-                    <el-input v-model="view_name" placeholder="输入场景名称" :disabled="enter_view_name"></el-input>
+                    <p id="title2" style="color: aqua;">选择场景</p>
+                    <el-select v-model="view_selected" placeholder="请选择场景" :disabled="enter_view_name" @change="select_view">
+                        <el-option
+                        v-for="item in views_list"
+                        :key="item.value"
+                        :label="item.value"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- <el-input v-model="view_selected" placeholder="输入场景名称" :disabled="enter_view_name"></el-input> -->
                     <br><br>
-                    <el-button type="primary" v-on:click="save_view_name">确定名称</el-button>
+                    <el-button type="primary" v-on:click="add_view" :disabled="enter_view_name">新建场景</el-button>
+                    <el-button type="success" v-on:click="save_view_name" :disabled="enter_view_name">载入场景</el-button>
+                    
                     <br><br>
                     <p id="title2" style="color: aqua;">添加模型</p>
+               
                     <el-input v-model="model_name" placeholder="输入模型名称"></el-input>
                     <br><br>
-                    <el-button type="primary" v-on:click="add_model">载入模型</el-button>
+                    <el-button type="primary" v-on:click="add_model">上传模型</el-button>
+                    <el-button type="success" v-on:click="add_model">载入模型</el-button>
                     <br><br>
                     <p id="title1">模型调试</p>
                     <el-select v-model="model_selected" placeholder="请选择模型" @change="select_model">
@@ -59,10 +71,10 @@
                         </el-option>
                     </el-select>
                     <br><br>
-                    <el-button type="primary" v-on:click="delete_model">删除模型</el-button>
+                    <el-button type="danger" v-on:click="delete_model">删除选中模型</el-button>
                     <br>
                     <p style="color: aqua;" v-html="model_information"></p>
-                    <br><br><br>
+                    <br>
                     <el-button type="primary" v-on:click="save_model">存储调试数据</el-button>   
                 </div>
             </div>

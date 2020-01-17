@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 import math
 import random
 import json
+from django.db.models import Sum, Count
 from vmm.models import Load_models_conf
 
 
@@ -144,6 +145,13 @@ def delete_model(request):
         model.update(isdelete=True)
         return HttpResponse('delete_success')
 
+#查询有哪些场景
+def get_views(request):
+    views=Load_models_conf.objects.values('view_name').annotate(nums=Count('model_name'))
+    data={}
+    data['views']=list(views)
+    return JsonResponse(data)
+#查询当前场景有哪些模型
 
 
     
