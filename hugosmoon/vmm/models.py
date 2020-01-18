@@ -27,3 +27,9 @@ class Load_models_conf(models.Model):
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
+class folder(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    folder_name = models.CharField(max_length=255, db_column="folder_name")
+    isdelete = models.BooleanField(default=False, db_column="is_delete")
+    createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
+    updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
