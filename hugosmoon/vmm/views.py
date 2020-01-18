@@ -115,12 +115,17 @@ def save_models(request):
             materials_color_g=model['materials_color_g']
             materials_color_b=model['materials_color_b']
 
+            scale_x=model['scale_x']
+            scale_y=model['scale_y']
+            scale_z=model['scale_z']
+
+
             models_in=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
             if len(models_in) > 0:
-                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b)
+                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
             else:
-                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b)
-        return HttpResponse('ok')
+                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
+        return HttpResponse('Save Success')
 #根据场景名称获取模型组数据
 @csrf_exempt
 def get_models_by_view_name(request):

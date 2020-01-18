@@ -18,6 +18,10 @@ class Load_models_conf(models.Model):
     materials_color_r=models.FloatField(default=0.13,db_column="materials_color_r")
     materials_color_g=models.FloatField(default=0.13,db_column="materials_color_g")
     materials_color_b=models.FloatField(default=0.13,db_column="materials_color_b")
+    scale_x=models.FloatField(default=1,db_column="scale_x")
+    scale_y=models.FloatField(default=1,db_column="scale_y")
+    scale_z=models.FloatField(default=1,db_column="scale_z")
+
     materials_type=models.IntegerField(default=1,db_column="materials_type")
 
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")

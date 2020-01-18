@@ -25,6 +25,7 @@ let Main = {
             model_name: '',
             model_list: [],
             model_selected: '',
+            model_to_add: '',
             X_loc: 20,
             Y_loc: 0,
             Z_loc: 0,
@@ -71,36 +72,47 @@ let Main = {
                 });
                 if(success){
                     this.view_selected=value;
+                    view_name=value;
+                    this.views_list.push({value: value,label: value});
+                    this.enter_view_name=true;
                     this.$message({
                         type: 'success',
-                        message: '成功新建场景: ' + this.view_name
+                        message: '成功新建场景: ' + this.view_selected
                     });
                 }
                 
               });
         },
         select_view:function(){
-            console.log(this.view_selected);
-
+            view_name=this.view_selected;
         },
         save_view_name:function(){
-            // if(this.view_name==""){
-            //     alert("场景名不能为空")
-            //     return false;
-            // }
+            if(this.view_selected==""){
+                alert("没有选中任何场景")
+                return false;
+            }
             view_name=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
         },
+        upload_model:function(){
+            if(view_name==undefined){
+                alert("没有选中任何场景")
+                return false;
+            }
+
+
+
+        },
         add_model: function () {
             if(view_name==undefined){
-                alert("场景名不能为空")
+                alert("没有选中任何场景")
                 return false;
             }
             if(this.model_name!=''){
                 index+=1;
                 models_info[index]=new Model(view_name,this.model_name,index);
-                this.model_list.push({value: index,label: this.model_name})
+                this.model_list.push({value: index,label: index+"-"+this.model_name})
                 this.model_name='';
                 initObject(index);  
                 
@@ -140,7 +152,8 @@ let Main = {
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                // console.log(res);
+                console.log(res);
+                alert(res.body)
                 });
         },
         get_models:function(){
@@ -171,7 +184,7 @@ let Main = {
                         
                         console.log(models_info)
                         // console.log('~~~')      
-                        models_got_list.push({value: index,label: model.model_name})
+                        models_got_list.push({value: index,label: index+"-"+model.model_name})
                         initObject(index);
                         // console.log(index)
                     });        
@@ -340,7 +353,7 @@ function Model(view_name,name,index){
     this.view_name=view_name;
     this.index=index;
     this.name=name;
-    this.url="/static/model/"+name;
+    this.url="/static/model/"+view_name+'/'+name;
     this.position_x=0;
     this.position_y=0;
     this.position_z=0;
@@ -501,9 +514,9 @@ function change_model(){
     gui.add(controls, 'm_color_g', 0, 1).onChange(controls.materials_color_g);
     gui.add(controls, 'm_color_b', 0, 1).onChange(controls.materials_color_b);
 
-    gui.add(controls, 'scale_x', 0, 1).onChange(controls.change_scale_x);
-    gui.add(controls, 'scale_y', 0, 1).onChange(controls.change_scale_y);
-    gui.add(controls, 'scale_z', 0, 1).onChange(controls.change_scale_z);
+    gui.add(controls, 'scale_x', 0, 10).onChange(controls.change_scale_x);
+    gui.add(controls, 'scale_y', 0, 10).onChange(controls.change_scale_y);
+    gui.add(controls, 'scale_z', 0, 10).onChange(controls.change_scale_z);
     // gui.add(controls, 'materials_specular', 0x000000, 0xffffff).onChange(controls.materials_specular);
 
 }

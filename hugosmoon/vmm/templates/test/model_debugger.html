@@ -38,7 +38,6 @@
         <div id="app">
             <div id="control" >
                 <div id="control-inner">
-                    <p id="title1">模型添加</p>
                     <p id="title2" style="color: aqua;">选择场景</p>
                     <el-select v-model="view_selected" placeholder="请选择场景" :disabled="enter_view_name" @change="select_view">
                         <el-option
@@ -55,14 +54,20 @@
                     
                     <br><br>
                     <p id="title2" style="color: aqua;">添加模型</p>
-               
-                    <el-input v-model="model_name" placeholder="输入模型名称"></el-input>
+                    <el-select v-model="model_to_add" placeholder="选择想要添加的模型">
+                        <el-option
+                        v-for="item in model_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- <el-input v-model="model_name" placeholder="输入模型名称"></el-input> -->
                     <br><br>
-                    <el-button type="primary" v-on:click="add_model">上传模型</el-button>
                     <el-button type="success" v-on:click="add_model">载入模型</el-button>
                     <br><br>
-                    <p id="title1">模型调试</p>
-                    <el-select v-model="model_selected" placeholder="请选择模型" @change="select_model">
+                    <p id="title2" style="color: aqua;">模型选择</p>
+                    <el-select v-model="model_selected" placeholder="选择想要设置的模型" @change="select_model">
                         <el-option
                         v-for="item in model_list"
                         :key="item.value"
@@ -75,7 +80,7 @@
                     <br>
                     <p style="color: aqua;" v-html="model_information"></p>
                     <br>
-                    <el-button type="primary" v-on:click="save_model">存储调试数据</el-button>   
+                    <el-button type="primary" v-on:click="save_model">存储场景调试数据</el-button>   
                 </div>
             </div>
             <!-- <div id="pla_control">
