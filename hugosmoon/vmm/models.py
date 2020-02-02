@@ -3,6 +3,7 @@ import django.utils.timezone as timezone
 
 # Create your models here.
 
+#场景
 class Load_models_conf(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
     view_name = models.CharField(max_length=255, db_column="view_name")
@@ -27,9 +28,20 @@ class Load_models_conf(models.Model):
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
+
+#文件夹
 class folder(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
     folder_name = models.CharField(max_length=255, db_column="folder_name")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
+
+#模型
+class com_model(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    model_name = models.CharField(max_length=255, db_column="model_name")
+    folder_id=models.IntegerField(default=0,db_column="folder_id")
+    url=models.CharField(max_length=255, db_column="url")
+    createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
+    isdelete = models.BooleanField(default=False, db_column="is_delete")

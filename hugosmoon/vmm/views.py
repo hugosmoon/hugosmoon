@@ -5,7 +5,8 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder
+from vmm.models import Load_models_conf,folder,com_model
+import os
 
 
  
@@ -159,7 +160,6 @@ def get_views(request):
     data={}
     data['views']=list(views)
     return JsonResponse(data)
-#查询当前场景有哪些模型
 
 #创建文件夹
 @csrf_exempt
@@ -167,18 +167,61 @@ def create_folder(request):
     # return HttpResponse('Save Success')
     if request.method == 'POST':
         folder_name=request.POST.get('folder_name')
-        print(folder_name)
+        # print(folder_name)
+        folders_existence=folder.objects.filter(isdelete=False,folder_name=folder_name).values()
+        # print("*"*30)
+        if len(folders_existence)!=0:
+            return HttpResponse('新建失败，与已有文件夹重名')
         folder.objects.create(folder_name=folder_name)
-        return HttpResponse('Save Success')
+        folder_url = os.path.dirname(globals()["__file__"])+'/static/models/'+folder_name
+        #获取此py文件路径，在此路径选创建在new_folder文件夹中的test文件夹
+        # print(folder_url)
+        if not os.path.exists(folder_url):
+            os.makedirs(folder_url)
+
+        return HttpResponse('文件夹新建成功')
 
 #查询文件夹
 def get_folders(request):
     folders=folder.objects.filter(isdelete=False).values()
-    print(folders)
+    # print(folders)
     data={}
     data['folders']=list(folders)
-    print(data)
+    # print(data)
     return JsonResponse(data)
+
+#上传模型
+@csrf_exempt
+def upload_model(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        folder_id=int(request.POST.get('folder_id'))
+        folder_name=folder.objects.get(id=folder_id).folder_name
+        # print(folder_name)
+        file_type = file.name.split('.')[1]
+        if file_type != 'STL' and file_type != 'stl':
+            return HttpResponse(file.name+'上传失败,因为文件格式不是STL')
+        file_path = os.path.join(os.path.dirname(globals()["__file__"]),'static','models',folder_name,file.name)
+        f = open(file_path, 'wb')
+        for chunk in file.chunks():
+            f.write(chunk)
+        f.close()
+        # return HttpResponse('OK')
+        com_model.objects.create(model_name=file.name,folder_id=folder_id,url='/static/models/'+folder_name+'/'+file.name)
+        return HttpResponse(file.name+'上传成功')
+
+#查询对应文件夹的模型
+@csrf_exempt
+def get_model_by_folderid(request):
+    if request.method == 'POST':
+        folder_id=int(request.POST.get('folder_id'))
+        print(folder_id)
+        moldels=com_model.objects.filter(folder_id=folder_id,isdelete=False).values()
+        data={}
+        data['models']=list(moldels)
+        return JsonResponse(data)
+
+
 
 
     

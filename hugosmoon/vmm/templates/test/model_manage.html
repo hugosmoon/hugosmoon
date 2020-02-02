@@ -36,7 +36,7 @@
                     <div style="width: 400px;">
                     <h3>上传模型</h3>
                     <template>
-                        <el-select v-model="folder_selected" placeholder="选择文件夹">
+                        <el-select v-model="folder_selected" placeholder="选择文件夹" @change="models_show">
                           <el-option
                             v-for="item in folders"
                             :key="item.value"
@@ -46,19 +46,22 @@
                         </el-select>
                     </template>
                     <br><br>
+                    <div id="models_show">
+
+                    </div>
+                    <br><br>
                     <el-upload
                     class="upload-demo"
-                    action="https://jsonplaceholder.typicode.com/posts/"
-                    :on-preview="handlePreview"
-                    :on-remove="handleRemove"
-                    :before-remove="beforeRemove"
+                    action='/vmm/upload_model/'
+                    :data='upload_data'
+                    :before-upload="beforeUpload"
+                    :on-success="successUpload"
                     multiple
-                    :limit="3"
-                    :on-exceed="handleExceed"
-                    :file-list="fileList">
-                    <el-button size="small" type="primary">点击上传</el-button>
-                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                    :show-file-list=false>
+                    <el-button size="small" type="primary">上传模型</el-button>
+                    <div slot="tip" class="el-upload__tip">只能上传STL文件，且大小不超过50M</div>
                     </el-upload>
+
                     </div>
                 </div>
             </div>
@@ -74,11 +77,15 @@
                     folder_name:'',
                     folders:[],
                     folder_selected:'',
-                    fileList: [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}],                   
+                    fileList: [],//[{name: 'food.jpeg', url: ''}, {name: 'food2.jpeg', url: ''}], 
+                    upload_data:{
+                        folder_id:0
+                    },                  
                 }                    
                 },
                 mounted:function(){
                 this.get_folders();
+                this.models_show();
 
             },
             methods: {
@@ -97,10 +104,13 @@
                     }
                     ).then(function (res) {
                         console.log(res);
-                        // alert(res.body)
+                        if(res.body=="Save failed"){
+                            alert(res.body);
+                            return false;
+                        }
+                        alert(res.body);
                         this. folders=[];
                         this.get_folders();
-
                     });
                 },
                 get_folders(){
@@ -112,17 +122,43 @@
                         })
                     });
                 },
-                handleRemove(file, fileList) {
-                    console.log(file, fileList);
+                beforeUpload(file){
+                    console.log(file.name);
+                    this.upload_data.folder_id=this.folder_selected;
+                    if(this.upload_data.folder_id==0){
+                        this.$message.warning('请选择文件夹');
+                        return false;
+                    }
+                    let type=file.name.split(".")[1]
+                    if(type!='STL'&&type!='stl'){
+                        this.$message.warning('只能上传STL格式的模型')
+                        // alert('只能上传STL格式的模型')
+                        return false;
+                    }
                 },
-                handlePreview(file) {
-                    console.log(file);
+                successUpload(file){
+                    this.$message(file);
+                    this.models_show();
                 },
-                handleExceed(files, fileList) {
-                    this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
-                },
-                beforeRemove(file, fileList) {
-                    return this.$confirm(`确定移除 ${ file.name }？`);
+                models_show(){
+                    this.$http.post(
+                    '/vmm/get_model_by_folderid/',
+                    {
+                        folder_id:this.folder_selected
+                    },
+                    { 
+                        emulateJSON: true 
+                    }
+                    ).then(function (res) {
+                        let models_string='';
+                        for(i=0;i<res.body.models.length;i++){
+                            models_string+=res.body.models[i].model_name;
+                            models_string+='<br>';
+                        }
+                        $("#models_show").html(models_string);
+                    });
+
+                    
                 }
             }
         }

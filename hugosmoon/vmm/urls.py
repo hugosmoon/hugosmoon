@@ -15,6 +15,8 @@ urlpatterns = [
     path('model_manage/',views.model_manage,name='model_manage'),
     path('create_folder/',views.create_folder,name='create_folder'),
     path('get_folders/',views.get_folders,name='get_folders'),
+    path('upload_model/',views.upload_model,name='upload_model'),
+    path('get_model_by_folderid/',views.get_model_by_folderid,name='get_model_by_folderid'),
     
     
 

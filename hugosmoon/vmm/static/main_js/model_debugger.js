@@ -288,7 +288,7 @@ function initThree() {
     let x_zhou_Material =
         new THREE.MeshLambertMaterial({color:0xff0000})
         x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
-    x_zhou.position.z = -900;
+    x_zhou.position.z = -930;
     x_zhou.receiveShadow = true;//开启地面的接收阴影
     scene.add(x_zhou);//添加到场景中
 
@@ -296,7 +296,7 @@ function initThree() {
     let y_zhou_Material =
         new THREE.MeshLambertMaterial({color:0x0000ff})
         y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
-    y_zhou.position.z = -900;
+    y_zhou.position.z = -930;
     y_zhou.rotation.z = Math.PI*0.5;
     y_zhou.receiveShadow = true;//开启地面的接收阴影
     scene.add(y_zhou);//添加到场景中
