@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'logo.ico' %}">
+    <title>模型调试</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
+    <!-- 引入组件库 -->
+    <script src="{% static 'import/vue.js' %}"></script>
+    <script src="{% static 'import/element_index.js' %}"></script>
+    <script src="{% static 'import/three.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/Setting.js' %}"></script>
+    <script src="{% static 'import/OrbitControls.js' %}"></script>
+    <script src="{% static 'import/dat.gui.min.js' %}"></script>
+    <script src="{% static 'import/SceneUtils.js' %}"></script>
+    <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/STLLoader.js' %}"></script>
+    <script src="{% static 'import/dat.gui.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/echarts.min.js' %}"></script>
+    <script src="{% static 'import/echarts-gl.min.js' %}"></script>
+    <script src="{% static 'import/vue-resource.min.js' %}"></script>
+    
+</head>
+<body onload="threeStart()">
+    <div id="Stats-output"></div>
+    
+
+    <div>
+        <!--加载动画的div-->
+        <div id="render">
+        </div>
+        <div id="app">
+            <div id="control" >
+                <div id="control-inner">
+                    <p id="title2" style="color: aqua;">选择场景</p>
+                    <el-select v-model="view_selected" placeholder="请选择场景" :disabled="enter_view_name" @change="select_view">
+                        <el-option
+                        v-for="item in views_list"
+                        :key="item.value"
+                        :label="item.value"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- <el-input v-model="view_selected" placeholder="输入场景名称" :disabled="enter_view_name"></el-input> -->
+                    <br><br>
+                    <el-button type="primary" v-on:click="add_view" :disabled="enter_view_name">新建场景</el-button>
+                    <el-button type="success" v-on:click="save_view_name" :disabled="enter_view_name">载入场景</el-button>
+                    
+                    <br><br>
+                    <p id="title2" style="color: aqua;">添加模型</p>
+                    <el-select v-model="folder_selected" placeholder="选择文件夹" @change="get_models_by_folder">
+                        <el-option
+                        v-for="item in folder_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <br><br>
+                    <el-select v-model="model_in_folder_selected" placeholder="选择想要添加的模型">
+                        <el-option
+                        v-for="item in model_in_folder_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <!-- <el-input v-model="model_name" placeholder="输入模型名称"></el-input> -->
+                    <br><br>
+                    <el-button type="success" v-on:click="get_model_info_by_id">获取模型信息</el-button>
+                    <el-button type="success" v-on:click="add_model">添加至场景</el-button>
+                    <br><br>
+                    <p id="title2" style="color: aqua;">模型选择</p>
+                    <el-select v-model="model_selected" placeholder="选择想要设置的模型" @change="select_model">
+                        <el-option
+                        v-for="item in model_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                    <br><br>
+                    <el-button type="danger" v-on:click="delete_model">删除选中模型</el-button>
+                    <br>
+                    <p style="color: aqua;" v-html="model_information"></p>
+                    <br>
+                    <el-button type="primary" v-on:click="save_model">存储场景调试数据</el-button>   
+                </div>
+            </div>
+            <!-- <div id="pla_control">
+                <div id="control-inner"> 
+                    <p id="title1">模型调试</p>
+                    
+                    <el-select v-model="model_selected" placeholder="请选择模型">
+                        <el-option
+                        v-for="item in model_list"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                  </el-select>
+                  <p id="title2" style="color: aqua;">位置调整</p> 
+                    <span class="demonstration" style="color:aquamarine;">X轴</span>
+                    <el-input
+                        size="mini"
+                        placeholder="x轴"
+                        v-model="X_loc">
+                    </el-input>
+                    <el-slider v-model="X_loc" :min='-100' :max='100' :step='0.1'></el-slider>
+                  <p id="title2" style="color: aqua;">角度调整</p>
+                  <p id="title2" style="color: aqua;">材质调整</p>
+                </div>
+                
+            </div> -->
+        </div>
+        </div>
+            
+        </div>
+    </div>
+    <script src="{% static 'main_js/model_debugger.js' %}"></script>
+</body>
+</html>

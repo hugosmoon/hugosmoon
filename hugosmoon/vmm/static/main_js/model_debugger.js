@@ -1,10 +1,19 @@
 //模型的编号，自增
 let index=0;
 //当前被选中的模型编号
-let selected_model_index=0;
+let current_model_index=0;
+
+//当前被选中的模型id
+let current_model_id=0;
 
 //场景名称
 let view_name;
+
+//当前被选中的view_id
+let current_view_id;
+
+//是否开始自动保存
+auto_save_status=0;
 
 //模型列表
 ////模型信息列表
@@ -20,12 +29,17 @@ let Main = {
         // this.openFullScreen(200);
         return {
             views_list:[],
-            view_name: '',
+            // view_name: '',
             view_selected: '',
             model_name: '',
+            model_url:'',
             model_list: [],
             model_selected: '',
             model_to_add: '',
+            folder_list: [],
+            folder_selected: '',
+            model_in_folder_selected:'',
+            model_in_folder_list:[],
             X_loc: 20,
             Y_loc: 0,
             Z_loc: 0,
@@ -38,19 +52,23 @@ let Main = {
     },
     mounted:function(){
         this.get_views();
-
+        this.get_folders();
+        this.timer = setInterval(this.auto_save, 20000);
     },
-
     methods: {
+        auto_save:function(){
+            if(auto_save_status==1){
+                this.save_model();
+            }
+
+        },
         get_views:function(){
             this.$http.get(
                 '/vmm/get_views/'
                 ).then(function (res) {
-                console.log(res);
-                console.log(res.body);
+                this.views_list=[];
                 res.body.views.forEach(view => {
-                    console.log(view.view_name);
-                    this.views_list.push({value: view.view_name,label: view.view_name});
+                    this.views_list.push({value: view.id,label: view.view_name});
                 })
 
             });
@@ -64,111 +82,77 @@ let Main = {
                 inputErrorMessage: '名称格式不正确'
             }).then(({ value }) => {
                 this.views_list.forEach(view =>{
-                    console.log(view.value);
                     if(view.value==value){
-                        alert("与现有场景名重复")
+                        this.$message({
+                            type: 'error',
+                            duration: 2000,
+                            message: "与现有场景名重复"
+                        });
                         success=false;
                     }
                 });
                 if(success){
-                    this.view_selected=value;
-                    view_name=value;
-                    this.views_list.push({value: value,label: value});
-                    this.enter_view_name=true;
-                    this.$message({
-                        type: 'success',
-                        message: '成功新建场景: ' + this.view_selected
-                    });
+                    this.$http.post(
+                        '/vmm/add_view/',
+                        {
+                            view_name:value
+                        },
+                        { emulateJSON: true }
+                        ).then(function (res) {
+                            this.$message({
+                                type: 'success',
+                                message: res.body
+                            });
+                            this.get_views();
+                        });                   
                 }
                 
               });
         },
         select_view:function(){
-            view_name=this.view_selected;
+            current_view_id=this.view_selected;
         },
-        save_view_name:function(){
+        select_model:function(sel){
+            auto_save_status=1;
+            current_model_index=sel;
+            this.model_information=''
+            // </td><td></td></tr></table>'
+            this.model_information+="<br>"+'模型尺寸：'+"<br>"
+            this.model_information+='<table><tr><td>'+'X:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.x*2).toFixed(3) +"</td>"
+            this.model_information+='<td>X/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.x).toFixed(3) +"</td></tr>"
+            this.model_information+='<tr><td>Y:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.y*2).toFixed(3) +"</td>"
+            this.model_information+='<td>Y/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.y).toFixed(3) +"</td></tr>"
+            this.model_information+='<tr><td>Z:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +"</td>"
+            this.model_information+='<td>Z/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +"</td></tr>"
+
+            console.log(this.model_information);
+        },
+       
+        upload_view:function(){
             if(this.view_selected==""){
                 alert("没有选中任何场景")
                 return false;
             }
-            view_name=this.view_selected;
+            // current_view_id=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
         },
-        upload_model:function(){
-            if(view_name==undefined){
-                alert("没有选中任何场景")
-                return false;
-            }
-
-
-
-        },
-        add_model: function () {
-            if(view_name==undefined){
-                alert("没有选中任何场景")
-                return false;
-            }
-            if(this.model_name!=''){
-                index+=1;
-                models_info[index]=new Model(view_name,this.model_name,index);
-                this.model_list.push({value: index,label: index+"-"+this.model_name})
-                this.model_name='';
-                initObject(index);  
-                
-            }
-            else{
-                alert('模型名称不能为空')
-            }
-        },
-        select_model:function(sel){
-            selected_model_index=sel;
-            this.model_information=''
-            this.model_information+='模型尺寸：'+"<br>"
-            this.model_information+='X:'+(models[selected_model_index].children[0].geometry.boundingBox.max.x*2).toFixed(3) +" <br> "
-            this.model_information+='--X/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.x).toFixed(3) +"  <br> "
-            this.model_information+='Y:'+(models[selected_model_index].children[0].geometry.boundingBox.max.y*2).toFixed(3) +" <br>"
-            this.model_information+='--Y/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.y).toFixed(3) +" <br>"
-            this.model_information+='Z:'+(models[selected_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +" <br>"
-            this.model_information+='--Z/2:'+(models[selected_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +" <br>"
-
-            console.log(this.model_information);
-        },
-        save_model:function(){
-            // console.log(models_info);
-            let info_list=[];
-            for(i=0;i<models_info.length;i++){
-                if(models_info[i] != null){
-                    info_list.push(models_info[i])
-                }
-            }
-            // console.log(info_list);
-            let info=JSON.stringify(info_list);
-            
-            this.$http.post(
-                '/vmm/save_models/',
-                {
-                    models:info
-                },
-                { emulateJSON: true }
-                ).then(function (res) {
-                console.log(res);
-                alert(res.body)
-                });
-        },
+        // 根据场景的ID加载场景中的模型
         get_models:function(){
             let models_got_list=[];
+            // console.log(this.view_selected);
             this.$http.post(
-                '/vmm/get_models_by_view_name/',
+                '/vmm/get_models_by_view/',
                 {
-                    view_name:this.view_selected
+                    view_id:current_view_id
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
                     models_got=res.body.models;
+                    console.log(models_got);
                     models_got.forEach(model => {
-                        index=Number(model.model_index);
-                        models_info[index]=new Model(model.view_name,model.model_name,index);
+                        index=Number(model.serial);
+                        models_info[index]=new Model(current_view_id,model.model_id,model.model_name,model.model_url,index);
                         // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
                         models_info[index].change_po_x(model.position_x);
                         models_info[index].change_po_y(model.position_y)
@@ -190,28 +174,149 @@ let Main = {
                     });        
                 });
             this.model_list=models_got_list;
-
+        },
+        save_model:function(){
+            // console.log(models_info);
+            let info_list=[];
+            for(i=0;i<models_info.length;i++){
+                if(models_info[i] != null){
+                    info_list.push(models_info[i])
+                }
+            }
+            // console.log(info_list);
+            let info=JSON.stringify(info_list);
+            // console.log(info)
+            this.$http.post(
+                '/vmm/save_models/',
+                {
+                    models:info
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                // console.log(res);
+                this.$message({
+                    type: 'success',
+                    duration: 1000,
+                    position: 'top-left',
+                    message: "保存完成"
+                });
+                });
         },
         delete_model:function(){
-            scene.remove(models[selected_model_index]);
+            scene.remove(models[current_model_index]);
             this.model_list.forEach(function(item, index, arr) {
-                if(item.value==selected_model_index) {
+                if(item.value==current_model_index) {
                     arr.splice(index, 1);
                 }
             });
-            // remove({value: selected_model_index,label: models_info[selected_model_index].name})
-            models_info[selected_model_index]=null;
+            // remove({value: current_model_index,label: models_info[current_model_index].name})
+            models_info[current_model_index]=null;
             this.$http.post(
                 '/vmm/delete_model/',
                 {
-                    view_name:this.view_name,
-                    model_index:selected_model_index
+                    view_id:current_view_id,
+                    model_index:current_model_index
                 },
                 { emulateJSON: true }
             ).then(function (res){
-                // console.log(res)
+                console.log(res)
             })
 
+        },
+        save_view_name:function(){
+            if(this.view_selected==""){
+                alert("没有选中任何场景")
+                return false;
+            }
+            view_name=this.view_selected;
+            this.enter_view_name=true;
+            this.get_models();
+        },
+        // upload_model:function(){
+        //     if(view_name==undefined){
+        //         alert("没有选中任何场景")
+        //         return false;
+        //     }
+        // },
+        add_model: function () {
+            if(view_name==undefined){
+                alert("没有选中任何场景")
+                return false;
+            }
+            if(this.model_in_folder_selected!=''){
+                this.$http.post(
+                    '/vmm/get_model_info_by_id/',
+                    {
+                        model_id:this.model_in_folder_selected
+                    },
+                    { emulateJSON: true }
+                ).then(function (res){
+                    console.log(res.body.model[0]);
+                    let model_id=res.body.model[0].id;
+                    let model_name=res.body.model[0].model_name;
+                    let url=res.body.model[0].url
+                    index+=1;
+                    models_info[index]=new Model(current_view_id,model_id,model_name,url,index);
+                    this.model_list.push({value: index,label: index+"-"+model_name})
+                    this.model_name='';
+                    initObject(index); 
+                })
+
+                 
+                
+            }
+            else{
+                alert('模型名称不能为空')
+            }
+        },
+        
+        
+        
+        
+        get_folders:function(){
+            this.$http.get(
+                '/vmm/get_folders/'
+                ).then(function (res) {
+                console.log(res);
+                console.log(res.body);
+                res.body.folders.forEach(folder => {
+                    console.log(folder.folder_name);
+                    this.folder_list.push({value: folder.id,label: folder.folder_name});
+                })
+
+            });
+        },
+        get_models_by_folder:function(){
+            console.log(this.folder_selected);
+            this.$http.post(
+                '/vmm/get_model_by_folderid/',
+                {
+                    folder_id:this.folder_selected
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                    this.model_in_folder_list=[];
+                    res.body.models.forEach(model => {
+                        this.model_in_folder_list.push({value: model.id,label: model.model_name});
+                })
+
+            });
+        },
+        //根据准备添加的模型的id获取模型的信息
+        get_model_info_by_id:function(){
+            this.$http.post(
+                '/vmm/get_model_info_by_id/',
+                {
+                    model_id:this.model_in_folder_selected
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                    console.log(res.body.model[0].url);
+                    this.model_url=res.body.model[0].url;
+            });
+        },
+        to_manage_models:function(){
+            window.open('/vmm/model_manage/');
         }
 
     }
@@ -226,7 +331,7 @@ new Ctor().$mount('#app')
 function threeStart() {
     initThree();
     loadAutoScreen(camera, renderer);
-    change_model(selected_model_index)
+    change_model(current_model_index)
     render();
 }
 
@@ -243,12 +348,12 @@ function initThree() {
     renderer.shadowMapEnabled = true;//开启阴影，默认是关闭的，太影响性能
     renderer.shadowMapType = THREE.PCFSoftShadowMap;//阴影的一个类型
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
     //摄像机的位置
-    camera.position.x = -1500;
-    camera.position.y = -1500;
-    camera.position.z = 500;
+    camera.position.x = -3000;
+    camera.position.y = -3000;
+    camera.position.z = 1000;
     camera.up.x = 0;
     camera.up.y = 0;
     camera.up.z = 1;//摄像机的上方向是Z轴
@@ -258,7 +363,7 @@ function initThree() {
     scene = new THREE.Scene();
 
     let light = new THREE.SpotLight(0xffffff, 1.2, 0);//点光源
-    light.position.set(4000, 2000, 8000);
+    light.position.set(40000, 20000, 80000);
     light.castShadow = true;//开启阴影
     light.shadowMapWidth = 8192;//阴影的分辨率，可以不设置对比看效果
     light.shadowMapHeight = 8192;
@@ -275,7 +380,7 @@ function initThree() {
     controller.target = new THREE.Vector3(0, 0, 0);
 
     //地面
-    let planeGeometry = new THREE.PlaneGeometry(5000, 5000, 20, 20);
+    let planeGeometry = new THREE.PlaneGeometry(50000, 50000, 20, 20);
     let planeMaterial =
         new THREE.MeshLambertMaterial({color: 0x232323})
     plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -284,7 +389,7 @@ function initThree() {
     scene.add(plane);//添加到场景中
 
     //坐标轴
-    let x_zhou_Geometry = new THREE.PlaneGeometry(5000, 10, 20, 20);
+    let x_zhou_Geometry = new THREE.PlaneGeometry(50000, 10, 20, 20);
     let x_zhou_Material =
         new THREE.MeshLambertMaterial({color:0xff0000})
         x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
@@ -292,7 +397,7 @@ function initThree() {
     x_zhou.receiveShadow = true;//开启地面的接收阴影
     scene.add(x_zhou);//添加到场景中
 
-    let y_zhou_Geometry = new THREE.PlaneGeometry(5000, 10, 20, 20);
+    let y_zhou_Geometry = new THREE.PlaneGeometry(50000, 10, 20, 20);
     let y_zhou_Material =
         new THREE.MeshLambertMaterial({color:0x0000ff})
         y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
@@ -349,11 +454,13 @@ function render() {
 }
 
 //模型对象
-function Model(view_name,name,index){
-    this.view_name=view_name;
+function Model(view_id,model_id,model_name,url,index){
+    this.view_id=view_id;
     this.index=index;
-    this.name=name;
-    this.url="/static/model/"+view_name+'/'+name;
+    this.model_id=model_id;
+    this.model_name=model_name;
+    this.url=url;
+    // this.url="/static/model/"+view_name+'/'+name;
     this.position_x=0;
     this.position_y=0;
     this.position_z=0;
@@ -432,73 +539,73 @@ function change_model(){
         this.scale_z=1;
 
         this.move_x = function () {
-            models[selected_model_index].position.x=controls.x+controls.mini_x;
-            models_info[selected_model_index].change_po_x(controls.x+controls.mini_x)
+            models[current_model_index].position.x=controls.x+controls.mini_x;
+            models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
         };
         this.move_y = function () {
-            models[selected_model_index].position.y=controls.y+controls.mini_y;
-            models_info[selected_model_index].change_po_y(controls.y+controls.mini_y)
+            models[current_model_index].position.y=controls.y+controls.mini_y;
+            models_info[current_model_index].change_po_y(controls.y+controls.mini_y)
            
         };
         this.move_z = function () {
-            models[selected_model_index].position.z=controls.z+controls.mini_z;
-            models_info[selected_model_index].change_po_z(controls.z+controls.mini_z)
+            models[current_model_index].position.z=controls.z+controls.mini_z;
+            models_info[current_model_index].change_po_z(controls.z+controls.mini_z)
         };
         this.move = function () {
-            models[selected_model_index].position.x=controls.x+controls.mini_x;
-            models[selected_model_index].position.y=controls.y+controls.mini_y;
-            models[selected_model_index].position.z=controls.z+controls.mini_z;
-            models_info[selected_model_index].change_po(controls.x+controls.mini_x,controls.y+controls.mini_y,controls.z+controls.mini_z)
-            models_info[selected_model_index].change_po_x(controls.x+controls.mini_x)
-            models_info[selected_model_index].change_po_y(controls.y+controls.mini_y)
-            models_info[selected_model_index].change_po_z(controls.z+controls.mini_z)
+            models[current_model_index].position.x=controls.x+controls.mini_x;
+            models[current_model_index].position.y=controls.y+controls.mini_y;
+            models[current_model_index].position.z=controls.z+controls.mini_z;
+            models_info[current_model_index].change_po(controls.x+controls.mini_x,controls.y+controls.mini_y,controls.z+controls.mini_z)
+            models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
+            models_info[current_model_index].change_po_y(controls.y+controls.mini_y)
+            models_info[current_model_index].change_po_z(controls.z+controls.mini_z)
         };
         this.rotate = function () {
-            models[selected_model_index].rotation.x=(Math.PI/180)*controls.rx;
-            models[selected_model_index].rotation.y=(Math.PI/180)*controls.ry;
-            models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
-            models_info[selected_model_index].change_ro((Math.PI/180)*controls.rx,(Math.PI/180)*controls.ry,(Math.PI/180)*controls.rz)
+            models[current_model_index].rotation.x=(Math.PI/180)*controls.rx;
+            models[current_model_index].rotation.y=(Math.PI/180)*controls.ry;
+            models[current_model_index].rotation.z=(Math.PI/180)*controls.rz;
+            models_info[current_model_index].change_ro((Math.PI/180)*controls.rx,(Math.PI/180)*controls.ry,(Math.PI/180)*controls.rz)
         };
         this.rotate_x = function () {
-            models[selected_model_index].rotation.x=(Math.PI/180)*controls.rx;
-            models_info[selected_model_index].change_ro_x((Math.PI/180)*controls.rx)
+            models[current_model_index].rotation.x=(Math.PI/180)*controls.rx;
+            models_info[current_model_index].change_ro_x((Math.PI/180)*controls.rx)
         };
         this.rotate_y = function () {
-            models[selected_model_index].rotation.y=(Math.PI/180)*controls.ry;
-            models_info[selected_model_index].change_ro_y((Math.PI/180)*controls.ry)
+            models[current_model_index].rotation.y=(Math.PI/180)*controls.ry;
+            models_info[current_model_index].change_ro_y((Math.PI/180)*controls.ry)
         };
         this.rotate_z = function () {
-            models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
-            models_info[selected_model_index].change_ro_z((Math.PI/180)*controls.rz)
+            models[current_model_index].rotation.z=(Math.PI/180)*controls.rz;
+            models_info[current_model_index].change_ro_z((Math.PI/180)*controls.rz)
         };
         this.materials_color_r = function () {
-            models[selected_model_index].children[0].material.color.r=controls.m_color_r;
-            models_info[selected_model_index].materials_color_r=controls.m_color_r;
+            models[current_model_index].children[0].material.color.r=controls.m_color_r;
+            models_info[current_model_index].materials_color_r=controls.m_color_r;
         };
         this.materials_color_g = function () {
-            models[selected_model_index].children[0].material.color.g=controls.m_color_g;
-            models_info[selected_model_index].materials_color_g=controls.m_color_g;
+            models[current_model_index].children[0].material.color.g=controls.m_color_g;
+            models_info[current_model_index].materials_color_g=controls.m_color_g;
         };
         this.materials_color_b = function () {
-            models[selected_model_index].children[0].material.color.b=controls.m_color_b;
-            models_info[selected_model_index].materials_color_b=controls.m_color_b;
+            models[current_model_index].children[0].material.color.b=controls.m_color_b;
+            models_info[current_model_index].materials_color_b=controls.m_color_b;
         };
         // this.materials_color = function () {
-        //     models[selected_model_index].rotation.z=(Math.PI/180)*controls.rz;
-        //     models_info[selected_model_index].change_ro_z((Math.PI/180)*controls.rz)
+        //     models[current_model_index].rotation.z=(Math.PI/180)*controls.rz;
+        //     models_info[current_model_index].change_ro_z((Math.PI/180)*controls.rz)
         // };
 
         this.change_scale_x=function(x){
-            models[selected_model_index].scale.x=controls.scale_x;
-            models_info[selected_model_index].scale_x=controls.scale_x;
+            models[current_model_index].scale.x=controls.scale_x;
+            models_info[current_model_index].scale_x=controls.scale_x;
         };
         this.change_scale_y=function(x){
-            models[selected_model_index].scale.y=controls.scale_y;
-            models_info[selected_model_index].scale_y=controls.scale_y;
+            models[current_model_index].scale.y=controls.scale_y;
+            models_info[current_model_index].scale_y=controls.scale_y;
         };
         this.change_scale_z=function(x){
-            models[selected_model_index].scale.z=controls.scale_z;
-            models_info[selected_model_index].scale_z=controls.scale_z;
+            models[current_model_index].scale.z=controls.scale_z;
+            models_info[current_model_index].scale_z=controls.scale_z;
         };
     };
     gui.add(controls, 'x', -1000, 1000).onChange(controls.move_x);

@@ -5,8 +5,9 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model
+from vmm.models import Load_models_conf,folder,com_model,views
 import os
+import time
 
 
  
@@ -103,10 +104,10 @@ def save_models(request):
         models= json.loads(models[0])
         for model in models:
             print(model)
-            
-            view_name=model['view_name']
-            model_index=model['index']
-            model_name=model['name']
+            view_id=model['view_id']
+            model_id=model['model_id']
+            serial=model['index']
+            model_name=model['model_name']
             model_url=model['url']
             position_x=model['position_x']
             position_y=model['position_y']
@@ -123,19 +124,19 @@ def save_models(request):
             scale_z=model['scale_z']
 
 
-            models_in=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
+            models_in=Load_models_conf.objects.filter(view_id=view_id,model_id=model_id,serial=serial)
             if len(models_in) > 0:
-                models_in.update(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
+                models_in.update(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
             else:
-                Load_models_conf.objects.create(view_name=view_name,model_index=model_index,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
+                Load_models_conf.objects.create(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
         return HttpResponse('Save Success')
 #根据场景名称获取模型组数据
 @csrf_exempt
-def get_models_by_view_name(request):
+def get_models_by_view(request):
     if request.method == 'POST':
-        view_name=request.POST.get('view_name')
-        print(view_name)
-        models=Load_models_conf.objects.filter(view_name=view_name,isdelete=False).values()
+        view_id=int(request.POST.get('view_id'))
+        print(view_id)
+        models=Load_models_conf.objects.filter(view_id=view_id,isdelete=False).values()
         data={}
         data['models'] = list(models)
         return JsonResponse(data)
@@ -145,21 +146,38 @@ def get_models_by_view_name(request):
 def delete_model(request):
     # return HttpResponse('success')
     if request.method == 'POST':
-        view_name=request.POST.get('view_name')
-        model_index=request.POST.get('model_index')
-        print(view_name)
-        print(model_index)
-        model=Load_models_conf.objects.filter(view_name=view_name,model_index=model_index)
+        view_id=request.POST.get('view_id')
+        serial=request.POST.get('model_index')
+        print(view_id)
+        print(serial)
+        model=Load_models_conf.objects.filter(view_id=view_id,serial=serial)
         model.update(isdelete=True)
         return HttpResponse('delete_success')
 
 #查询有哪些场景
 @csrf_exempt
 def get_views(request):
-    views=Load_models_conf.objects.values('view_name').annotate(nums=Count('model_name'))
+    # views=Load_models_conf.objects.values('view_name').annotate(nums=Count('model_name'))
+    # data={}
+    # data['views']=list(views)
+    # return JsonResponse(data)
+    get_views=views.objects.filter(isdelete=False).values()
     data={}
-    data['views']=list(views)
+    data['views']=list(get_views)
     return JsonResponse(data)
+
+# 新建场景
+@csrf_exempt
+def add_view(request):
+    if request.method == 'POST':
+        view_name=request.POST.get('view_name')
+        get_views=list(views.objects.filter(view_name=view_name,isdelete=False).values())
+        print(get_views)
+        if len(get_views) == 0:
+            views.objects.create(view_name=view_name)
+            return HttpResponse('场景新建成功')
+        return HttpResponse('场景新建失败')
+
 
 #创建文件夹
 @csrf_exempt
@@ -201,13 +219,16 @@ def upload_model(request):
         file_type = file.name.split('.')[1]
         if file_type != 'STL' and file_type != 'stl':
             return HttpResponse(file.name+'上传失败,因为文件格式不是STL')
-        file_path = os.path.join(os.path.dirname(globals()["__file__"]),'static','models',folder_name,file.name)
+        
+        file_name_url=str(round(time.time()*1000000))+'.STL'
+        
+        file_path = os.path.join(os.path.dirname(globals()["__file__"]),'static','models',folder_name,file_name_url)
         f = open(file_path, 'wb')
         for chunk in file.chunks():
             f.write(chunk)
         f.close()
         # return HttpResponse('OK')
-        com_model.objects.create(model_name=file.name,folder_id=folder_id,url='/static/models/'+folder_name+'/'+file.name)
+        com_model.objects.create(model_name=file.name,folder_id=folder_id,url='/static/models/'+folder_name+'/'+file_name_url)
         return HttpResponse(file.name+'上传成功')
 
 #查询对应文件夹的模型
@@ -219,6 +240,15 @@ def get_model_by_folderid(request):
         moldels=com_model.objects.filter(folder_id=folder_id,isdelete=False).values()
         data={}
         data['models']=list(moldels)
+        return JsonResponse(data)
+
+@csrf_exempt
+def get_model_info_by_id(request):
+    if request.method == 'POST':
+        model_id=int(request.POST.get('model_id'))
+        model_info=com_model.objects.filter(id=model_id).values()
+        data={}
+        data['model']=list(model_info)
         return JsonResponse(data)
 
 

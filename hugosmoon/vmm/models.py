@@ -3,13 +3,15 @@ import django.utils.timezone as timezone
 
 # Create your models here.
 
-#场景
+#模型设置
 class Load_models_conf(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
-    view_name = models.CharField(max_length=255, db_column="view_name")
-    model_index= models.CharField(max_length=255, db_column="model_index")
-    model_name= models.CharField(max_length=255, db_column="model_name")
-    model_url=models.CharField(max_length=255, db_column="model_url")
+    view_id = models.IntegerField(default=0,db_column="view_id")
+    model_id = models.IntegerField(default=0,db_column="model_id")
+    # view_name = models.CharField(max_length=255, db_column="view_name")
+    serial = models.IntegerField(default=0,db_column="serial")
+    model_name= models.CharField(default='',max_length=255, db_column="model_name")
+    model_url=models.CharField(default='',max_length=255, db_column="model_url")
     position_x=models.FloatField(db_column="position_x")
     position_y=models.FloatField(db_column="position_y")
     position_z=models.FloatField(db_column="position_z")
@@ -45,3 +47,11 @@ class com_model(models.Model):
     url=models.CharField(max_length=255, db_column="url")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
+
+#场景
+class views(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    view_name = models.CharField(max_length=255, db_column="view_name")
+    createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
+    isdelete = models.BooleanField(default=False, db_column="is_delete")
+
