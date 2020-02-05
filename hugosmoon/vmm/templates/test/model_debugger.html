@@ -84,7 +84,11 @@
                         :value="item.value">
                         </el-option>
                     </el-select>
-                    <!-- <el-input v-model="model_name" placeholder="输入模型名称"></el-input> -->
+                    <!-- <br><br>
+                    <template>
+                        <el-radio v-model="model_in_folder_material" label=1>金属材质</el-radio>
+                        <el-radio v-model="model_in_folder_material" label=2>非金属材质</el-radio>
+                      </template> -->
                     <br><br>
                     <!-- <el-button type="success" v-on:click="get_model_info_by_id">获取模型信息</el-button> -->
                     <el-button type="success" v-on:click="add_model">添加至场景</el-button>

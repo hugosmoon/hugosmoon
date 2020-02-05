@@ -103,7 +103,7 @@ def save_models(request):
         models=request.POST.getlist('models')
         models= json.loads(models[0])
         for model in models:
-            print(model)
+            # print(model)
             view_id=model['view_id']
             model_id=model['model_id']
             serial=model['index']
@@ -123,12 +123,25 @@ def save_models(request):
             scale_y=model['scale_y']
             scale_z=model['scale_z']
 
+            materials_type=model['materials_type']
+
+            metalness=model['metalness']
+            roughness=model['roughness']
+            emissive_r=model['emissive_r']
+            emissive_g=model['emissive_g']
+            emissive_b=model['emissive_b']
+            emissiveIntensity=model['emissiveIntensity']
+            reflectivity=model['reflectivity']
+            
+
+            
+
 
             models_in=Load_models_conf.objects.filter(view_id=view_id,model_id=model_id,serial=serial)
             if len(models_in) > 0:
-                models_in.update(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
+                models_in.update(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity)
             else:
-                Load_models_conf.objects.create(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z)
+                Load_models_conf.objects.create(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity)
         return HttpResponse('Save Success')
 #根据场景名称获取模型组数据
 @csrf_exempt

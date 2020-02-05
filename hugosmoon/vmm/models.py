@@ -27,6 +27,15 @@ class Load_models_conf(models.Model):
 
     materials_type=models.IntegerField(default=1,db_column="materials_type")
 
+    metalness=models.FloatField(default=1,db_column="metalness")
+    roughness=models.FloatField(default=0.5,db_column="roughness")
+    emissive_r=models.FloatField(default=1,db_column="emissive_r")
+    emissive_g=models.FloatField(default=1,db_column="emissive_g")
+    emissive_b=models.FloatField(default=1,db_column="emissive_b")
+    emissiveIntensity=models.FloatField(default=0.1,db_column="emissiveIntensity")
+    reflectivity=models.FloatField(default=0.5,db_column="reflectivity")
+
+
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")

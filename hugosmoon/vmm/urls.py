@@ -1,4 +1,6 @@
 from django.urls import path,re_path
+from django.conf.urls import url
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from . import views
 
@@ -7,7 +9,7 @@ urlpatterns = [
     path('tool_display/', views.tool_display),
     re_path('^qxyl/(?P<id>[0-9]+)/', views.qxyl,name='qxyl'),
     path('cuttingforce_cal/',views.cuttingforce_cal,name='cuttingforce_cal'),
-    path('model_debugger/',views.model_debugger,name='model_debugger'),
+    url(r'model_debugger/',views.model_debugger,name='model_debugger'),
     path('save_models/',views.save_models,name='save_models'),
     path('get_models_by_view/',views.get_models_by_view,name='get_models_by_view'),
     path('delete_model/',views.delete_model,name='delete_model'),
@@ -22,3 +24,5 @@ urlpatterns = [
 
     
 ]
+
+urlpatterns += staticfiles_urlpatterns()
