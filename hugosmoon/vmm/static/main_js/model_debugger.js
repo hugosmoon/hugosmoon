@@ -21,8 +21,16 @@ let models_info=[];
 ////模型实体列表
 let models=[];
 
+// //当前子场景模型列表
+// let models_in_childView_list=[];
+
 let renderer, camera, scene;
 let gui = new dat.GUI();
+
+let load_models_num;
+let loaded_models_num=0;
+let load_status=false;
+
 
 let Main = {
     data() {
@@ -92,6 +100,7 @@ let Main = {
                     this.child_view_list.push({value: view.id,label: view.view_name});
                 })
 
+
             });
         },
         add_view:function(){
@@ -128,9 +137,7 @@ let Main = {
                                 message: "与现有场景名重复"
                             });
                             success=false;
-                        }
-        
-                        
+                        }                        
                         else{
                             this.$http.post(
                                 '/vmm/add_view/',
@@ -145,13 +152,13 @@ let Main = {
                                         message: res.body
                                     });
                                     this.get_views();
-                                });
-                            this.get_views();                   
+                                    if(this.view_selected!=0){
+                                        this.get_child_views();
+                                    }
+                                });                   
                         }
                         
                     });   
-                
-                
             });
         },
         select_view:function(){
@@ -196,10 +203,11 @@ let Main = {
                 { emulateJSON: true }
                 ).then(function (res) {
                     models_got=res.body.models;
+                    load_models_num=models_got.length;
                     //console.log(models_got);
                     models_got.forEach(model => {
                         index=Number(model.serial);
-                        models_info[index]=new Model(current_view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
+                        models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
                         // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
                         models_info[index].change_po_x(model.position_x);
                         models_info[index].change_po_y(model.position_y)
@@ -249,7 +257,7 @@ let Main = {
                     //console.log(models_got);
                     models_got.forEach(model => {
                         index=Number(model.serial);
-                        models_info[index]=new Model(current_view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
+                        models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
                         // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
                         models_info[index].change_po_x(model.position_x);
                         models_info[index].change_po_y(model.position_y)
@@ -328,6 +336,7 @@ let Main = {
 
         },
         save_view_name:function(){
+            this.openFullScreen(200);
             this.child_view_status=false;
             if(this.view_selected==''){
                 alert("没有选中任何场景")
@@ -345,6 +354,10 @@ let Main = {
         //     }
         // },
         add_model: function () {
+            load_status=false;
+            this.openFullScreen(200);
+            load_models_num=1;
+            loaded_models_num=0;
             if(view_name==undefined){
                 alert("请载入场景")
                 return false;
@@ -436,7 +449,24 @@ let Main = {
         },
         to_manage_models:function(){
             window.open('/vmm/model_manage/');
-        }
+        },
+        // 加载遮罩
+        openFullScreen:function(time) {
+            const loading = this.$loading({
+                lock: true,
+                text: '模型加载中',
+                background: 'rgba(0, 0, 0, 0.92)'
+            });
+            setTimeout(() => {
+                if(load_status){
+                    loading.close();
+                }
+                else {
+                    this.openFullScreen(200);
+                }
+
+            }, time);
+        },
 
     }
 }
@@ -518,28 +548,48 @@ function initThree() {
     controller.target = new THREE.Vector3(0, 0, 0);
 
     //地面
-    let planeGeometry = new THREE.PlaneGeometry(50000, 50000, 20, 20);
-    let planeMaterial =
-        new THREE.MeshLambertMaterial({color: 0x232323})
-    plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.z = -950;
-    plane.receiveShadow = true;//开启地面的接收阴影
-    scene.add(plane);//添加到场景中
+    // let planeGeometry = new THREE.PlaneGeometry(50000, 50000, 20, 20);
+    // let planeMaterial =
+    //     new THREE.MeshLambertMaterial({color: 0x000000,transparent:true,opacity:0.5})
+    // plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    // plane.position.z = -950;
+    // plane.receiveShadow = true;//开启地面的接收阴影
+    // scene.add(plane);//添加到场景中
+    for(let i=0;i<=50000;i+=500){
+        let x_zhou_Geometry = new THREE.PlaneGeometry(50000, 5, 20, 20);
+        let x_zhou_Material =
+            new THREE.MeshLambertMaterial({color: 0x000000,transparent:true,opacity:0.7,side:THREE.DoubleSide})
+            x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
+        x_zhou.position.z = -1000;
+        x_zhou.position.y = 25000-i;
+        // x_zhou.receiveShadow = true;//开启地面的接收阴影
+        scene.add(x_zhou);//添加到场景中
+
+        let y_zhou_Geometry = new THREE.PlaneGeometry(50000, 5, 20, 20);
+        let y_zhou_Material =
+            new THREE.MeshLambertMaterial({color: 0x000000,transparent:true,opacity:0.7,side:THREE.DoubleSide})
+            y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
+        y_zhou.position.z = -1000;
+        y_zhou.rotation.z = Math.PI*0.5;
+        y_zhou.position.x = 25000-i;
+        y_zhou.receiveShadow = true;//开启地面的接收阴影
+        scene.add(y_zhou);//添加到场景中
+    }
 
     //坐标轴
-    let x_zhou_Geometry = new THREE.PlaneGeometry(50000, 10, 20, 20);
+    let x_zhou_Geometry = new THREE.PlaneGeometry(50000, 30, 20, 20);
     let x_zhou_Material =
         new THREE.MeshLambertMaterial({color:0xff0000})
         x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
-    x_zhou.position.z = -930;
+    x_zhou.position.z = -995;
     x_zhou.receiveShadow = true;//开启地面的接收阴影
     scene.add(x_zhou);//添加到场景中
 
-    let y_zhou_Geometry = new THREE.PlaneGeometry(50000, 10, 20, 20);
+    let y_zhou_Geometry = new THREE.PlaneGeometry(50000, 30, 20, 20);
     let y_zhou_Material =
         new THREE.MeshLambertMaterial({color:0x0000ff})
         y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
-    y_zhou.position.z = -930;
+    y_zhou.position.z = -995;
     y_zhou.rotation.z = Math.PI*0.5;
     y_zhou.receiveShadow = true;//开启地面的接收阴影
     scene.add(y_zhou);//添加到场景中
@@ -591,6 +641,10 @@ function initObject(index,materials_type) {
         scene.add(models[index]);
         // //console.log(models)
         //console.log(this.name+'加载完成');
+        loaded_models_num+=1;
+        if(loaded_models_num==load_models_num){
+            load_status=true;
+        }
     });  
 }
 
@@ -641,7 +695,6 @@ function Model(view_id,model_id,model_name,url,index,materials_type){
     this.scale_x=1;
     this.scale_y=1;
     this.scale_z=1;
-
    
     this.change_po_x=function(x){
         this.position_x=x;
@@ -745,6 +798,15 @@ function change_model(){
         ////非金属材料的反射率。 当metalness为1.0时无效
         this.reflectivity=0.5;
 
+        //子场景整体移动
+        this.all_mov_x=0;
+        this.all_mov_x_last=0;
+        this.all_mov_y=0;
+        this.all_mov_y_last=0;
+        this.all_mov_z=0;
+        this.all_mov_z_last=0;
+
+
         this.move_x = function () {
             models[current_model_index].position.x=controls.x+controls.mini_x;
             models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
@@ -846,6 +908,45 @@ function change_model(){
             models_info[current_model_index].reflectivity=controls.reflectivity;
         };
 
+        this.change_all_mov_x = function () {
+            let step=controls.all_mov_x-controls.all_mov_x_last;
+            controls.all_mov_x_last=controls.all_mov_x;
+            for(i=0;i<models_info.length;i++){
+                if(models_info[i]){
+                    if(models_info[i].view_id==current_view_id){
+                        models[i].position.x+=step;
+                        models_info[i].change_po_x( models_info[i].position_x+step)
+                    }
+                }   
+            }
+        };
+        this.change_all_mov_y = function () {
+            let step=controls.all_mov_y-controls.all_mov_y_last;
+            controls.all_mov_y_last=controls.all_mov_y;
+            for(i=0;i<models_info.length;i++){
+                if(models_info[i]){
+                    if(models_info[i].view_id==current_view_id){
+                        models[i].position.y+=step;
+                        models_info[i].change_po_y( models_info[i].position_y+step)
+                    }
+                }   
+            }
+        };
+
+        this.change_all_mov_z = function () {
+            let step=controls.all_mov_z-controls.all_mov_z_last;
+            controls.all_mov_z_last=controls.all_mov_z;
+            for(i=0;i<models_info.length;i++){
+                if(models_info[i]){
+                    if(models_info[i].view_id==current_view_id){
+                        models[i].position.z+=step;
+                        models_info[i].change_po_z( models_info[i].position_z+step)
+                    }
+                }   
+            }
+        };
+
+
 
 
 
@@ -876,6 +977,11 @@ function change_model(){
     gui.add(controls, 'emissive_b', 0, 1).onChange(controls.change_emissive_b);
     gui.add(controls, 'emissiveIntensity', 0, 1).onChange(controls.change_emissiveIntensity);
     gui.add(controls, 'reflectivity', 0, 1).onChange(controls.change_reflectivity);
+
+    gui.add(controls, 'all_mov_x', -50000, 50000).onChange(controls.change_all_mov_x);
+    gui.add(controls, 'all_mov_y', -50000, 50000).onChange(controls.change_all_mov_y);
+    gui.add(controls, 'all_mov_z', -50000, 50000).onChange(controls.change_all_mov_z);
+    
     
 
 
