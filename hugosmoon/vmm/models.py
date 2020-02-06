@@ -62,5 +62,6 @@ class views(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
     view_name = models.CharField(max_length=255, db_column="view_name")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
+    parent_id=models.IntegerField(default=0,db_column="parent_id")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
 

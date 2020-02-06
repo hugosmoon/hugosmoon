@@ -148,8 +148,18 @@ def save_models(request):
 def get_models_by_view(request):
     if request.method == 'POST':
         view_id=int(request.POST.get('view_id'))
-        print(view_id)
-        models=Load_models_conf.objects.filter(view_id=view_id,isdelete=False).values()
+        if len(views.objects.filter(id=view_id,parent_id=0)) == 0:
+            models=Load_models_conf.objects.filter(view_id=view_id,isdelete=False).values()
+            data={}
+            data['models'] = list(models)
+            return JsonResponse(data)
+        child_view_ids=views.objects.filter(parent_id=view_id).values()
+        # print(child_view_ids[1]['id'])
+        child_view_id_list=[]
+        for child_view_id in child_view_ids:
+            child_view_id_list.append(int(child_view_id['id']))
+        # print(child_view_id_list)
+        models=Load_models_conf.objects.filter(view_id__in=child_view_id_list,isdelete=False).values()
         data={}
         data['models'] = list(models)
         return JsonResponse(data)
@@ -170,24 +180,41 @@ def delete_model(request):
 #查询有哪些场景
 @csrf_exempt
 def get_views(request):
+    if request.method == 'POST':
+        parent_id=request.POST.get('parent_id')
+        get_views=views.objects.filter(isdelete=False,parent_id=parent_id).values()
+        data={}
+        data['views']=list(get_views)
+        return JsonResponse(data)
     # views=Load_models_conf.objects.values('view_name').annotate(nums=Count('model_name'))
     # data={}
     # data['views']=list(views)
     # return JsonResponse(data)
-    get_views=views.objects.filter(isdelete=False).values()
+    get_views=views.objects.filter(isdelete=False,parent_id=0).values()
     data={}
     data['views']=list(get_views)
     return JsonResponse(data)
+# 验证场景名是否存在
+@csrf_exempt
+def is_view_exist(request):
+    if request.method == 'POST':
+        view_name=request.POST.get('view_name')
+        if len(views.objects.filter(view_name=view_name)) == 0:
+            return HttpResponse('false')
+        return HttpResponse('true')
+
+
 
 # 新建场景
 @csrf_exempt
 def add_view(request):
     if request.method == 'POST':
         view_name=request.POST.get('view_name')
+        parent_id=int(request.POST.get('parent_id'))  
         get_views=list(views.objects.filter(view_name=view_name,isdelete=False).values())
-        print(get_views)
+        # print(parent_id)
         if len(get_views) == 0:
-            views.objects.create(view_name=view_name)
+            views.objects.create(view_name=view_name,parent_id=parent_id)
             return HttpResponse('场景新建成功')
         return HttpResponse('场景新建失败')
 

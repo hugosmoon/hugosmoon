@@ -31,6 +31,8 @@ let Main = {
             views_list:[],
             // view_name: '',
             view_selected: '',
+            child_view_list:[],
+            child_view_selected: '',
             model_name: '',
             model_url:'',
             model_list: [],
@@ -49,6 +51,9 @@ let Main = {
             Z_rot: 0,
             enter_view_name:false,
             model_information: '',
+            child_view_status:true,
+            add_model_status:true,
+            del_model_status:true,
         }
     },
     mounted:function(){
@@ -74,43 +79,85 @@ let Main = {
 
             });
         },
+        get_child_views:function(){
+            this.$http.post(
+                '/vmm/get_views/',
+                {
+                    parent_id:current_view_id
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                this.child_view_list=[];
+                res.body.views.forEach(view => {
+                    this.child_view_list.push({value: view.id,label: view.view_name});
+                })
+
+            });
+        },
         add_view:function(){
-            let success=true;
+            if(this.view_selected==''){
+                this.view_selected=0;
+            }
             this.$prompt('输入场景名称（不能与现有场景名称重复，不要使用汉字）', '新建场景', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]/,
                 inputErrorMessage: '名称格式不正确'
             }).then(({ value }) => {
-                this.views_list.forEach(view =>{
-                    if(view.value==value){
-                        this.$message({
-                            type: 'error',
-                            duration: 2000,
-                            message: "与现有场景名重复"
-                        });
-                        success=false;
-                    }
-                });
-                if(success){
-                    this.$http.post(
-                        '/vmm/add_view/',
-                        {
-                            view_name:value
-                        },
-                        { emulateJSON: true }
-                        ).then(function (res) {
+                // this.views_list.forEach(view =>{
+                //     if(view.value==value){
+                //         this.$message({
+                //             type: 'error',
+                //             duration: 2000,
+                //             message: "与现有场景名重复"
+                //         });
+                //         success=false;
+                //     }
+                // });
+                this.$http.post(
+                    '/vmm/is_view_exist/',
+                    {
+                        view_name:value
+                    },
+                    { emulateJSON: true }
+                    ).then(function (res) {
+                        if(res.body=='true'){
                             this.$message({
-                                type: 'success',
-                                message: res.body
+                                type: 'error',
+                                duration: 2000,
+                                message: "与现有场景名重复"
                             });
-                            this.get_views();
-                        });                   
-                }
+                            success=false;
+                        }
+        
+                        
+                        else{
+                            this.$http.post(
+                                '/vmm/add_view/',
+                                {
+                                    view_name:value,
+                                    parent_id:this.view_selected
+                                },
+                                { emulateJSON: true }
+                                ).then(function (res) {
+                                    this.$message({
+                                        type: 'success',
+                                        message: res.body
+                                    });
+                                    this.get_views();
+                                });
+                            this.get_views();                   
+                        }
+                        
+                    });   
                 
-              });
+                
+            });
         },
         select_view:function(){
+            if(this.view_selected==''){
+                this.view_selected=0;
+            }
             current_view_id=this.view_selected;
         },
         select_model:function(sel){
@@ -127,21 +174,20 @@ let Main = {
             this.model_information+='<td>>>>> Z/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +"</td></tr>"
 
             //console.log(this.model_information);
+            this.del_model_status=false;
         },
        
         upload_view:function(){
-            if(this.view_selected==""){
+            if(this.view_selected==''){
                 alert("没有选中任何场景")
                 return false;
             }
-            // current_view_id=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
         },
         // 根据场景的ID加载场景中的模型
         get_models:function(){
             let models_got_list=[];
-            // //console.log(this.view_selected);
             this.$http.post(
                 '/vmm/get_models_by_view/',
                 {
@@ -176,13 +222,62 @@ let Main = {
                         models_info[index].change_reflectivity(model.reflectivity)
                         
                         //console.log(models_info)
-                        // //console.log('~~~')      
-                        models_got_list.push({value: index,label: index+"-"+model.model_name})
+                        // //console.log('~~~') 
+                        ////////////////////////////////////////////////////////////////////////////////  
+                        // models_got_list.push({value: index,label: index+"-"+model.model_name})
                         initObject(index,model.materials_type);
                         // //console.log(index)
                     });        
                 });
             this.model_list=models_got_list;
+        },
+        get_models_by_child_view:function(){
+            
+            if(this.child_view_selected==''){
+                this.child_view_selected=0
+            }
+            current_view_id=this.child_view_selected;
+            let models_got_list=[];
+            this.$http.post(
+                '/vmm/get_models_by_view/',
+                {
+                    view_id:current_view_id
+                },
+                { emulateJSON: true }
+                ).then(function (res) {
+                    models_got=res.body.models;
+                    //console.log(models_got);
+                    models_got.forEach(model => {
+                        index=Number(model.serial);
+                        models_info[index]=new Model(current_view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
+                        // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
+                        models_info[index].change_po_x(model.position_x);
+                        models_info[index].change_po_y(model.position_y)
+                        models_info[index].change_po_z(model.position_z)
+
+                        // models_info[index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
+                        models_info[index].change_ro_x(model.rotation_x)
+                        models_info[index].change_ro_y(model.rotation_y)
+                        models_info[index].change_ro_z(model.rotation_z)
+                        models_info[index].change_materials_color_r(model.materials_color_r)
+                        models_info[index].change_materials_color_g(model.materials_color_g)
+                        models_info[index].change_materials_color_b(model.materials_color_b)
+
+                        models_info[index].change_metalness(model.metalness)
+                        models_info[index].change_roughness(model.roughness)
+                        models_info[index].change_emissive_r(model.emissive_r)
+                        models_info[index].change_emissive_g(model.emissive_g)
+                        models_info[index].change_emissive_b(model.emissive_b)
+                        models_info[index].change_emissiveIntensity(model.emissiveIntensity)
+                        models_info[index].change_reflectivity(model.reflectivity)
+                        models_got_list.push({value: index,label: index+"-"+model.model_name})
+                        // initObject(index,model.materials_type);
+                        // //console.log(index)
+                    });        
+                });
+            this.model_list=models_got_list;
+            this.add_model_status=false;
+
         },
         save_model:function(){
             // //console.log(models_info);
@@ -233,13 +328,15 @@ let Main = {
 
         },
         save_view_name:function(){
-            if(this.view_selected==""){
+            this.child_view_status=false;
+            if(this.view_selected==''){
                 alert("没有选中任何场景")
                 return false;
             }
             view_name=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
+            this.get_child_views();
         },
         // upload_model:function(){
         //     if(view_name==undefined){

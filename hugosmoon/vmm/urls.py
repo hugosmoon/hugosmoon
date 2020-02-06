@@ -21,6 +21,7 @@ urlpatterns = [
     path('upload_model/',views.upload_model,name='upload_model'),
     path('get_model_by_folderid/',views.get_model_by_folderid,name='get_model_by_folderid'),
     path('get_model_info_by_id/',views.get_model_info_by_id,name='get_model_info_by_id'),
+    path('is_view_exist/',views.is_view_exist,name='is_view_exist'),
 
     
 ]
