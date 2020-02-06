@@ -285,6 +285,7 @@ let Main = {
                 });
             this.model_list=models_got_list;
             this.add_model_status=false;
+            auto_save_status=1;
 
         },
         save_model:function(){
