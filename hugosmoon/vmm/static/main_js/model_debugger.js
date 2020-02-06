@@ -204,6 +204,9 @@ let Main = {
                 ).then(function (res) {
                     models_got=res.body.models;
                     load_models_num=models_got.length;
+                    if(load_models_num>loaded_models_num){
+                        this.openFullScreen(200);
+                    }
                     //console.log(models_got);
                     models_got.forEach(model => {
                         index=Number(model.serial);
@@ -337,23 +340,16 @@ let Main = {
 
         },
         save_view_name:function(){
-            this.openFullScreen(200);
-            this.child_view_status=false;
             if(this.view_selected==''){
                 alert("没有选中任何场景")
                 return false;
             }
+            this.child_view_status=false;
             view_name=this.view_selected;
             this.enter_view_name=true;
             this.get_models();
             this.get_child_views();
         },
-        // upload_model:function(){
-        //     if(view_name==undefined){
-        //         alert("没有选中任何场景")
-        //         return false;
-        //     }
-        // },
         add_model: function () {
             load_status=false;
             this.openFullScreen(200);
