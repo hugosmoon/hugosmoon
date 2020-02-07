@@ -25,7 +25,9 @@ let models=[];
 // let models_in_childView_list=[];
 
 let renderer, camera, scene;
-let gui = new dat.GUI();
+// let gui = new dat.GUI();
+let model_gui;
+let child_view_gui;
 
 let load_models_num;
 let loaded_models_num=0;
@@ -182,6 +184,23 @@ let Main = {
 
             //console.log(this.model_information);
             this.del_model_status=false;
+            change_model(
+                models_info[current_model_index].model_name,
+                models_info[current_model_index].position_x,models_info[current_model_index].position_y,models_info[current_model_index].position_z,
+                models_info[current_model_index].rotation_x*(180/Math.PI),models_info[current_model_index].rotation_y*(180/Math.PI),models_info[current_model_index].rotation_z*(180/Math.PI),
+                models_info[current_model_index].scale_x,models_info[current_model_index].scale_y,models_info[current_model_index].scale_z,
+                models_info[current_model_index].metalness,
+                models_info[current_model_index].roughness,
+                models_info[current_model_index].materials_color_r,
+                models_info[current_model_index].materials_color_g,
+                models_info[current_model_index].materials_color_b,
+                models_info[current_model_index].emissive_r,
+                models_info[current_model_index].emissive_g,
+                models_info[current_model_index].emissive_b,
+                models_info[current_model_index].emissiveIntensity,
+                models_info[current_model_index].reflectivity)
+            // function change_model(,,model_red,model_green,model_blue,emissive_r,emissive_g,emissive_b,emissiveIntensity,reflectivity){models_info[current_model_index].
+
         },
        
         upload_view:function(){
@@ -289,6 +308,7 @@ let Main = {
             this.model_list=models_got_list;
             this.add_model_status=false;
             auto_save_status=1;
+            change_child_view();
 
         },
         save_model:function(){
@@ -477,7 +497,7 @@ new Ctor().$mount('#app')
 function threeStart() {
     initThree();
     loadAutoScreen(camera, renderer);
-    change_model(current_model_index)
+    
     render();
 }
 
@@ -675,15 +695,15 @@ function Model(view_id,model_id,model_name,url,index,materials_type){
     this.roughness=0.5;
     ////材质在光线下的颜色，不是材质本身的颜色
     this.materials_color=0x212121;
-    this.materials_color_r=0.12941176470588237;
-    this.materials_color_g=0.12941176470588237;
-    this.materials_color_b=0.12941176470588237;
+    this.materials_color_r=0.63;
+    this.materials_color_g=0.63;
+    this.materials_color_b=0.63;
     ////材质本身的颜色，与光线无关
     this.emissive_r=1.0;
     this.emissive_g=1.0;
     this.emissive_b=1.0;
     ////材质本身颜色的强度
-    this.emissiveIntensity=0.1;
+    this.emissiveIntensity=0;
     ////非金属材料的反射率。 当metalness为1.0时无效
     this.reflectivity=0.5;
 
@@ -763,45 +783,50 @@ function Model(view_id,model_id,model_name,url,index,materials_type){
 }
 
 //调整模型位置和角度
-function change_model(){
-    // gui = new dat.GUI();
+function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalness,roughness,model_red,model_green,model_blue,emissive_r,emissive_g,emissive_b,emissiveIntensity,reflectivity){
+    if(model_gui){
+        model_gui.destroy();
+    }
+    model_gui = new dat.GUI();
+    model_gui.width=400; 
     let controls = new function () {
-        this.x=0;
-        this.y=0;
-        this.z=0;
-        this.mini_x=0;
-        this.mini_y=0;
-        this.mini_z=0;
-        this.rx=0;
-        this.ry=0;
-        this.rz=0;
-        this.model_red=0.12941176470588237;
-        this.model_green=0.12941176470588237;
-        this.model_blue=0.12941176470588237;
-        this.scale_x=1;
-        this.scale_y=1;
-        this.scale_z=1;
+        this.model_name=model_name;
+        this.x=x;
+        this.y=y;
+        this.z=z;
+        this.mini_x=0.01;
+        this.mini_y=0.01;
+        this.mini_z=0.01;
+        this.rx=rx;
+        this.ry=ry;
+        this.rz=rz;
+        this.model_red=model_red;
+        this.model_green=model_green;
+        this.model_blue=model_blue;
+        this.scale_x=scale_x;
+        this.scale_y=scale_y;
+        this.scale_z=scale_z;
 
         ////材质金属性
-        this.metalness=1.0;
+        this.metalness=metalness;
         ////材质粗糙度（从镜面反射到漫反射）
-        this.roughness=0.5;
+        this.roughness=roughness;
         ////材质本身的颜色，与光线无关
-        this.emissive_r=1.0;
-        this.emissive_g=1.0;
-        this.emissive_b=1.0;
+        this.emissive_r=emissive_r;
+        this.emissive_g=emissive_g;
+        this.emissive_b=emissive_b;
         ////材质本身颜色的强度
-        this.emissiveIntensity=0.1;
+        this.emissiveIntensity=emissiveIntensity;
         ////非金属材料的反射率。 当metalness为1.0时无效
-        this.reflectivity=0.5;
+        this.reflectivity=reflectivity;
 
         //子场景整体移动
-        this.all_mov_x=0;
-        this.all_mov_x_last=0;
-        this.all_mov_y=0;
-        this.all_mov_y_last=0;
-        this.all_mov_z=0;
-        this.all_mov_z_last=0;
+        // this.all_mov_x=0;
+        // this.all_mov_x_last=0;
+        // this.all_mov_y=0;
+        // this.all_mov_y_last=0;
+        // this.all_mov_z=0;
+        // this.all_mov_z_last=0;
 
 
         this.move_x = function () {
@@ -904,7 +929,54 @@ function change_model(){
             models[current_model_index].children[0].material.reflectivity=controls.reflectivity;
             models_info[current_model_index].reflectivity=controls.reflectivity;
         };
+    }; 
+    let f1 = model_gui;
+    f1.add({m:''},'m').name(controls.model_name);
+    let f1_1 = f1.addFolder('位置设置');
+    f1_1.add(controls, 'x', -25000, 25000).name('X轴移动').onChange(controls.move_x);
+    f1_1.add(controls, 'mini_x', -10, 10).step(0.01).name('X轴移动微调').onChange(controls.move_x);
+    f1_1.add(controls, 'y', -25000, 25000).name('Y轴移动').onChange(controls.move_y);
+    f1_1.add(controls, 'mini_y', -10, 10).step(0.01).name('Y轴移动微调').onChange(controls.move_y);
+    f1_1.add(controls, 'z', -25000, 25000).name('Z轴移动').onChange(controls.move_z);
+    f1_1.add(controls, 'mini_z', -10, 10).step(0.01).name('Z轴移动微调').onChange(controls.move_z);
+    let f1_2 = f1.addFolder('旋转设置');
+    f1_2.add(controls, 'rx', -180, 180).name('X轴旋转度数').onChange(controls.rotate_x);
+    f1_2.add(controls, 'ry', -180, 180).name('Y轴旋转度数').onChange(controls.rotate_y);
+    f1_2.add(controls, 'rz', -180, 180).name('Z轴旋转度数').onChange(controls.rotate_z);
+    let f1_3 = f1.addFolder('缩放设置');
+    f1_3.add(controls, 'scale_x', 0, 10).name('X轴缩放比例').onChange(controls.change_scale_x);
+    f1_3.add(controls, 'scale_y', 0, 10).name('Y轴缩放比例').onChange(controls.change_scale_y);
+    f1_3.add(controls, 'scale_z', 0, 10).name('Z轴缩放比例').onChange(controls.change_scale_z);
+    let f1_4 = f1.addFolder('材质设置');
+    f1_4.add(controls, 'metalness', 0, 1).name('金属质感').onChange(controls.change_metalness);
+    f1_4.add(controls, 'roughness', 0, 1).name('粗糙度').onChange(controls.change_roughness);
+    f1_4.add(controls, 'reflectivity', 0, 1).name('非金属反光度（金属质感=1时失效）').onChange(controls.change_reflectivity);
 
+    f1_4.add(controls, 'model_red', 0, 1).name('反光材质—R').onChange(controls.materials_color_r);
+    f1_4.add(controls, 'model_green', 0, 1).name('反光材质—G').onChange(controls.materials_color_g);
+    f1_4.add(controls, 'model_blue', 0, 1).name('反光材质—B').onChange(controls.materials_color_b);
+
+    f1_4.add(controls, 'emissive_r', 0, 1).name('发光材质—R').onChange(controls.change_emissive_r);
+    f1_4.add(controls, 'emissive_g', 0, 1).name('发光材质—G').onChange(controls.change_emissive_g);
+    f1_4.add(controls, 'emissive_b', 0, 1).name('发光材质—B').onChange(controls.change_emissive_b);
+    f1_4.add(controls, 'emissiveIntensity', 0, 1).name('反光材质不透明度').onChange(controls.change_emissiveIntensity);
+}
+function change_child_view(){
+    if(child_view_gui){
+        child_view_gui.destroy();
+    }
+    child_view_gui = new dat.GUI();
+    child_view_gui.width=300; 
+    child_view_gui.name="子场景设置";
+
+    let controls = new function () {
+        //子场景整体移动
+        this.all_mov_x=0;
+        this.all_mov_x_last=0;
+        this.all_mov_y=0;
+        this.all_mov_y_last=0;
+        this.all_mov_z=0;
+        this.all_mov_z_last=0;
         this.change_all_mov_x = function () {
             let step=controls.all_mov_x-controls.all_mov_x_last;
             controls.all_mov_x_last=controls.all_mov_x;
@@ -942,49 +1014,11 @@ function change_model(){
                 }   
             }
         };
+    }
 
-
-
-
-
-    };
-    gui.add(controls, 'x', -25000, 25000).onChange(controls.move_x);
-    gui.add(controls, 'mini_x', -10, 10).onChange(controls.move_x);
-    gui.add(controls, 'y', -25000, 25000).onChange(controls.move_y);
-    gui.add(controls, 'mini_y', -10, 10).onChange(controls.move_y);
-    gui.add(controls, 'z', -25000, 25000).onChange(controls.move_z);
-    gui.add(controls, 'mini_z', -10, 10).onChange(controls.move_z);
-    gui.add(controls, 'rx', -180, 180).onChange(controls.rotate_x);
-    gui.add(controls, 'ry', -180, 180).onChange(controls.rotate_y);
-    gui.add(controls, 'rz', -180, 180).onChange(controls.rotate_z);
-    gui.add(controls, 'scale_x', 0, 10).onChange(controls.change_scale_x);
-    gui.add(controls, 'scale_y', 0, 10).onChange(controls.change_scale_y);
-    gui.add(controls, 'scale_z', 0, 10).onChange(controls.change_scale_z);
-    
-    gui.add(controls, 'model_red', 0, 1).onChange(controls.materials_color_r);
-    gui.add(controls, 'model_green', 0, 1).onChange(controls.materials_color_g);
-    gui.add(controls, 'model_blue', 0, 1).onChange(controls.materials_color_b);
-
-   
-
-    gui.add(controls, 'metalness', 0, 1).onChange(controls.change_metalness);
-    gui.add(controls, 'roughness', 0, 1).onChange(controls.change_roughness);
-    gui.add(controls, 'emissive_r', 0, 1).onChange(controls.change_emissive_r);
-    gui.add(controls, 'emissive_g', 0, 1).onChange(controls.change_emissive_g);
-    gui.add(controls, 'emissive_b', 0, 1).onChange(controls.change_emissive_b);
-    gui.add(controls, 'emissiveIntensity', 0, 1).onChange(controls.change_emissiveIntensity);
-    gui.add(controls, 'reflectivity', 0, 1).onChange(controls.change_reflectivity);
-
-    gui.add(controls, 'all_mov_x', -50000, 50000).onChange(controls.change_all_mov_x);
-    gui.add(controls, 'all_mov_y', -50000, 50000).onChange(controls.change_all_mov_y);
-    gui.add(controls, 'all_mov_z', -50000, 50000).onChange(controls.change_all_mov_z);
-    
-    
-
-
-    
-    // gui.add(controls, 'materials_specular', 0x000000, 0xffffff).onChange(controls.materials_specular);
-
+    child_view_gui.add(controls, 'all_mov_x', -50000, 50000).name('子场景移动-X').onChange(controls.change_all_mov_x);
+    child_view_gui.add(controls, 'all_mov_y', -50000, 50000).name('子场景移动-Y').onChange(controls.change_all_mov_y);
+    child_view_gui.add(controls, 'all_mov_z', -50000, 50000).name('子场景移动-Z').onChange(controls.change_all_mov_z);
 }
 
 

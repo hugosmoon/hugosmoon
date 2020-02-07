@@ -32,7 +32,7 @@ class Load_models_conf(models.Model):
     emissive_r=models.FloatField(default=1,db_column="emissive_r")
     emissive_g=models.FloatField(default=1,db_column="emissive_g")
     emissive_b=models.FloatField(default=1,db_column="emissive_b")
-    emissiveIntensity=models.FloatField(default=0.1,db_column="emissiveIntensity")
+    emissiveIntensity=models.FloatField(default=0,db_column="emissiveIntensity")
     reflectivity=models.FloatField(default=0.5,db_column="reflectivity")
 
 
