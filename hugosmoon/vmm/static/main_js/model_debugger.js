@@ -92,11 +92,11 @@ let Main = {
 
             });
         },
-        get_child_views:function(){
+        get_child_views:function(parent_view_id){
             this.$http.post(
                 '/vmm/get_views/',
                 {
-                    parent_id:current_view_id
+                    parent_id:parent_view_id
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
@@ -158,7 +158,7 @@ let Main = {
                                     });
                                     this.get_views();
                                     if(this.view_selected!=0){
-                                        this.get_child_views();
+                                        this.get_child_views(this.view_selected);
                                     }
                                 });                   
                         }
@@ -185,7 +185,7 @@ let Main = {
             this.model_information+='<tr><td>Z:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +"</td>"
             this.model_information+='<td> Z/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +"</td></tr>"
 
-            //console.log(this.model_information);
+            ////console.log(this.model_information);
             this.del_model_status=false;
             change_model(
                 models_info[current_model_index].model_name,
@@ -229,7 +229,7 @@ let Main = {
                     if(load_models_num>loaded_models_num){
                         this.openFullScreen(200);
                     }
-                    //console.log(models_got);
+                    ////console.log(models_got);
                     models_got.forEach(model => {
                         index=Number(model.serial);
                         models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
@@ -253,13 +253,16 @@ let Main = {
                         models_info[index].change_emissive_b(model.emissive_b)
                         models_info[index].change_emissiveIntensity(model.emissiveIntensity)
                         models_info[index].change_reflectivity(model.reflectivity)
+                        models_info[index].change_scale_x(model.scale_x)
+                        models_info[index].change_scale_y(model.scale_y)
+                        models_info[index].change_scale_z(model.scale_z)
                         
-                        //console.log(models_info)
-                        // //console.log('~~~') 
+                        ////console.log(models_info)
+                        // ////console.log('~~~') 
                         ////////////////////////////////////////////////////////////////////////////////  
                         // models_got_list.push({value: index,label: index+"-"+model.model_name})
                         initObject(index);
-                        // //console.log(index)
+                        // ////console.log(index)
                     });        
                 });
             this.model_list=models_got_list;
@@ -279,7 +282,7 @@ let Main = {
                 { emulateJSON: true }
                 ).then(function (res) {
                     models_got=res.body.models;
-                    //console.log(models_got);
+                    ////console.log(models_got);
                     models_got.forEach(model => {
                         index=Number(model.serial);
                         models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
@@ -303,9 +306,12 @@ let Main = {
                         models_info[index].change_emissive_b(model.emissive_b)
                         models_info[index].change_emissiveIntensity(model.emissiveIntensity)
                         models_info[index].change_reflectivity(model.reflectivity)
+                        models_info[index].change_scale_x(model.scale_x)
+                        models_info[index].change_scale_y(model.scale_y)
+                        models_info[index].change_scale_z(model.scale_z)
                         models_got_list.push({value: index,label: index+"-"+model.model_name})
                         // initObject(index,model.materials_type);
-                        // //console.log(index)
+                        // ////console.log(index)
                     });        
                 });
             this.model_list=models_got_list;
@@ -322,16 +328,16 @@ let Main = {
 
         },
         save_model:function(){
-            // //console.log(models_info);
+            // ////console.log(models_info);
             let info_list=[];
             for(i=0;i<models_info.length;i++){
                 if(models_info[i] != null){
                     info_list.push(models_info[i])
                 }
             }
-            // //console.log(info_list);
+            // ////console.log(info_list);
             let info=JSON.stringify(info_list);
-            // //console.log(info)
+            // ////console.log(info)
             this.$http.post(
                 '/vmm/save_models/',
                 {
@@ -339,7 +345,7 @@ let Main = {
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                // //console.log(res);
+                // ////console.log(res);
                 this.$message({
                     type: 'success',
                     duration: 1000,
@@ -365,7 +371,7 @@ let Main = {
                 },
                 { emulateJSON: true }
             ).then(function (res){
-                //console.log(res)
+                ////console.log(res)
             })
 
         },
@@ -380,7 +386,7 @@ let Main = {
             this.enter_view_name=true;
             this.display_status=false;
             this.get_models();
-            this.get_child_views();
+            this.get_child_views(view_name);
         },
         add_model: function () {
             load_status=false;
@@ -412,7 +418,7 @@ let Main = {
                     },
                     { emulateJSON: true }
                 ).then(function (res){
-                    //console.log(res.body.model[0]);
+                    ////console.log(res.body.model[0]);
                     let model_id=res.body.model[0].id;
                     let model_name=res.body.model[0].model_name;
                     let url=res.body.model[0].url
@@ -421,10 +427,7 @@ let Main = {
                     this.model_list.push({value: index,label: index+"-"+model_name})
                     this.model_name='';
                     initObject(index); 
-                })
-
-                 
-                
+                })     
             }
             else{
                 alert('模型名称不能为空')
@@ -437,17 +440,17 @@ let Main = {
             this.$http.get(
                 '/vmm/get_folders/'
                 ).then(function (res) {
-                //console.log(res);
-                //console.log(res.body);
+                ////console.log(res);
+                ////console.log(res.body);
                 res.body.folders.forEach(folder => {
-                    //console.log(folder.folder_name);
+                    ////console.log(folder.folder_name);
                     this.folder_list.push({value: folder.id,label: folder.folder_name});
                 })
 
             });
         },
         get_models_by_folder:function(){
-            //console.log(this.folder_selected);
+            ////console.log(this.folder_selected);
             this.$http.post(
                 '/vmm/get_model_by_folderid/',
                 {
@@ -471,7 +474,7 @@ let Main = {
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                    //console.log(res.body.model[0].url);
+                    ////console.log(res.body.model[0].url);
                     this.model_url=res.body.model[0].url;
             });
         },
@@ -507,7 +510,7 @@ let Main = {
                     if(res.body.views.length != 0){
                         inputValue=res.body.views[0].display_name;
                     }
-                    console.log(inputValue)
+                    //console.log(inputValue)
                     this.$prompt('输入预览场景的名称', '预览设置', {
                         confirmButtonText: '预览',
                         cancelButtonText: '取消',
@@ -663,11 +666,11 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         };
 
         this.change_model_color = function() {
-            console.log(controls.model_color)
-            console.log(controls.model_color.length)
+            //console.log(controls.model_color)
+            //console.log(controls.model_color.length)
             if(controls.model_color.length==7){
-                // console.log(controls.model_color.substr(3,2))
-                // console.log(parseInt(controls.model_color.substr(3,2),16))
+                // //console.log(controls.model_color.substr(3,2))
+                // //console.log(parseInt(controls.model_color.substr(3,2),16))
                 models[current_model_index].children[0].material.color.r=parseInt(controls.model_color.substr(1,2),16)/255;
                 models[current_model_index].children[0].material.color.g=parseInt(controls.model_color.substr(3,2),16)/255;
                 models[current_model_index].children[0].material.color.b=parseInt(controls.model_color.substr(5,2),16)/255;
@@ -746,11 +749,11 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
 
 
         this.change_emissive_color = function () {
-            console.log(controls.emissive_color)
-            console.log(controls.emissive_color.length)
+            //console.log(controls.emissive_color)
+            //console.log(controls.emissive_color.length)
             if(controls.emissive_color.length==7){
-                // console.log(controls.emissive_color.substr(3,2))
-                // console.log(parseInt(controls.emissive_color.substr(3,2),16))
+                // //console.log(controls.emissive_color.substr(3,2))
+                // //console.log(parseInt(controls.emissive_color.substr(3,2),16))
                 models[current_model_index].children[0].material.emissive.r=parseInt(controls.emissive_color.substr(1,2),16)/255;
                 models[current_model_index].children[0].material.emissive.g=parseInt(controls.emissive_color.substr(3,2),16)/255;
                 models[current_model_index].children[0].material.emissive.b=parseInt(controls.emissive_color.substr(5,2),16)/255;
@@ -808,7 +811,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         };
 
         this.move_x = function () {
-            console.log(controls.x)
+            //console.log(controls.x)
             if(!(isNaN(controls.x))&&!(isNaN(controls.mini_x))){
                 models[current_model_index].position.x=controls.x+controls.mini_x;
                 models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
@@ -816,7 +819,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
             
         };
         this.move_y = function () {
-            console.log(controls.y)
+            //console.log(controls.y)
             if(!(isNaN(controls.y))&&!(isNaN(controls.mini_y))){
                 models[current_model_index].position.y=controls.y+controls.mini_y;
                 models_info[current_model_index].change_po_y(controls.y+controls.mini_y)
@@ -825,7 +828,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
            
         };
         this.move_z = function () {
-            console.log(controls.z)
+            //console.log(controls.z)
             if(!(isNaN(controls.z))&&!(isNaN(controls.mini_z))){
                 models[current_model_index].position.z=controls.z+controls.mini_z;
                 models_info[current_model_index].change_po_z(controls.z+controls.mini_z)
