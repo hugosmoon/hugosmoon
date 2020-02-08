@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- <link rel="icon" href="{% static 'logo.ico' %}"> -->
+    <title>{{display_name}}</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
+    <!-- 引入组件库 -->
+    <script src="{% static 'import/vue.js' %}"></script>
+    <script src="{% static 'import/element_index.js' %}"></script>
+    <script src="{% static 'import/three.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/Setting.js' %}"></script>
+    <script src="{% static 'import/OrbitControls.js' %}"></script>
+    <script src="{% static 'import/dat.gui.min.js' %}"></script>
+    <script src="{% static 'import/SceneUtils.js' %}"></script>
+    <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/STLLoader.js' %}"></script>
+    <script src="{% static 'import/dat.gui.js' %}"></script>
+    <script src="{% static 'import/stats.js' %}"></script>
+    <script src="{% static 'import/echarts.min.js' %}"></script>
+    <script src="{% static 'import/echarts-gl.min.js' %}"></script>
+    <script src="{% static 'import/vue-resource.min.js' %}"></script>
+    
+</head>
+<body>
+    <div id="Stats-output"></div>
+    <div>
+        <!--加载动画的div-->
+        <div id="render">
+        </div>
+        <div id="app">
+            <div id="lef_top_label">
+                <p id="title2"></p>
+            </div>
+        </div>
+            
+        </div>
+    </div>
+    <script src="{% static 'main_js/model.js' %}"></script>
+    <script src="{% static 'main_js/view_display.js' %}"></script>
+    <script>
+        let display_view_id={{view_id}};
+        let renderer, camera, scene;
+        ////模型信息列表
+        let models_info=[];
+        ////模型实体列表
+        let models=[];
+        let load_models_num;
+        let loaded_models_num=0;
+        let load_status=false;
+        let Main = {
+            data() {
+                return {
+                    display_name:'',
+
+                }
+            },
+            mounted:function(){
+                this.get_display_info();
+                initThree();
+                loadAutoScreen(camera, renderer);
+                this.load_view(display_view_id);
+                render();
+            },
+            methods: {
+                get_display_info:function(){
+                    this.$http.post(
+                    '/vmm/get_display_view/',
+                    {
+                        display_view_id:display_view_id
+                    },
+                    { emulateJSON: true }
+                    ).then(function (res) {
+                        this.display_name=res.body.views[0].display_name;
+                        console.log(this.display_name)
+                        $('#title2').html(this.display_name)
+                        $("title").html(this.display_name);
+                    });
+                },
+                load_view:function (view_id){
+                    let models_got_list=[];
+                    this.$http.post(
+                        '/vmm/get_models_by_view/',
+                        {
+                            view_id:display_view_id
+                        },
+                        { emulateJSON: true }
+                        ).then(function (res) {
+                            models_got=res.body.models;
+                            load_models_num=models_got.length;
+                            if(load_models_num>loaded_models_num){
+                                this.openFullScreen(200);
+                            }
+                            // console.log(models_got);
+                            models_got.forEach(model => {
+                                index=Number(model.serial);
+                                models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
+                                // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
+                                models_info[index].change_po_x(model.position_x);
+                                models_info[index].change_po_y(model.position_y)
+                                models_info[index].change_po_z(model.position_z)
+
+                                // models_info[index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
+                                models_info[index].change_ro_x(model.rotation_x)
+                                models_info[index].change_ro_y(model.rotation_y)
+                                models_info[index].change_ro_z(model.rotation_z)
+                                models_info[index].change_materials_color_r(model.materials_color_r)
+                                models_info[index].change_materials_color_g(model.materials_color_g)
+                                models_info[index].change_materials_color_b(model.materials_color_b)
+
+                                models_info[index].change_metalness(model.metalness)
+                                models_info[index].change_roughness(model.roughness)
+                                models_info[index].change_emissive_r(model.emissive_r)
+                                models_info[index].change_emissive_g(model.emissive_g)
+                                models_info[index].change_emissive_b(model.emissive_b)
+                                models_info[index].change_emissiveIntensity(model.emissiveIntensity)
+                                models_info[index].change_reflectivity(model.reflectivity)
+                                initObject(index);
+                            });        
+                    });
+
+                },
+                // 加载遮罩
+                openFullScreen:function(time) {
+                    const loading = this.$loading({
+                        lock: true,
+                        text: '模型加载中',
+                        background: 'rgba(0, 0, 0, 0.92)'
+                    });
+                    setTimeout(() => {
+                        if(load_status){
+                            loading.close();
+                        }
+                        else {
+                            this.openFullScreen(200);
+                        }
+
+                    }, time);
+                },
+
+            }
+        }
+        var Ctor = Vue.extend(Main)
+        new Ctor().$mount('#app')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        //主函数
+        function threeStart() {
+            initThree();
+            loadAutoScreen(camera, renderer);
+            load_view(display_view_id);
+            render();
+        }
+        //动画
+        function render() {
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+        
+    </script>
+    
+    
+</body>
+</html>

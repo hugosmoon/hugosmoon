@@ -22,7 +22,9 @@ urlpatterns = [
     path('get_model_by_folderid/',views.get_model_by_folderid,name='get_model_by_folderid'),
     path('get_model_info_by_id/',views.get_model_info_by_id,name='get_model_info_by_id'),
     path('is_view_exist/',views.is_view_exist,name='is_view_exist'),
-
+    re_path('^view_display/(?P<view_id>[0-9]+)/',views.view_display,name='view_display'),
+    path('create_display_view/',views.create_display_view,name='create_display_view'),
+    path('get_display_view/',views.get_display_view,name='get_display_view'),
     
 ]
 

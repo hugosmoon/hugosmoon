@@ -5,7 +5,7 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model,views
+from vmm.models import Load_models_conf,folder,com_model,views,display_views
 import os
 import time
 
@@ -26,6 +26,8 @@ def model_debugger(request):
     return render(request, 'test/model_debugger.html')
 def model_manage(request):
     return render(request, 'test/model_manage.html')
+def view_display(request,view_id):
+    return render(request, 'test/view_display.html',{"view_id": view_id})
 
 # 计算切削力
 @csrf_exempt
@@ -289,6 +291,32 @@ def get_model_info_by_id(request):
         model_info=com_model.objects.filter(id=model_id).values()
         data={}
         data['model']=list(model_info)
+        return JsonResponse(data)
+
+# 创建or更新预览场景
+@csrf_exempt
+def create_display_view(request):
+    if request.method == 'POST':
+        view_id=int(request.POST.get('display_view_id'))
+        display_name = request.POST.get('display_name')
+
+        display_view=display_views.objects.filter(view_id=view_id,isdelete=False)
+        if len(display_view) > 0:
+            if len(display_view) > 1:
+                return HttpResponse('failed')
+            display_view.update(view_id=view_id,display_name=display_name)
+        else:
+            display_views.objects.create(view_id=view_id,display_name=display_name)
+        return HttpResponse('success')
+
+# 查询预览场景
+@csrf_exempt
+def get_display_view(request):
+    if request.method == 'POST':
+        view_id=int(request.POST.get('display_view_id'))
+        view=display_views.objects.filter(view_id=view_id).values()
+        data={}
+        data['views']=list(view)
         return JsonResponse(data)
 
 
