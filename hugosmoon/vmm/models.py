@@ -15,6 +15,9 @@ class Load_models_conf(models.Model):
     position_x=models.FloatField(db_column="position_x")
     position_y=models.FloatField(db_column="position_y")
     position_z=models.FloatField(db_column="position_z")
+    view_position_x=models.FloatField(default=0,db_column="view_position_x")
+    view_position_y=models.FloatField(default=0,db_column="view_position_y")
+    view_position_z=models.FloatField(default=0,db_column="view_position_z")
     rotation_x=models.FloatField(db_column="rotation_x")
     rotation_y=models.FloatField(db_column="rotation_y")
     rotation_z=models.FloatField(db_column="rotation_z")
@@ -34,6 +37,8 @@ class Load_models_conf(models.Model):
     emissive_b=models.FloatField(default=1,db_column="emissive_b")
     emissiveIntensity=models.FloatField(default=0,db_column="emissiveIntensity")
     reflectivity=models.FloatField(default=0.5,db_column="reflectivity")
+
+
 
 
     isdelete = models.BooleanField(default=False, db_column="f_is_delete")

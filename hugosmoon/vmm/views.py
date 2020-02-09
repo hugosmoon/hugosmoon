@@ -114,6 +114,12 @@ def save_models(request):
             position_x=model['position_x']
             position_y=model['position_y']
             position_z=model['position_z']
+            view_position_x=model['view_position_x']
+            view_position_y=model['view_position_y']
+            view_position_z=model['view_position_z']
+            
+            
+
             rotation_x=model['rotation_x']
             rotation_y=model['rotation_y']
             rotation_z=model['rotation_z']
@@ -141,9 +147,9 @@ def save_models(request):
 
             models_in=Load_models_conf.objects.filter(view_id=view_id,model_id=model_id,serial=serial)
             if len(models_in) > 0:
-                models_in.update(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity)
+                models_in.update(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity,view_position_x=view_position_x,view_position_y=view_position_y,view_position_z=view_position_z)
             else:
-                Load_models_conf.objects.create(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity)
+                Load_models_conf.objects.create(view_id=view_id,model_id=model_id,serial=serial,model_name=model_name,model_url=model_url,position_x=position_x,position_y=position_y,position_z=position_z,rotation_x=rotation_x,rotation_y=rotation_y,rotation_z=rotation_z,materials_color_r=materials_color_r,materials_color_g=materials_color_g,materials_color_b=materials_color_b,scale_x=scale_x,scale_y=scale_y,scale_z=scale_z,materials_type=materials_type,metalness=metalness,roughness=roughness,emissive_r=emissive_r,emissive_g=emissive_g,emissive_b=emissive_b,emissiveIntensity=emissiveIntensity,reflectivity=reflectivity,view_position_x=view_position_x,view_position_y=view_position_y,view_position_z=view_position_z)
         return HttpResponse('Save Success')
 #根据场景名称获取模型组数据
 @csrf_exempt

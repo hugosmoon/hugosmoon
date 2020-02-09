@@ -111,6 +111,7 @@ function initThree() {
 
 //初始化一个模型
 function initObject(index) {
+    console.log('正在加载');
     //模型材质
     let color=new THREE.Color(models_info[index].materials_color_r,models_info[index].materials_color_g,models_info[index].materials_color_b);
     let emissive_color=new THREE.Color(models_info[index].emissive_r,models_info[index].emissive_g,models_info[index].emissive_b);
@@ -135,13 +136,14 @@ function initObject(index) {
 
     let loader = new THREE.STLLoader();
     loader.load(models_info[index].url, function (geometry) {
+       
         // //console.log(geometry);
         geometry.center();
         models[index] = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
         models[index].receiveShadow = true; 
-        models[index].position.x=models_info[index].position_x;
-        models[index].position.y=models_info[index].position_y;
-        models[index].position.z=models_info[index].position_z;
+        models[index].position.x=models_info[index].position_x+models_info[index].view_position_x;
+        models[index].position.y=models_info[index].position_y+models_info[index].view_position_y;
+        models[index].position.z=models_info[index].position_z+models_info[index].view_position_z;
         models[index].rotation.x=models_info[index].rotation_x;
         models[index].rotation.y=models_info[index].rotation_y;
         models[index].rotation.z=models_info[index].rotation_z;
@@ -152,7 +154,7 @@ function initObject(index) {
         
         scene.add(models[index]);
         // //console.log(models)
-        //console.log(this.name+'加载完成');
+        console.log('加载完成');
         loaded_models_num+=1;
         if(loaded_models_num==load_models_num){
             load_status=true;
@@ -171,6 +173,11 @@ function Model(view_id,model_id,model_name,url,index,materials_type){
     this.position_x=0;
     this.position_y=0;
     this.position_z=0;
+
+    this.view_position_x=0;
+    this.view_position_y=0;
+    this.view_position_z=0;
+
     this.rotation_x=0;
     this.rotation_y=0;
     this.rotation_z=0;
@@ -210,6 +217,16 @@ function Model(view_id,model_id,model_name,url,index,materials_type){
     };
     this.change_po_z=function(z){
         this.position_z=z;
+    };
+
+    this.change_view_po_x=function(x){
+        this.view_position_x=x;
+    };
+    this.change_view_po_y=function(y){
+        this.view_position_y=y;
+    };
+    this.change_view_po_z=function(z){
+        this.view_position_z=z;
     };
    
     this.change_ro_x=function(x){
