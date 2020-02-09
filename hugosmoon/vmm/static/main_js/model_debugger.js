@@ -568,7 +568,7 @@ new Ctor().$mount('#app')
 
 //主函数
 function threeStart() {
-    initThree();
+    initThree(1);
     loadAutoScreen(camera, renderer);
     
     render();

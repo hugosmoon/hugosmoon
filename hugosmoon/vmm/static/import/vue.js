@@ -3,6 +3,7 @@
  * (c) 2014-2019 Evan You
  * Released under the MIT License.
  */
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -9046,10 +9047,10 @@
         if (devtools) {
           devtools.emit('init', Vue);
         } else {
-          console[console.info ? 'info' : 'log'](
-            'Download the Vue Devtools extension for a better development experience:\n' +
-            'https://github.com/vuejs/vue-devtools'
-          );
+          // console[console.info ? 'info' : 'log'](
+          //   'Download the Vue Devtools extension for a better development experience:\n' +
+          //   'https://github.com/vuejs/vue-devtools'
+          // );
         }
       }
       if (config.productionTip !== false &&

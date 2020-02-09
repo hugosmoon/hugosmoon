@@ -1,5 +1,5 @@
 //初始化渲染器
-function initThree() {
+function initThree(debug) {
     
     renderer = new THREE.WebGLRenderer({
         antialias: true
@@ -8,8 +8,8 @@ function initThree() {
     document.getElementById('render').appendChild(renderer.domElement);//将渲染器加在html中的div里面
 
     renderer.setClearColor(0x444444, 1.0);//渲染的颜色设置
-    renderer.shadowMapEnabled = true;//开启阴影，默认是关闭的，太影响性能
-    renderer.shadowMapType = THREE.PCFSoftShadowMap;//阴影的一个类型
+    renderer.shadowMap.enabled = true;//开启阴影，默认是关闭的，太影响性能
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;//阴影的一个类型
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
@@ -35,8 +35,8 @@ function initThree() {
     light.position.set(0, 0, 80000);
     light.angle=Math.PI;
     light.castShadow = true;//开启阴影
-    light.shadowMapWidth = 8192;//阴影的分辨率，可以不设置对比看效果
-    light.shadowMapHeight = 8192;
+    light.shadow.mapSize.width = 8192;//阴影的分辨率，可以不设置对比看效果
+    light.shadow.mapSize.height = 8192;
     scene.add(light);
 
     let light2 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
@@ -89,24 +89,29 @@ function initThree() {
         y_zhou.receiveShadow = true;//开启地面的接收阴影
         scene.add(y_zhou);//添加到场景中
     }
+    if(debug==1){
+        //坐标轴
+        let x_zhou_Geometry = new THREE.CylinderGeometry(2, 2, 50000);
+        let x_zhou_Material =
+            new THREE.MeshLambertMaterial({color:0xff0000,transparent:true,opacity:0.6,})
+            x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
+        // x_zhou.position.z = -995;
+        x_zhou.rotation.z = Math.PI*0.5;
+        x_zhou.receiveShadow = true;//开启地面的接收阴影
+        scene.add(x_zhou);//添加到场景中
 
-    //坐标轴
-    let x_zhou_Geometry = new THREE.PlaneGeometry(50000, 30, 20, 20);
-    let x_zhou_Material =
-        new THREE.MeshLambertMaterial({color:0xff0000})
-        x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
-    x_zhou.position.z = -995;
-    x_zhou.receiveShadow = true;//开启地面的接收阴影
-    scene.add(x_zhou);//添加到场景中
+        let y_zhou_Geometry = new THREE.CylinderGeometry(2, 2, 50000);
+        let y_zhou_Material =
+            new THREE.MeshLambertMaterial({color:0x0000ff,transparent:true,opacity:0.6,})
+            y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
+        // y_zhou.position.z = -995;
+        // y_zhou.rotation.z = Math.PI*0.5;
+        y_zhou.receiveShadow = true;//开启地面的接收阴影
+        scene.add(y_zhou);//添加到场景中
+    
+    }
 
-    let y_zhou_Geometry = new THREE.PlaneGeometry(50000, 30, 20, 20);
-    let y_zhou_Material =
-        new THREE.MeshLambertMaterial({color:0x0000ff})
-        y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
-    y_zhou.position.z = -995;
-    y_zhou.rotation.z = Math.PI*0.5;
-    y_zhou.receiveShadow = true;//开启地面的接收阴影
-    scene.add(y_zhou);//添加到场景中
+    
 }
 
 //初始化一个模型

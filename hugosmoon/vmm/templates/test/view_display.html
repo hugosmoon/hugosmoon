@@ -61,7 +61,7 @@
             },
             mounted:function(){
                 this.get_display_info();
-                initThree();
+                initThree(0);
                 loadAutoScreen(camera, renderer);
                 this.load_view(display_view_id);
                 render();
@@ -149,34 +149,6 @@
         }
         var Ctor = Vue.extend(Main)
         new Ctor().$mount('#app')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-        //主函数
-        function threeStart() {
-            initThree();
-            loadAutoScreen(camera, renderer);
-            load_view(display_view_id);
-            render();
-        }
         //动画
         function render() {
             requestAnimationFrame(render);
