@@ -6,8 +6,8 @@ from . import views
 
 urlpatterns = [
     path('index/', views.home,name='home'),
-    path('tool_display/', views.tool_display),
-    re_path('^qxyl/(?P<id>[0-9]+)/', views.qxyl,name='qxyl'),
+    path('tool_display/', views.tool_display,name='tool_display'),
+    path('qxyl/', views.qxyl,name='qxyl'),
     path('cuttingforce_cal/',views.cuttingforce_cal,name='cuttingforce_cal'),
     url(r'model_debugger/',views.model_debugger,name='model_debugger'),
     path('save_models/',views.save_models,name='save_models'),
@@ -25,6 +25,8 @@ urlpatterns = [
     re_path('^view_display/(?P<view_id>[0-9]+)/',views.view_display,name='view_display'),
     path('create_display_view/',views.create_display_view,name='create_display_view'),
     path('get_display_view/',views.get_display_view,name='get_display_view'),
+    path('test/',views.test,name='test'),
+
     
 ]
 

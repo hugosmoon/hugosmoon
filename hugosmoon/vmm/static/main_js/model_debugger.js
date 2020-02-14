@@ -62,10 +62,12 @@ let Main = {
             enter_view_name:false,
             model_information: '',
             child_view_status:true,
+            select_model_status:true,
             add_model_status:true,
             del_model_status:true,
             display_status:true,
             save_status:true,
+            
             display_view_id:0,
         }
     },
@@ -231,57 +233,62 @@ let Main = {
                     }
                     ////console.log(models_got);
                     models_got.forEach(model => {
-                        index=Number(model.serial);
-                        models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
-                        // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
-                        models_info[index].change_po_x(model.position_x);
-                        models_info[index].change_po_y(model.position_y);
-                        models_info[index].change_po_z(model.position_z);
+                        let p_index=Number(model.serial);
+                        if(p_index>index){
+                            index=p_index;
+                        }
+                        // console.log(index);
+                        models_info[p_index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,p_index,model.materials_type);
+                        // models_info[p_index].change_po(model.position_x,model.position_y,model.position_z)
+                        models_info[p_index].change_po_x(model.position_x);
+                        models_info[p_index].change_po_y(model.position_y);
+                        models_info[p_index].change_po_z(model.position_z);
                         
-                        models_info[index].change_view_po_x(model.view_position_x);
-                        models_info[index].change_view_po_y(model.view_position_y);
-                        models_info[index].change_view_po_z(model.view_position_z);
+                        models_info[p_index].change_view_po_x(model.view_position_x);
+                        models_info[p_index].change_view_po_y(model.view_position_y);
+                        models_info[p_index].change_view_po_z(model.view_position_z);
                         
 
-                        // models_info[index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
-                        models_info[index].change_ro_x(model.rotation_x)
-                        models_info[index].change_ro_y(model.rotation_y)
-                        models_info[index].change_ro_z(model.rotation_z)
-                        models_info[index].change_materials_color_r(model.materials_color_r)
-                        models_info[index].change_materials_color_g(model.materials_color_g)
-                        models_info[index].change_materials_color_b(model.materials_color_b)
+                        // models_info[p_index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
+                        models_info[p_index].change_ro_x(model.rotation_x)
+                        models_info[p_index].change_ro_y(model.rotation_y)
+                        models_info[p_index].change_ro_z(model.rotation_z)
+                        models_info[p_index].change_materials_color_r(model.materials_color_r)
+                        models_info[p_index].change_materials_color_g(model.materials_color_g)
+                        models_info[p_index].change_materials_color_b(model.materials_color_b)
 
-                        models_info[index].change_metalness(model.metalness)
-                        models_info[index].change_roughness(model.roughness)
-                        models_info[index].change_emissive_r(model.emissive_r)
-                        models_info[index].change_emissive_g(model.emissive_g)
-                        models_info[index].change_emissive_b(model.emissive_b)
-                        models_info[index].change_emissiveIntensity(model.emissiveIntensity)
-                        models_info[index].change_reflectivity(model.reflectivity)
-                        models_info[index].change_scale_x(model.scale_x)
-                        models_info[index].change_scale_y(model.scale_y)
-                        models_info[index].change_scale_z(model.scale_z)
+                        models_info[p_index].change_metalness(model.metalness)
+                        models_info[p_index].change_roughness(model.roughness)
+                        models_info[p_index].change_emissive_r(model.emissive_r)
+                        models_info[p_index].change_emissive_g(model.emissive_g)
+                        models_info[p_index].change_emissive_b(model.emissive_b)
+                        models_info[p_index].change_emissiveIntensity(model.emissiveIntensity)
+                        models_info[p_index].change_reflectivity(model.reflectivity)
+                        models_info[p_index].change_scale_x(model.scale_x)
+                        models_info[p_index].change_scale_y(model.scale_y)
+                        models_info[p_index].change_scale_z(model.scale_z)
                         
                         ////console.log(models_info)
                         // ////console.log('~~~') 
                         ////////////////////////////////////////////////////////////////////////////////  
-                        // models_got_list.push({value: index,label: index+"-"+model.model_name})
-                        initObject(index);
+                        // models_got_list.push({value: p_index,label: p_index+"-"+model.model_name})
+                        initObject(p_index);
                         // ////console.log(index)
                     });        
                 });
             this.model_list=models_got_list;
         },
         get_models_by_child_view:function(){
+            this.select_model_status=false; 
             
             if(this.child_view_selected==''){
                 this.child_view_selected=0
             }
             current_view_id=this.child_view_selected;
             let models_got_list=[];
-            let view_position_x;
-            let view_position_y;
-            let view_position_z;
+            let view_position_x=0;
+            let view_position_y=0;
+            let view_position_z=0;
 
             this.$http.post(
                 '/vmm/get_models_by_view/',
@@ -291,40 +298,41 @@ let Main = {
                 { emulateJSON: true }
                 ).then(function (res) {
                     models_got=res.body.models;
-                    view_position_x=models_got[0].view_position_x;
-                    view_position_y=models_got[0].view_position_y;
-                    view_position_z=models_got[0].view_position_z;
-
+                    if(models_got.length>0){
+                        view_position_x=models_got[0].view_position_x;
+                        view_position_y=models_got[0].view_position_y;
+                        view_position_z=models_got[0].view_position_z;
+                    }
                     ////console.log(models_got);
                     models_got.forEach(model => {
-                        index=Number(model.serial);
-                        models_info[index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,index,model.materials_type);
-                        // models_info[index].change_po(model.position_x,model.position_y,model.position_z)
-                        models_info[index].change_po_x(model.position_x);
-                        models_info[index].change_po_y(model.position_y)
-                        models_info[index].change_po_z(model.position_z)
-                        models_info[index].change_view_po_x(model.view_position_x);
-                        models_info[index].change_view_po_y(model.view_position_y);
-                        models_info[index].change_view_po_z(model.view_position_z);
-                        // models_info[index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
-                        models_info[index].change_ro_x(model.rotation_x)
-                        models_info[index].change_ro_y(model.rotation_y)
-                        models_info[index].change_ro_z(model.rotation_z)
-                        models_info[index].change_materials_color_r(model.materials_color_r)
-                        models_info[index].change_materials_color_g(model.materials_color_g)
-                        models_info[index].change_materials_color_b(model.materials_color_b)
+                        let ch_index=Number(model.serial);
+                        models_info[ch_index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,ch_index,model.materials_type);
+                        // models_info[ch_index].change_po(model.position_x,model.position_y,model.position_z)
+                        models_info[ch_index].change_po_x(model.position_x);
+                        models_info[ch_index].change_po_y(model.position_y)
+                        models_info[ch_index].change_po_z(model.position_z)
+                        models_info[ch_index].change_view_po_x(model.view_position_x);
+                        models_info[ch_index].change_view_po_y(model.view_position_y);
+                        models_info[ch_index].change_view_po_z(model.view_position_z);
+                        // models_info[ch_index].change_ro(model.rotation_x,model.rotation_y,model.rotation_z)
+                        models_info[ch_index].change_ro_x(model.rotation_x)
+                        models_info[ch_index].change_ro_y(model.rotation_y)
+                        models_info[ch_index].change_ro_z(model.rotation_z)
+                        models_info[ch_index].change_materials_color_r(model.materials_color_r)
+                        models_info[ch_index].change_materials_color_g(model.materials_color_g)
+                        models_info[ch_index].change_materials_color_b(model.materials_color_b)
 
-                        models_info[index].change_metalness(model.metalness)
-                        models_info[index].change_roughness(model.roughness)
-                        models_info[index].change_emissive_r(model.emissive_r)
-                        models_info[index].change_emissive_g(model.emissive_g)
-                        models_info[index].change_emissive_b(model.emissive_b)
-                        models_info[index].change_emissiveIntensity(model.emissiveIntensity)
-                        models_info[index].change_reflectivity(model.reflectivity)
-                        models_info[index].change_scale_x(model.scale_x)
-                        models_info[index].change_scale_y(model.scale_y)
-                        models_info[index].change_scale_z(model.scale_z)
-                        models_got_list.push({value: index,label: index+"-"+model.model_name})
+                        models_info[ch_index].change_metalness(model.metalness)
+                        models_info[ch_index].change_roughness(model.roughness)
+                        models_info[ch_index].change_emissive_r(model.emissive_r)
+                        models_info[ch_index].change_emissive_g(model.emissive_g)
+                        models_info[ch_index].change_emissive_b(model.emissive_b)
+                        models_info[ch_index].change_emissiveIntensity(model.emissiveIntensity)
+                        models_info[ch_index].change_reflectivity(model.reflectivity)
+                        models_info[ch_index].change_scale_x(model.scale_x)
+                        models_info[ch_index].change_scale_y(model.scale_y)
+                        models_info[ch_index].change_scale_z(model.scale_z)
+                        models_got_list.push({value: ch_index,label: ch_index+"-"+model.model_name})
                         // initObject(index,model.materials_type);
                         // ////console.log(index)
                     });
@@ -338,7 +346,8 @@ let Main = {
                             child_view_name=view.label;
                         }
                     }); 
-                    change_child_view(child_view_name,view_position_x,view_position_y,view_position_z);       
+                    change_child_view(child_view_name,view_position_x,view_position_y,view_position_z);
+                         
                 });
             
             
@@ -436,7 +445,8 @@ let Main = {
                     },
                     { emulateJSON: true }
                 ).then(function (res){
-                    ////console.log(res.body.model[0]);
+
+                    console.log(res.body.model[0].model_name+'添加完成');
                     let model_id=res.body.model[0].id;
                     let model_name=res.body.model[0].model_name;
                     let url=res.body.model[0].url
@@ -612,11 +622,13 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         ////反光颜色
         
         this.model_color=[parseInt((model_red*255).toFixed(0)),parseInt((model_green*255).toFixed(0)),parseInt((model_blue*255).toFixed(0))];
+        this.model_color_number=(model_red*255).toFixed(0)+','+(model_green*255).toFixed(0)+','+(model_blue*255).toFixed(0);
         // this.model_red=model_red;
         // this.model_green=model_green;
         // this.model_blue=model_blue;
         ////材质本身的颜色，与光线无关
         this.emissive_color=[parseInt((emissive_r*255).toFixed(0)),parseInt((emissive_g*255).toFixed(0)),parseInt((emissive_b*255).toFixed(0))];
+        this.emissive_color_number=(emissive_r*255).toFixed(0)+','+(emissive_g*255).toFixed(0)+','+(emissive_b*255).toFixed(0);
         
         this.emissive_r=emissive_r;
         this.emissive_g=emissive_g;
@@ -649,6 +661,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         };
 
         this.change_model_color = function() {
+            // console.log(controls.model_color)
 
             if(controls.model_color.length==7){
 
@@ -670,6 +683,23 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
 
             }
             
+        };
+        this.change_model_color_number = function() {
+            let color=controls.model_color_number.split(',');
+            // console.log(color);
+            if(color.length==3&&!(isNaN(Number(color[0])))&&!(isNaN(Number(color[1])))&&!(isNaN(Number(color[2])))){
+                models[current_model_index].children[0].material.color.r=Number(color[0])/255;
+                models[current_model_index].children[0].material.color.g=Number(color[1])/255;
+                models[current_model_index].children[0].material.color.b=Number(color[2])/255;
+                models_info[current_model_index].materials_color_r=Number(color[0])/255;
+                models_info[current_model_index].materials_color_g=Number(color[1])/255;
+                models_info[current_model_index].materials_color_b=Number(color[2])/255;
+            }
+            else{
+                alert("色值输入格式必须为'R,G,B',其中R、G、B均为0~255之间的整数")
+                return false;
+            }
+
         };
 
         this.change_scale_x=function(x){
@@ -725,6 +755,24 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
                 models_info[current_model_index].emissive_g=controls.emissive_color[1]/255;
                 models_info[current_model_index].emissive_b=controls.emissive_color[2]/255;
 
+            }
+
+        };
+
+        this.change_emissive_color_number = function() {
+            let color=controls.emissive_color_number.split(',');
+            // console.log(color);
+            if(color.length==3&&!(isNaN(Number(color[0])))&&!(isNaN(Number(color[1])))&&!(isNaN(Number(color[2])))){
+                models[current_model_index].children[0].material.emissive.r=Number(color[0])/255;
+                models[current_model_index].children[0].material.emissive.g=Number(color[1])/255;
+                models[current_model_index].children[0].material.emissive.b=Number(color[2])/255;
+                models_info[current_model_index].emissive_r=Number(color[0])/255;
+                models_info[current_model_index].emissive_g=Number(color[1])/255;
+                models_info[current_model_index].emissive_b=Number(color[2])/255;
+            }
+            else{
+                alert("色值输入格式必须为'R,G,B',其中R、G、B均为0~255之间的整数")
+                return false;
             }
 
         };
@@ -791,12 +839,13 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
     f1_4.add(controls, 'metalness', 0, 1).name('金属质感').onChange(controls.change_metalness);
     f1_4.add(controls, 'roughness', 0, 1).name('粗糙度').onChange(controls.change_roughness);
     f1_4.add(controls, 'reflectivity', 0, 1).name('非金属反光度（金属质感=1时失效）').onChange(controls.change_reflectivity);
-
-    f1_4.addColor(controls, 'model_color').name('反光颜色').onChange(controls.change_model_color);
-    
-    f1_4.addColor(controls, 'emissive_color').name('发光颜色').onChange(controls.change_emissive_color);
-    
-    f1_4.add(controls, 'emissiveIntensity', 0, 1).step(0.01).name('发光材质不透明度').onChange(controls.change_emissiveIntensity);
+    let f1_4_1 = f1_4.addFolder('反光颜色设置');
+    f1_4_1.addColor(controls, 'model_color').name('取色设置').onChange(controls.change_model_color);
+    f1_4_1.add(controls, 'model_color_number').name('色值设置').onFinishChange(controls.change_model_color_number);
+    let f1_4_2 = f1_4.addFolder('发光颜色设置');
+    f1_4_2.addColor(controls, 'emissive_color').name('发光颜色').onChange(controls.change_emissive_color);
+    f1_4_2.add(controls, 'emissive_color_number').name('色值设置').onFinishChange(controls.change_emissive_color_number);
+    f1_4_2.add(controls, 'emissiveIntensity', 0, 1).step(0.01).name('发光材质不透明度').onChange(controls.change_emissiveIntensity);
 }
 function change_child_view(child_view_name,x,y,z){
     if(child_view_gui){

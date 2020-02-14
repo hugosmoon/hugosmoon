@@ -13,15 +13,28 @@ import time
  
 def home(request):
     return render(request, 'index.html')
+def test(request):
+    return render(request, 'test/test.html')
 
 def tool_display(request):
     return render(request, 'tooldisplay/tooldisplay.html')
-
-def qxyl(request,id): 
-    if id=='1':
-        return render(request, 'cuttingforce/qxyl_1.html')
-    elif id =='2':
-        return render(request, 'cuttingforce/qxyl_2.html')
+@csrf_exempt
+def qxyl(request): 
+    if request.method == 'POST':
+        print(request.POST)
+        main_angle=request.POST.get('main_angle')
+        tool_minor_cutting_edge_angle=request.POST.get('tool_minor_cutting_edge_angle')
+        edge_inclination_angle=request.POST.get('edge_inclination_angle')
+        rake_angle=request.POST.get('rake_angle')
+        back_angle=request.POST.get('back_angle')
+        secondary_edge_back_angl=request.POST.get('secondary_edge_back_angl')
+        bangliao_r=request.POST.get('bangliao_r')
+        bangliao_length=request.POST.get('bangliao_length')
+        daojujiaodubuchang=request.POST.get('daojujiaodubuchang')
+        bangliao_material=request.POST.get('bangliao_material')
+        print(bangliao_material)
+        return render(request, 'cuttingforce/qxyl_2.html',{"main_angle": main_angle,"tool_minor_cutting_edge_angle": tool_minor_cutting_edge_angle,"edge_inclination_angle": edge_inclination_angle,"rake_angle": rake_angle,"back_angle": back_angle,"secondary_edge_back_angl": secondary_edge_back_angl,"bangliao_r": bangliao_r,"bangliao_length": bangliao_length,"daojujiaodubuchang": daojujiaodubuchang,"bangliao_material": bangliao_material})
+    return render(request, 'cuttingforce/qxyl_1.html')
 def model_debugger(request):
     return render(request, 'test/model_debugger.html')
 def model_manage(request):

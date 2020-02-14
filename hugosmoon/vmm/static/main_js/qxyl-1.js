@@ -97,14 +97,23 @@ function initObject() {
     //刀柄
 
     let boxgeom = new THREE.BoxGeometry(l, w, w)
+    let color=new THREE.Color(1,1,1)
     let materials = [
-        new THREE.MeshPhongMaterial({
-            opacity: 0.6,
-            color: 0x545454,
-            transparent: false,
-            specular: 0x545454,
-            metal: true
-        }),
+        new THREE.MeshPhysicalMaterial({
+            color:color,
+            // 材质像金属的程度. 非金属材料，如木材或石材，使用0.0，金属使用1.0，中间没有（通常）.
+            // 默认 0.5. 0.0到1.0之间的值可用于生锈的金属外观
+            metalness: 1.0,
+            // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
+            roughness: 0.7,
+            // 设置环境贴图
+            // envMap: textureCube,
+            // 反射程度, 从 0.0 到1.0.默认0.5.
+            // 这模拟了非金属材料的反射率。 当metalness为1.0时无效
+            // reflectivity: models_info[index].reflectivity,
+            // emissive:emissive_color,
+            // emissiveIntensity:models_info[index].emissiveIntensity,
+            }),
     ];
 
 
@@ -261,7 +270,7 @@ var Main = {
             value5: 10,
             value6: 15,
 
-            bangliao_r: 80,
+            bangliao_d: 80,
             bangdliao_length:600,
             bangliao_materials: [{
                 value: '45_steel',
@@ -277,7 +286,6 @@ var Main = {
                 label: '可锻铸铁'
               }],
               value: '',
-
             marks_main_angle: {
                 10:'10°',
                 20:'20°',
@@ -336,12 +344,12 @@ var Main = {
                 1.5: '1.5mm',
                 2: '2.0mm'
             },
-            marks_bangliao_r:{
-                60:'60',
-                70:'70',
+            marks_bangliao_d:{
                 80:'80',
-                90:'90',
-                100:'100',
+                160:'160',
+                240:'240',
+                320:'320',
+                400:'400',
             },
             marks_bangdliao_length:{
                 300:'300',
@@ -349,6 +357,9 @@ var Main = {
                 500:'500',
                 600:'600',
                 700:'700',
+                800:'800',
+                900:'900',
+                1000:'1000',
             }
         }
     },
@@ -431,21 +442,27 @@ var Main = {
             p0.material.visible =xx
         },
         submit:function () {
+            if(this.value==''){
+                this.$message.warning('请选棒料材料');
+                return false;
+            }
             //60,=15,=0,=30,=10,=10;
-            let url='/vmm/qxyl/2/';
+
+            // let url='/vmm/qxyl/2/';
             let daojujiaodubuchang=w1*5;
-            url+='?';
-            url+=('main_angle='+this.$refs.main_angle.value)+'&';
-            url+=('tool_minor_cutting_edge_angle='+this.$refs.tool_minor_cutting_edge_angle.value)+'&';
-            url+=('edge_inclination_angle='+this.$refs.edge_inclination_angle.value)+'&';
-            url+=('rake_angle='+this.$refs.rake_angle.value)+'&';
-            url+=('back_angle='+this.$refs.back_angle.value)+'&';
-            url+=('secondary_edge_back_angl='+this.$refs.secondary_edge_back_angl.value)+'&';
-            url+=('bangliao_r='+this.$refs.bangdliao_r.value)+'&';
-            url+=('bangliao_length='+(this.$refs.bangliao_length.value+100))+'&';
-            url+=('daojujiaodubuchang='+daojujiaodubuchang)+'&';
-            url+=('bangliao_material='+this.$refs.bangliao_material.value)+'&';
-            location.href=url;
+            document.write("<form action='/vmm/qxyl/' method=post name=form1 style='display:none'>");  
+            document.write("<input type=hidden name='main_angle' value='"+this.$refs.main_angle.value+"'/>"); 
+            document.write("<input type=hidden name='tool_minor_cutting_edge_angle' value='"+this.$refs.tool_minor_cutting_edge_angle.value+"'/>"); 
+            document.write("<input type=hidden name='edge_inclination_angle' value='"+this.$refs.edge_inclination_angle.value+"'/>"); 
+            document.write("<input type=hidden name='rake_angle' value='"+this.$refs.rake_angle.value+"'/>"); 
+            document.write("<input type=hidden name='back_angle' value='"+this.$refs.back_angle.value+"'/>"); 
+            document.write("<input type=hidden name='secondary_edge_back_angl' value='"+this.$refs.secondary_edge_back_angl.value+"'/>"); 
+            document.write("<input type=hidden name='bangliao_r' value='"+this.$refs.bangliao_d.value/2+"'/>"); 
+            document.write("<input type=hidden name='bangliao_length' value='"+this.$refs.bangliao_length.value+"'/>"); 
+            document.write("<input type=hidden name='daojujiaodubuchang' value='"+daojujiaodubuchang+"'/>"); 
+            document.write("<input type=hidden name='bangliao_material' value='"+this.$refs.bangliao_material.value+"'/>");  
+            document.write("</form>");  
+            document.form1.submit();  
         }
     }
 

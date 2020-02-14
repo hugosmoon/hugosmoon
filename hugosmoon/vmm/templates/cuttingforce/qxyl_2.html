@@ -27,7 +27,7 @@
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
     
 </head>
-<body onload="threeStart()">
+<body style="background-color: black;">
     <div id="Stats-output"></div>
     <el-row :gutter="20" v-loading='loading'>
         <!-- ... -->
@@ -42,7 +42,7 @@
         <!--<button id="control-8">刀尖向前</button>-->
 
         <div id="app">
-            <div id="control">
+            <div class="control experiment">
                 <div id="control-inner">
                     <!-- <p id="title1">车床参数</p> -->
                     <template>
@@ -66,9 +66,9 @@
                     </el-row>
                     <br>
                     <el-row>
-                        <el-button type="primary" @click="start">启动机床</el-button>
+                        <el-button :disabled="start_status" type="primary" @click="start">启动机床</el-button>
 
-                        <el-button type="danger" @click="end">关闭机床</el-button>
+                        <el-button :disabled="end_status" type="danger" @click="end">关闭机床</el-button>
                     </el-row>
                     <!-- <br>
                     <el-row>
@@ -77,21 +77,33 @@
 
                 </div>
             </div>
-            <div id="qxyl2-charts">
-                <div id="control-inner">
+            <div class="right-charts">
                     <div class="demo-image__placeholder">
 
                         <div id="container" style="height:200px;width: 100%;"></div>
                         <div id="container2" style="height:300px;width: 100%;margin-top: -120px;"></div>
 
 
-                    </div>
+                
                 </div>
             </div>
         </div>
     </div>
+    <script>
+       let  main_angle={{main_angle}}
+       let  tool_minor_cutting_edge_angle={{tool_minor_cutting_edge_angle}}
+       let  edge_inclination_angle={{edge_inclination_angle}}
+       let  rake_angle={{rake_angle}}
+       let  back_angle={{back_angle}}
+       let  secondary_edge_back_angl={{secondary_edge_back_angl}}
+       let  bangliao_r={{bangliao_r}}
+       let  bangliao_length={{bangliao_length}}
+       let  daojujiaodubuchang={{daojujiaodubuchang}}
+       let  bangliao_material='{{bangliao_material}}'
+    </script>
     
-       
+    <script src="{% static 'main_js/model.js' %}"></script>
+    <script src="{% static 'main_js/view_display.js' %}"></script>  
     <script src="{% static 'main_js/chart_line.js' %}"></script>
     <script src="{% static 'main_js/create_cylinder.js' %}"></script>
     <script src="{% static 'main_js/tool.js' %}"></script>

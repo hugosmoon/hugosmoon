@@ -34,8 +34,8 @@
         <div id="render">
         </div>
         <div id="app">
-            <div id="control">
-                <div id="control-inner" >
+            <div class="control">
+                
                     <el-button type="primary" v-on:click="add_view" :disabled="enter_view_name" size="mini">新建场景</el-button>
                     <el-button  type="primary" v-on:click="add_view" :disabled="child_view_status" size="mini">新建子场景</el-button>
                     <p id="title2" style="color: aqua;">选择场景</p>
@@ -72,12 +72,12 @@
                     
                     <div style="color: aqua;" v-html="model_information"></div>
                     
-                    <el-button  id="button1"  type="danger" v-on:click="delete_model" size="mini" :disabled="del_model_status">删除选中模型</el-button>
+                    <el-button  id="button1"  type="danger" v-on:click="delete_model" size="mini" :disabled="del_model_status" >删除选中模型</el-button>
                     
                     <p id="title2" style="color: aqua;">添加模型</p>
                     <el-button type="primary" v-on:click="to_manage_models" size="mini">管理模型库</el-button>
                     <br>
-                    <el-select id="select1" v-model="folder_selected" placeholder="选择文件夹" @change="get_models_by_folder" size="mini">
+                    <el-select id="select1" v-model="folder_selected" placeholder="选择文件夹" @change="get_models_by_folder" size="mini" :disabled="select_model_status">
                         <el-option
                         v-for="item in folder_list"
                         :key="item.value"
@@ -86,7 +86,7 @@
                         </el-option>
                     </el-select>
                     <br>
-                    <el-select id="select1" v-model="model_in_folder_selected" placeholder="选择想要添加的模型" @change="select_model_in_folder" size="mini">
+                    <el-select id="select1" v-model="model_in_folder_selected" placeholder="选择想要添加的模型" @change="select_model_in_folder" size="mini" :disabled="select_model_status">
                         <el-option
                         v-for="item in model_in_folder_list"
                         :key="item.value"
@@ -107,8 +107,8 @@
                     <el-button style="margin-top: 20px;" type="success" v-on:click="save_model" size="mini" :disabled="save_status">存储场景</el-button id="button1"> 
                       
 
-                </div></div>
             </div>
+        </div>
             
         </div>
         </div>

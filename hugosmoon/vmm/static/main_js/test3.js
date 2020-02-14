@@ -4,6 +4,9 @@ let renderer, camera, scene;
 
 let gui=new dat.GUI();
 let mesh;
+let model;
+let material;
+let points;
 
 
 
@@ -11,7 +14,7 @@ let mesh;
 //主函数
 function threeStart() {
     initThree();
-    initObject();
+    // initObject();
     loadAutoScreen(camera, renderer);
     render();
 }
@@ -27,62 +30,108 @@ function initThree() {
     document.getElementById('render').appendChild(renderer.domElement);//将渲染器加在html中的div里面
 
     renderer.setClearColor(0x444444, 1.0);//渲染的颜色设置
-    renderer.shadowMapEnabled = true;//开启阴影，默认是关闭的，太影响性能
-    renderer.shadowMapType = THREE.PCFSoftShadowMap;//阴影的一个类型
+    renderer.shadowMap.enabled = true;//开启阴影，默认是关闭的，太影响性能
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;//阴影的一个类型
 
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
     //摄像机的位置
-    camera.position.x = -3;
-    camera.position.y = -3;
-    camera.position.z = 1;
+    camera.position.x = -1470;
+    camera.position.y = -4680;
+    camera.position.z = 1100;
     camera.up.x = 0;
     camera.up.y = 0;
     camera.up.z = 1;//摄像机的上方向是Z轴
-    camera.lookAt(0, -50, 0);//摄像机对焦的位置
+    camera.lookAt(0, 0, 0);//摄像机对焦的位置
     //这三个参数共同作用才能决定画面
 
     scene = new THREE.Scene();
 
+    
     let light = new THREE.SpotLight(0xffffff, 1, 0);//点光源
-    light.position.set(4000, 2000, 8000);
+    light.position.set(0, 0, 80000);
+    light.angle=Math.PI;
     light.castShadow = true;//开启阴影
-    light.shadowMapWidth = 8192;//阴影的分辨率，可以不设置对比看效果
-    light.shadowMapHeight = 8192;
+    light.shadow.mapSize.width = 8192;//阴影的分辨率，可以不设置对比看效果
+    light.shadow.mapSize.height = 8192;
     scene.add(light);
 
-    let light2 = new THREE.SpotLight(0xffffff, 0.8, 0);//点光源
-    light2.position.set(-3000, -3000, 2500);
+    let light2 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    light2.position.set(80000,-80000,300);
     scene.add(light2);
 
-    let light3 = new THREE.AmbientLight(0xaaaaaa, 1);//环境光，如果不加，点光源照不到的地方就完全是黑色的
+    let light3 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    light3.position.set(80000,80000,300);
     scene.add(light3);
 
+    let light4 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    light4.position.set(-80000,-80000,300);
+    scene.add(light4);
+
+    let light6 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    light6.position.set(-80000,80000,300);
+    scene.add(light6);
+
+    let light5 = new THREE.AmbientLight(0xaaaaaa, 0.99);//环境光，如果不加，点光源照不到的地方就完全是黑色的
+    scene.add(light5);
+    
     controller = new THREE.OrbitControls(camera, renderer.domElement);
     controller.target = new THREE.Vector3(0, 0, 0);
 
-}
 
-function initObject() {
-
-
-    var loader = new THREE.GLTFLoader();
-
-    loader.load( '../../../model/test2.gltf', function ( gltf ) {
-
-        mesh=gltf.scene;
-        scene.add(mesh);
-        mesh.rotation.x=0.5*Math.PI;
-        // console.log(gltf);
-
-    }, undefined, function ( error ) {
-        console.error( error );
-    } );
+    let color=new THREE.Color(1,1,1);
+    material = [new THREE.MeshPhysicalMaterial({
+                        color:color,
+                        // 材质像金属的程度. 非金属材料，如木材或石材，使用0.0，金属使用1.0，中间没有（通常）.
+                        // 默认 0.5. 0.0到1.0之间的值可用于生锈的金属外观
+                        metalness: 1,
+                        // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
+                        roughness: 0.45,
+                        }),];
+    // points=create_vertices(1500,1500,3000).vertices;
+    // modelww = createModel(points,material,720);
+    modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
+    scene.add(modelww);
 }
 function render() {
-    // count+=1;
-    // console.log(count);
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
+
+// //创建顶点
+// function create_vertices(r1,r2,h,num=720){
+//     let degree=(Math.PI/180)*360/num;
+//     let points=[]
+//     let vertices=[];
+
+//     vertices.push(new THREE.Vector3(0,0,0));
+
+//     for(let i=0;i<num;i++){
+        
+//         points[i]=[];
+//         for(let m=0;m<51;m++){
+//             points[i][m]=[];
+//             points[i][m]['x']=r1*(1.2-Math.pow((m-25),2)/625)*Math.sin(i*degree);
+//             points[i][m]['y']=r1*(1.2-Math.pow((m-25),2)/625)*Math.cos(i*degree);
+//             points[i][m]['z']=h*m/50;
+//         }
+//     }
+
+//     for(let j=0;j<51;j++){
+//         for(let i=0;i<num;i++){
+//             vertices.push(new THREE.Vector3(points[i][j]['x'], points[i][j]['y'], points[i][j]['z']))
+//         }
+//     }
+
+//     vertices.push(new THREE.Vector3(0,0,h));
+
+//     let obj=new function(){
+//         this.vertices=vertices;
+//         this.num=num;   
+//     }
+//     return obj;
+    
+// }
+
+

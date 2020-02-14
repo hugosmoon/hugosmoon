@@ -35,7 +35,7 @@ function create_vertices(r1,r2,h,num=720){
 }
 
 //创建圆柱
-function create_cylinder(vertices,materials1,materials2,materials3){
+function create_cylinder(vertices,materials1,status1,status2,status3){
     
     let num=vertices.length/2;
     let faces=[],geom,mesh;
@@ -43,22 +43,29 @@ function create_cylinder(vertices,materials1,materials2,materials3){
     // let material = new THREE.MeshBasicMaterial({ color: new THREE.Color(Math.random() * 0xffffff)});
                 
 
-    
-    for(let i=0;i<num-2;i++){
-        faces.push(new THREE.Face3(0, i+1, i+2))
+    if(status1==1){
+        for(let i=0;i<num-2;i++){
+            faces.push(new THREE.Face3(0, i+1, i+2))
+        }    
     }
     
-    for(let i=0;i<num-2;i++){
-        faces.push(new THREE.Face3(num, num+i+2, num+i+1))
+    if(status2==1){
+        for(let i=0;i<num-2;i++){
+            faces.push(new THREE.Face3(num, num+i+2, num+i+1))
+        }
     }
 
-    for(let i=0;i<num-1;i++){
-        faces.push(new THREE.Face3(i, i+num, i+num+1))
-        faces.push(new THREE.Face3(i, i+num+1, i+1))
+    if(status3==1){
+        for(let i=0;i<num-1;i++){
 
+            faces.push(new THREE.Face3(i, i+num, i+num+1))
+            faces.push(new THREE.Face3(i, i+num+1, i+1))
+    
+        }
+        faces.push(new THREE.Face3(0, num-1, 2*num-1));
+        faces.push(new THREE.Face3(0, 2*num-1, num));
     }
-    faces.push(new THREE.Face3(0, num-1, 2*num-1));
-    faces.push(new THREE.Face3(0, 2*num-1, num));
+    
     
     geom = new THREE.Geometry();
     

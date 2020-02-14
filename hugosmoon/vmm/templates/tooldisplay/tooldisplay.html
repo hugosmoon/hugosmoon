@@ -32,7 +32,7 @@
         <!--<button id="control-8">刀尖向前</button>-->
 
         <div id="app">
-            <div id="control" >
+            <div class="control experiment">
                 <div id="control-inner">
                     <p id="title1">车刀基本标注角度</p>
             <template>
@@ -74,9 +74,11 @@
                 <div id="control-inner">
                     <el-checkbox ref="check_pr" v-model="check_pr" @change="pla_view_pr">显示基面</el-checkbox>
                 </div>
+                <br>
                 <div id="control-inner">
                     <el-checkbox ref="check_ps" v-model="check_ps" @change="pla_view_ps">显示切削平面</el-checkbox>
                 </div>
+                <br>
                 <div id="control-inner">
                     <el-checkbox ref="check_p0" v-model="check_p0" @change="pla_view_p0">显示正交平面</el-checkbox>
                 </div>

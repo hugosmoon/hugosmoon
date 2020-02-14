@@ -12,11 +12,12 @@ function initThree(debug) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;//阴影的一个类型
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
+    // camera = new THREE.OrthographicCamera(window.innerWidth , window.innerWidth , window.innerHeight, window.innerHeight , -20000, 50000);
 
     //摄像机的位置
-    camera.position.x = -3000;
-    camera.position.y = -3000;
-    camera.position.z = 1000;
+    camera.position.x = -1470;
+    camera.position.y = -4680;
+    camera.position.z = 1100;
     camera.up.x = 0;
     camera.up.y = 0;
     camera.up.z = 1;//摄像机的上方向是Z轴
@@ -74,7 +75,7 @@ function initThree(debug) {
         let x_zhou_Material =
             new THREE.MeshLambertMaterial({color: 0x000000,transparent:true,opacity:0.7,side:THREE.DoubleSide})
             x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
-        x_zhou.position.z = -1000;
+        x_zhou.position.z = -2000;
         x_zhou.position.y = 25000-i;
         // x_zhou.receiveShadow = true;//开启地面的接收阴影
         scene.add(x_zhou);//添加到场景中
@@ -83,7 +84,7 @@ function initThree(debug) {
         let y_zhou_Material =
             new THREE.MeshLambertMaterial({color: 0x000000,transparent:true,opacity:0.7,side:THREE.DoubleSide})
             y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
-        y_zhou.position.z = -1000;
+        y_zhou.position.z = -2000;
         y_zhou.rotation.z = Math.PI*0.5;
         y_zhou.position.x = 25000-i;
         y_zhou.receiveShadow = true;//开启地面的接收阴影
@@ -116,7 +117,7 @@ function initThree(debug) {
 
 //初始化一个模型
 function initObject(index) {
-    console.log('正在加载');
+    // console.log('正在加载');
     //模型材质
     let color=new THREE.Color(models_info[index].materials_color_r,models_info[index].materials_color_g,models_info[index].materials_color_b);
     let emissive_color=new THREE.Color(models_info[index].emissive_r,models_info[index].emissive_g,models_info[index].emissive_b);
@@ -159,7 +160,7 @@ function initObject(index) {
         
         scene.add(models[index]);
         // //console.log(models)
-        console.log('加载完成');
+        console.log(models_info[index].model_name+'加载完成');
         loaded_models_num+=1;
         if(loaded_models_num==load_models_num){
             load_status=true;

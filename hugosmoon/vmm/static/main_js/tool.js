@@ -2,7 +2,7 @@ function create_tool(main_angle,tool_minor_cutting_edge_angle,edge_inclination_a
 
     let mesh, box;
     let a0=3,a1=25;
-    let w=40, w1 = 26, a=a0, b = 20,c =10, h = 30,l=250;
+    let w=50, w1 = 26, a=a0, b = 20,c =10, h = 41,l=250;
     let x0,y0,z0,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9;
     a=a0+(a1-a0)*(main_angle-5)/70;
     w1=a*trig('cot',main_angle);
@@ -58,14 +58,16 @@ function create_tool(main_angle,tool_minor_cutting_edge_angle,edge_inclination_a
 
 
     let boxgeom = new THREE.BoxGeometry(l, w, w)
+    let color=new THREE.Color(1,1,1);
     let materials = [
-        new THREE.MeshPhongMaterial({
-            opacity: 0.6,
-            color: 0x232323,
-            transparent: false,
-            specular: 0x545454,
-            metal: true
-        }),
+        new THREE.MeshPhysicalMaterial({
+            color:color,
+            // 材质像金属的程度. 非金属材料，如木材或石材，使用0.0，金属使用1.0，中间没有（通常）.
+            // 默认 0.5. 0.0到1.0之间的值可用于生锈的金属外观
+            metalness: 1.0,
+            // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
+            roughness: 0.25,
+            }),
     ];
 
     //刀柄
