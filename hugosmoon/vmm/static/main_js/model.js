@@ -10,16 +10,16 @@ function initThree(debug) {
     document.getElementById('render').appendChild(renderer.domElement);//将渲染器加在html中的div里面
 
     renderer.setClearColor(0x333333, 1.0);//渲染的颜色设置
-    renderer.shadowMap.enabled = true;//开启阴影，默认是关闭的，太影响性能
+    // renderer.shadowMap.enabled = true;//开启阴影，默认是关闭的，太影响性能
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;//阴影的一个类型
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
     // camera = new THREE.OrthographicCamera(window.innerWidth , window.innerWidth , window.innerHeight, window.innerHeight , -20000, 50000);
 
     //摄像机的位置
-    camera.position.x = -1470;
-    camera.position.y = -4680;
-    camera.position.z = 1100;
+    camera.position.x = 200;
+    camera.position.y = -5000;
+    camera.position.z = 1000;
     camera.up.x = 0;
     camera.up.y = 0;
     camera.up.z = 1;//摄像机的上方向是Z轴
@@ -94,43 +94,81 @@ function initThree(debug) {
     //     y_zhou.receiveShadow = true;//开启地面的接收阴影
     //     scene.add(y_zhou);//添加到场景中
     // }
-    let helper = new THREE.GridHelper(50000, 50, 0x555555, 0x555555);
+    let color=new THREE.Color(0x232323);
+    let helper = new THREE.GridHelper(50000, 50, color, color);
     helper.rotation.x=Math.PI*0.5;
     helper.position.z = -2000;
     scene.add(helper);
 
     if(debug==1){
-        //坐标轴
-        let x_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
-        let x_zhou_Material =
-            new THREE.MeshLambertMaterial({color:0xff0000,transparent:true,opacity:0.6,})
-            x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
-        // x_zhou.position.z = -995;
-        x_zhou.rotation.z = Math.PI*0.5;
-        // x_zhou.receiveShadow = true;//开启地面的接收阴影
-        scene.add(x_zhou);//添加到场景中
+        // //坐标轴
+        // let x_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
+        // let x_zhou_Material =
+        //     new THREE.MeshLambertMaterial({color:0xff0000,transparent:true,opacity:0.6,})
+        //     x_zhou = new THREE.Mesh(x_zhou_Geometry, x_zhou_Material);
+        // // x_zhou.position.z = -995;
+        // x_zhou.rotation.z = Math.PI*0.5;
+        // // x_zhou.receiveShadow = true;//开启地面的接收阴影
+        // scene.add(x_zhou);//添加到场景中
 
-        let y_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
-        let y_zhou_Material =
-            new THREE.MeshLambertMaterial({color:0x00ff00,transparent:true,opacity:0.6,})
-            y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
-        // y_zhou.position.z = -995;
-        // y_zhou.rotation.z = Math.PI*0.5;
-        // y_zhou.receiveShadow = true;//开启地面的接收阴影
-        scene.add(y_zhou);//添加到场景中
+        // let y_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
+        // let y_zhou_Material =
+        //     new THREE.MeshLambertMaterial({color:0x00ff00,transparent:true,opacity:0.6,})
+        //     y_zhou = new THREE.Mesh(y_zhou_Geometry, y_zhou_Material);
+        // // y_zhou.position.z = -995;
+        // // y_zhou.rotation.z = Math.PI*0.5;
+        // // y_zhou.receiveShadow = true;//开启地面的接收阴影
+        // scene.add(y_zhou);//添加到场景中
 
-        let z_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
-        let z_zhou_Material =
-            new THREE.MeshLambertMaterial({color:0x0000ff,transparent:true,opacity:0.6,})
-            z_zhou = new THREE.Mesh(z_zhou_Geometry, z_zhou_Material);
-        // y_zhou.position.z = -995;
-        z_zhou.rotation.x = Math.PI*0.5;
-        // z_zhou.receiveShadow = true;//开启地面的接收阴影
-        scene.add(z_zhou);//添加到场景中
+        // let z_zhou_Geometry = new THREE.CylinderGeometry(4, 4, 50000);
+        // let z_zhou_Material =
+        //     new THREE.MeshLambertMaterial({color:0x0000ff,transparent:true,opacity:0.6,})
+        //     z_zhou = new THREE.Mesh(z_zhou_Geometry, z_zhou_Material);
+        // // y_zhou.position.z = -995;
+        // z_zhou.rotation.x = Math.PI*0.5;
+        // // z_zhou.receiveShadow = true;//开启地面的接收阴影
+        // scene.add(z_zhou);//添加到场景中
+
+            
+            let color1 = new THREE.Color( 0xff0000 ), color2= new THREE.Color( 0x00ff00 ), color3= new THREE.Color( 0x0000ff );
+            // 线的材质可以由2点的颜色决定
+            let p1 = new THREE.Vector3( -25000, 0, 0 );
+            let p2 = new THREE.Vector3( 25000, 0, 0 );
+            let p3 = new THREE.Vector3( 0, -25000, 0 );
+            let p4 = new THREE.Vector3( 0, 25000, 0 );
+            let p5 = new THREE.Vector3( 0, 0, -25000 );
+            let p6 = new THREE.Vector3( 0, 0, 25000 );
+            // geometry_x.vertices.push(p1);
+            // geometry_x.vertices.push(p2);
+            // geometry_x.colors.push( color1, color1 );
+ 
+            // //第一个参数是几何体，第二个参数是材质或者线的属性，第三个参数是一组点的连接方式
+            // let line_x = new THREE.Line( geometry_x, material, THREE.LinePieces );
+            // let line_y = new THREE.Line( geometry_y, material, THREE.LinePieces );
+            // let line_z = new THREE.Line( geometry_z, material, THREE.LinePieces );
+            // scene.add(line_x);
+            // scene.add(line_y);
+            // scene.add(line_z);
+
+            // x轴
+            add_line(p1,p2,color1,color1);
+            // y轴
+            add_line(p3,p4,color2,color2);
+            // z轴
+            add_line(p5,p6,color3,color3);
     
     }
 
     
+}
+function add_line(p1,p2,color1,color2){
+    let geometry = new THREE.Geometry();
+    let material = new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+    geometry.vertices.push(p1);
+    geometry.vertices.push(p2);
+    geometry.colors.push( color1, color2 );
+    let line = new THREE.Line( geometry, material, THREE.LineSegments );
+    scene.add(line);
 }
 
 //初始化一个模型
@@ -165,15 +203,15 @@ function initObject(index) {
         geometry.center();
         models[index] = THREE.SceneUtils.createMultiMaterialObject(geometry, materials);
         models[index].receiveShadow = true; 
-        models[index].position.x=models_info[index].position_x+models_info[index].view_position_x;
-        models[index].position.y=models_info[index].position_y+models_info[index].view_position_y;
-        models[index].position.z=models_info[index].position_z+models_info[index].view_position_z;
-        models[index].rotation.x=models_info[index].rotation_x;
-        models[index].rotation.y=models_info[index].rotation_y;
-        models[index].rotation.z=models_info[index].rotation_z;
-        models[index].scale.x=models_info[index].scale_x;
-        models[index].scale.y=models_info[index].scale_y;
-        models[index].scale.z=models_info[index].scale_z;
+        models[index].children[0].position.x=models_info[index].position_x+models_info[index].view_position_x;
+        models[index].children[0].position.y=models_info[index].position_y+models_info[index].view_position_y;
+        models[index].children[0].position.z=models_info[index].position_z+models_info[index].view_position_z;
+        models[index].children[0].rotation.x=models_info[index].rotation_x;
+        models[index].children[0].rotation.y=models_info[index].rotation_y;
+        models[index].children[0].rotation.z=models_info[index].rotation_z;
+        models[index].children[0].scale.x=models_info[index].scale_x;
+        models[index].children[0].scale.y=models_info[index].scale_y;
+        models[index].children[0].scale.z=models_info[index].scale_z;
 
         
         scene.add(models[index]);

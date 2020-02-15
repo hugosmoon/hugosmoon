@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html >
 <head>
     <meta charset="UTF-8">
     {% load static %}
@@ -24,6 +24,8 @@
     <script src="{% static 'import/echarts.min.js' %}"></script>
     <script src="{% static 'import/echarts-gl.min.js' %}"></script>
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
+    <!-- 轨迹球控件 -->
+    <script src="{% static 'import/TrackballControls.js' %}"></script>
     
 </head>
 <body>
@@ -44,7 +46,7 @@
     <script src="{% static 'main_js/view_display.js' %}"></script>
     <script>
         let display_view_id={{view_id}};
-        let renderer, camera, scene;
+        let renderer, camera, scene,controls;
         ////模型信息列表
         let models_info=[];
         ////模型实体列表
@@ -108,6 +110,7 @@
         function render() {
             requestAnimationFrame(render);
             renderer.render(scene, camera);
+            controls.update();
         }
         
         

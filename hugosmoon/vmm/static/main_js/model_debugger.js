@@ -24,7 +24,7 @@ let models=[];
 // //当前子场景模型列表
 // let models_in_childView_list=[];
 
-let renderer, camera, scene,controls;
+let renderer, camera, scene,controls,dragControls,transformControls;
 // let gui = new dat.GUI();
 let model_gui;
 let child_view_gui;
@@ -445,8 +445,16 @@ let Main = {
             // 初始化轨迹球控件
             // controls = new THREE.TrackballControls(camera, renderer.domElement);
             // 添加平移控件
-            let transformControls = new THREE.TransformControls(camera, renderer.domElement);
+            if(transformControls){
+                scene.remove(transformControls);
+            }
+            transformControls = new THREE.TransformControls(camera, renderer.domElement);
             scene.add(transformControls);
+
+            transformControls.addEventListener('mouseUp', (event) => {
+                // console.log("坐标移动")
+                update_modelsinfo(event.target.position.x,event.target.position.y,event.target.position.z)
+              });
 
             // 过滤不是 Mesh 的物体,例如辅助网格
             let objects = [];
@@ -458,21 +466,18 @@ let Main = {
                 }
             }
             // 初始化拖拽控件
-            let dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+            dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
 
             // console.log(objects[0][0])
 
             // 鼠标略过
             dragControls.addEventListener('hoveron', function (event) {
+                // transformControls.detach();
+                // console.log(transformControls);
                 transformControls.attach(event.object);
                 // console.log(event.object)
-                
                 for(let i=0;i<models.length;i++){
                     if(models[i]&&event.object.id==models[i].children[0].id){
-
-                        // console.log('index:'+i)
-                        // console.log(models[i].children[0].id)
-                        // console.log(event.object.id)
                         timeStamp_out=Date.now();
                         current_model_index=i;
                     }
@@ -485,10 +490,16 @@ let Main = {
             // 拖拽结束
             dragControls.addEventListener('dragend', function (event) {
                 controls.enabled = true;
-                // console.log('index:'+current_model_index)
-                models_info[current_model_index].position_x=event.object.position.x;
-                models_info[current_model_index].position_y=event.object.position.y;
-                models_info[current_model_index].position_z=event.object.position.z;
+                // console.log('x:'+event.object.position.x)
+                // console.log("物体移动"+event.object.position.x+event.object.position.y+event.object.position.z)
+                update_modelsinfo(event.object.position.x,event.object.position.y,event.object.position.z)
+
+            }); 
+            function update_modelsinfo(x,y,z){
+                models_info[current_model_index].position_x=x;
+                models_info[current_model_index].position_y=y;
+                models_info[current_model_index].position_z=z;
+
                 change_model(
                     models_info[current_model_index].model_name,
                     models_info[current_model_index].position_x,models_info[current_model_index].position_y,models_info[current_model_index].position_z,
@@ -504,8 +515,7 @@ let Main = {
                     models_info[current_model_index].emissive_b,
                     models_info[current_model_index].emissiveIntensity,
                     models_info[current_model_index].reflectivity);
-
-            }); 
+            }
         },
         add_model: function () {
             load_status=false;
@@ -778,21 +788,21 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
 
         this.rotate_x = function () {
             if(!(isNaN(controls.rx))){
-                models[current_model_index].rotation.x=(Math.PI/180)*controls.rx;
+                models[current_model_index].children[0].rotation.x=(Math.PI/180)*controls.rx;
                 models_info[current_model_index].change_ro_x((Math.PI/180)*controls.rx)
             }
            
         };
         this.rotate_y = function () {
             if(!(isNaN(controls.ry))){
-                models[current_model_index].rotation.y=(Math.PI/180)*controls.ry;
+                models[current_model_index].children[0].rotation.y=(Math.PI/180)*controls.ry;
                 models_info[current_model_index].change_ro_y((Math.PI/180)*controls.ry)
             }
            
         };
         this.rotate_z = function () {
             if(!(isNaN(controls.rz))){
-                models[current_model_index].rotation.z=(Math.PI/180)*controls.rz;
+                models[current_model_index].children[0].rotation.z=(Math.PI/180)*controls.rz;
                 models_info[current_model_index].change_ro_z((Math.PI/180)*controls.rz)
             }
             
@@ -842,20 +852,20 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
 
         this.change_scale_x=function(x){
             if(!(isNaN(controls.scale_x))){
-                models[current_model_index].scale.x=controls.scale_x;
+                models[current_model_index].children[0].scale.x=controls.scale_x;
                 models_info[current_model_index].scale_x=controls.scale_x;
             }
         };
         this.change_scale_y=function(x){
             if(!(isNaN(controls.scale_y))){
-                models[current_model_index].scale.y=controls.scale_y;
+                models[current_model_index].children[0].scale.y=controls.scale_y;
                 models_info[current_model_index].scale_y=controls.scale_y;
 
             }            
         };
         this.change_scale_z=function(x){
             if(!(isNaN(controls.scale_z))){
-                models[current_model_index].scale.z=controls.scale_z;
+                models[current_model_index].children[0].scale.z=controls.scale_z;
                 models_info[current_model_index].scale_z=controls.scale_z;
             }            
         };
@@ -933,7 +943,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         this.move_x = function () {
             //console.log(controls.x)
             if(!(isNaN(controls.x))&&!(isNaN(controls.mini_x))){
-                models[current_model_index].position.x=controls.x+controls.mini_x+models_info[current_model_index].view_position_x;
+                models[current_model_index].children[0].position.x=controls.x+controls.mini_x+models_info[current_model_index].view_position_x;
                 models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
             }
             
@@ -941,7 +951,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         this.move_y = function () {
             //console.log(controls.y)
             if(!(isNaN(controls.y))&&!(isNaN(controls.mini_y))){
-                models[current_model_index].position.y=controls.y+controls.mini_y+models_info[current_model_index].view_position_y;
+                models[current_model_index].children[0].position.y=controls.y+controls.mini_y+models_info[current_model_index].view_position_y;
                 models_info[current_model_index].change_po_y(controls.y+controls.mini_y)
             }
             
@@ -950,7 +960,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         this.move_z = function () {
             //console.log(controls.z)
             if(!(isNaN(controls.z))&&!(isNaN(controls.mini_z))){
-                models[current_model_index].position.z=controls.z+controls.mini_z+models_info[current_model_index].view_position_z;
+                models[current_model_index].children[0].position.z=controls.z+controls.mini_z+models_info[current_model_index].view_position_z;
                 models_info[current_model_index].change_po_z(controls.z+controls.mini_z)
             }
             
@@ -958,13 +968,13 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
     }; 
     let f1 = model_gui;
     f1.add({m:''},'m').name(controls.model_name);
-    let f1_1 = f1.addFolder('位置设置');
-    f1_1.add(controls, 'x', -5000, 5000).name('X轴移动').onChange(controls.move_x);
-    f1_1.add(controls, 'mini_x', -30, 30).step(0.01).name('X轴移动微调').onChange(controls.move_x);
-    f1_1.add(controls, 'y', -5000, 5000).name('Y轴移动').onChange(controls.move_y);
-    f1_1.add(controls, 'mini_y', -30, 30).step(0.01).name('Y轴移动微调').onChange(controls.move_y);
-    f1_1.add(controls, 'z', -5000, 5000).name('Z轴移动').onChange(controls.move_z);
-    f1_1.add(controls, 'mini_z', -30, 30).step(0.01).name('Z轴移动微调').onChange(controls.move_z);
+    // let f1_1 = f1.addFolder('位置设置');
+    f1.add(controls, 'x', -5000, 5000).name('X轴移动').onChange(controls.move_x);
+    f1.add(controls, 'mini_x', -30, 30).step(0.01).name('X轴移动微调').onChange(controls.move_x);
+    f1.add(controls, 'y', -5000, 5000).name('Y轴移动').onChange(controls.move_y);
+    f1.add(controls, 'mini_y', -30, 30).step(0.01).name('Y轴移动微调').onChange(controls.move_y);
+    f1.add(controls, 'z', -5000, 5000).name('Z轴移动').onChange(controls.move_z);
+    f1.add(controls, 'mini_z', -30, 30).step(0.01).name('Z轴移动微调').onChange(controls.move_z);
     let f1_2 = f1.addFolder('旋转设置');
     f1_2.add(controls, 'rx', -180, 180).name('X轴旋转度数').onChange(controls.rotate_x);
     f1_2.add(controls, 'ry', -180, 180).name('Y轴旋转度数').onChange(controls.rotate_y);
@@ -1010,7 +1020,7 @@ function change_child_view(child_view_name,x,y,z){
                     if(models_info[i]){
                         if(models_info[i].view_id==current_view_id){
                             // models_info[i].change_po_x( models_info[i].position_x+step)
-                            models[i].position.x=controls.all_mov_x+models_info[i].position_x;
+                            models[i].children[0].position.x=controls.all_mov_x+models_info[i].position_x;
                             models_info[i].change_view_po_x(controls.all_mov_x)
                         }
                     }   
@@ -1026,7 +1036,7 @@ function change_child_view(child_view_name,x,y,z){
                         if(models_info[i].view_id==current_view_id){
                             // models[i].position.y+=step;
                             // models_info[i].change_po_y( models_info[i].position_y+step)
-                            models[i].position.y=controls.all_mov_y+models_info[i].position_y;
+                            models[i].children[0].position.y=controls.all_mov_y+models_info[i].position_y;
                             models_info[i].change_view_po_y(controls.all_mov_y)
                         }
                     }   
@@ -1044,7 +1054,7 @@ function change_child_view(child_view_name,x,y,z){
                         if(models_info[i].view_id==current_view_id){
                             // models[i].position.z+=step;
                             // models_info[i].change_po_z( models_info[i].position_z+step)
-                            models[i].position.z=controls.all_mov_z+models_info[i].position_z;
+                            models[i].children[0].position.z=controls.all_mov_z+models_info[i].position_z;
                             models_info[i].change_view_po_z(controls.all_mov_z)
                         }
                     }   

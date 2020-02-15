@@ -364,6 +364,8 @@ function render() {
     
     requestAnimationFrame(render);
     renderer.render(scene, camera);
+    controls.update();
+
 }
 //加载棒料
 function create_bangliao(){
@@ -459,8 +461,8 @@ function models_control()
         // 30-daozuo
     let daojia_list=[16,17,18,25,30]
     for (let i=0;i<daojia_list.length;i++){
-        models[daojia_list[i]].position.x=models_info[daojia_list[i]].position_x+models_info[daojia_list[i]].view_position_x+ bangliao_length-cut_length+bcdl*trig('cot',main_angle)+duidaobuchang-1463;
-        models[daojia_list[i]].position.y=140-bangliao_r1+bcdl+models_info[daojia_list[i]].position_y+models_info[daojia_list[i]].view_position_y;
+        models[daojia_list[i]].children[0].position.x=models_info[daojia_list[i]].position_x+models_info[daojia_list[i]].view_position_x+ bangliao_length-cut_length+bcdl*trig('cot',main_angle)+duidaobuchang-1463;
+        models[daojia_list[i]].children[0].position.y=140-bangliao_r1+bcdl+models_info[daojia_list[i]].position_y+models_info[daojia_list[i]].view_position_y;
     }
     //溜杆箱 
         // 13-jinjixiang
@@ -468,7 +470,7 @@ function models_control()
         // 24-liuganxiangshoulun
     let liuganxinag_list=[13,14,24]
     for (let i=0;i<liuganxinag_list.length;i++){
-        models[liuganxinag_list[i]].position.x=models_info[liuganxinag_list[i]].position_x+models_info[liuganxinag_list[i]].view_position_x+ bangliao_length-cut_length+bcdl*trig('cot',main_angle)+duidaobuchang-1463;
+        models[liuganxinag_list[i]].children[0].position.x=models_info[liuganxinag_list[i]].position_x+models_info[liuganxinag_list[i]].view_position_x+ bangliao_length-cut_length+bcdl*trig('cot',main_angle)+duidaobuchang-1463;
     }
     // 尾座
         // 21-weizuodingjian
@@ -477,29 +479,29 @@ function models_control()
         // 29-weizuodizuo
         let weizuo_list=[21,22,23,29]
     for (let i=0;i<weizuo_list.length;i++){
-        models[weizuo_list[i]].position.x=models_info[weizuo_list[i]].position_x+models_info[weizuo_list[i]].view_position_x+ bangliao_length-2323;
+        models[weizuo_list[i]].children[0].position.x=models_info[weizuo_list[i]].position_x+models_info[weizuo_list[i]].view_position_x+ bangliao_length-2323;
     }
     // 夹盘爪位置
-    models[31].rotation.x=rot_angle;
-    models[31].position.z=szjp_distance*Math.cos(-rot_angle);
-    models[31].position.y=szjp_distance*Math.sin(-rot_angle);
+    models[31].children[0].rotation.x=rot_angle;
+    models[31].children[0].position.z=szjp_distance*Math.cos(-rot_angle);
+    models[31].children[0].position.y=szjp_distance*Math.sin(-rot_angle);
 
-    models[32].rotation.x=(2/3) * Math.PI+rot_angle;
-    models[32].position.z=szjp_distance*Math.cos(-rot_angle-(2/3)*Math.PI);
-    models[32].position.y=szjp_distance*Math.sin(-rot_angle-(2/3)*Math.PI);
+    models[32].children[0].rotation.x=(2/3) * Math.PI+rot_angle;
+    models[32].children[0].position.z=szjp_distance*Math.cos(-rot_angle-(2/3)*Math.PI);
+    models[32].children[0].position.y=szjp_distance*Math.sin(-rot_angle-(2/3)*Math.PI);
 
-    models[33].rotation.x=(4/3) * Math.PI+rot_angle;
-    models[33].position.z=szjp_distance*Math.cos(-rot_angle-(4/3)*Math.PI);
-    models[33].position.y=szjp_distance*Math.sin(-rot_angle-(4/3)*Math.PI);
+    models[33].children[0].rotation.x=(4/3) * Math.PI+rot_angle;
+    models[33].children[0].position.z=szjp_distance*Math.cos(-rot_angle-(4/3)*Math.PI);
+    models[33].children[0].position.y=szjp_distance*Math.sin(-rot_angle-(4/3)*Math.PI);
 
 
     // 夹盘旋转
-    models[2].rotation.z=60*(Math.PI/180)-Math.PI+rot_angle;
+    models[2].children[0].rotation.z=60*(Math.PI/180)-Math.PI+rot_angle;
     // 尾座顶尖旋转
-    models[21].rotation.x=-Math.PI+rot_angle;
+    models[21].children[0].rotation.x=-Math.PI+rot_angle;
     // 丝杠旋转
     if(machine_status==3){
-        models[10].rotation.x+=frame_time*machine_speed*jjl*Math.PI/240000;
+        models[10].children[0].rotation.x+=frame_time*machine_speed*jjl*Math.PI/240000;
     }
     // 车刀移动
     tool.position.x=0+bangliao_length-cut_length+bcdl*trig('cot',main_angle)+duidaobuchang;
