@@ -24,7 +24,7 @@ let models=[];
 // //当前子场景模型列表
 // let models_in_childView_list=[];
 
-let renderer, camera, scene;
+let renderer, camera, scene,controls;
 // let gui = new dat.GUI();
 let model_gui;
 let child_view_gui;
@@ -32,6 +32,9 @@ let child_view_gui;
 let load_models_num;
 let loaded_models_num=0;
 let load_status=false;
+
+//时间戳，作为数据更新的版本，以此作为基础来建立vue内外的通信
+let timeStamp_out=0;
 
 
 let Main = {
@@ -69,14 +72,23 @@ let Main = {
             save_status:true,
             
             display_view_id:0,
+            timeStamp_in:0,
         }
     },
     mounted:function(){
         this.get_views();
         this.get_folders();
         this.timer = setInterval(this.auto_save, 20000);
+        this.timer = setInterval(this.update_data, 500);
     },
     methods: {
+        update_data:function(){
+            if(timeStamp_out>this.timeStamp_in){
+                this.model_selected=current_model_index;
+                this.select_model(this.model_selected);
+                this.timeStamp_in=Date.now();
+            }
+        },
         auto_save:function(){
             if(auto_save_status==1){
                 this.save_model();
@@ -304,6 +316,7 @@ let Main = {
                         view_position_z=models_got[0].view_position_z;
                     }
                     ////console.log(models_got);
+                    let models_to_control=[];
                     models_got.forEach(model => {
                         let ch_index=Number(model.serial);
                         models_info[ch_index]=new Model(model.view_id,model.model_id,model.model_name,model.model_url,ch_index,model.materials_type);
@@ -333,9 +346,13 @@ let Main = {
                         models_info[ch_index].change_scale_y(model.scale_y)
                         models_info[ch_index].change_scale_z(model.scale_z)
                         models_got_list.push({value: ch_index,label: ch_index+"-"+model.model_name})
+                        models_to_control.push(models[ch_index]);
+                        // console.log(models_to_control);
                         // initObject(index,model.materials_type);
                         // ////console.log(index)
                     });
+                    // this.initDragControls(models_to_control);
+                    this.child_view_models_DragControls();
                     
                     this.model_list=models_got_list;
                     auto_save_status=1;
@@ -349,10 +366,17 @@ let Main = {
                     change_child_view(child_view_name,view_position_x,view_position_y,view_position_z);
                          
                 });
-            
-            
-            
-
+        },
+        // 将当前子场景的模型添加自由移动
+        child_view_models_DragControls:function(){
+            let models_to_control=[]; 
+            for(let i=0;i<models.length;i++){
+                if(models_info[i]&&models_info[i].view_id==current_view_id){
+                    models_to_control.push(models[i]);
+                }
+            }
+            // console.log(models_to_control)
+            this.initDragControls(models_to_control);
         },
         save_model:function(){
             // ////console.log(models_info);
@@ -414,6 +438,74 @@ let Main = {
             this.display_status=false;
             this.get_models();
             this.get_child_views(view_name);
+            
+            // this.initDragControls(models);
+        },
+        initDragControls:function(models_to_control){
+            // 初始化轨迹球控件
+            // controls = new THREE.TrackballControls(camera, renderer.domElement);
+            // 添加平移控件
+            let transformControls = new THREE.TransformControls(camera, renderer.domElement);
+            scene.add(transformControls);
+
+            // 过滤不是 Mesh 的物体,例如辅助网格
+            let objects = [];
+            for (let i = 0; i < models_to_control.length; i++) {
+                // console.log(models[i].isObject3D)
+                if (models_to_control[i].isObject3D) {
+                    objects.push(models_to_control[i].children[0]);
+                    
+                }
+            }
+            // 初始化拖拽控件
+            let dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+
+            // console.log(objects[0][0])
+
+            // 鼠标略过
+            dragControls.addEventListener('hoveron', function (event) {
+                transformControls.attach(event.object);
+                // console.log(event.object)
+                
+                for(let i=0;i<models.length;i++){
+                    if(models[i]&&event.object.id==models[i].children[0].id){
+
+                        // console.log('index:'+i)
+                        // console.log(models[i].children[0].id)
+                        // console.log(event.object.id)
+                        timeStamp_out=Date.now();
+                        current_model_index=i;
+                    }
+                }
+            });
+            // 开始拖拽
+            dragControls.addEventListener('dragstart', function (event) {
+                controls.enabled = false;
+            });
+            // 拖拽结束
+            dragControls.addEventListener('dragend', function (event) {
+                controls.enabled = true;
+                // console.log('index:'+current_model_index)
+                models_info[current_model_index].position_x=event.object.position.x;
+                models_info[current_model_index].position_y=event.object.position.y;
+                models_info[current_model_index].position_z=event.object.position.z;
+                change_model(
+                    models_info[current_model_index].model_name,
+                    models_info[current_model_index].position_x,models_info[current_model_index].position_y,models_info[current_model_index].position_z,
+                    models_info[current_model_index].rotation_x*(180/Math.PI),models_info[current_model_index].rotation_y*(180/Math.PI),models_info[current_model_index].rotation_z*(180/Math.PI),
+                    models_info[current_model_index].scale_x,models_info[current_model_index].scale_y,models_info[current_model_index].scale_z,
+                    models_info[current_model_index].metalness,
+                    models_info[current_model_index].roughness,
+                    models_info[current_model_index].materials_color_r,
+                    models_info[current_model_index].materials_color_g,
+                    models_info[current_model_index].materials_color_b,
+                    models_info[current_model_index].emissive_r,
+                    models_info[current_model_index].emissive_g,
+                    models_info[current_model_index].emissive_b,
+                    models_info[current_model_index].emissiveIntensity,
+                    models_info[current_model_index].reflectivity);
+
+            }); 
         },
         add_model: function () {
             load_status=false;
@@ -519,6 +611,7 @@ let Main = {
             setTimeout(() => {
                 if(load_status){
                     loading.close();
+                    this.child_view_models_DragControls();
                 }
                 else {
                     this.openFullScreen(200);
@@ -571,16 +664,59 @@ let Main = {
     }
 }
 
-var Ctor = Vue.extend(Main)
+let Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')
 
+// function initDragControls(models_to_control){
+//             // 初始化轨迹球控件
+//             // controls = new THREE.TrackballControls(camera, renderer.domElement);
+//             // 添加平移控件
+//             let transformControls = new THREE.TransformControls(camera, renderer.domElement);
+//             scene.add(transformControls);
 
+//             // 过滤不是 Mesh 的物体,例如辅助网格
+//             let objects = [];
+//             for (let i = 0; i < models_to_control.length; i++) {
+//                 // console.log(models[i].isObject3D)
+//                 if (models_to_control[i].isObject3D) {
+//                     objects.push(models_to_control[i].children[0]);
+                    
+//                 }
+//             }
+//             // 初始化拖拽控件
+//             let dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+
+//             // console.log(objects[0][0])
+
+//             // 鼠标略过
+//             dragControls.addEventListener('hoveron', function (event) {
+//                 transformControls.attach(event.object);
+//                 // console.log(event.object)
+                
+//                 for(let i=0;i<models.length;i++){
+//                     if(models[i]&&event.object.id==models[i].children[0].id){
+
+//                         console.log('index:'+i)
+//                         console.log(models[i].children[0].id)
+//                         console.log(event.object.id)
+//                     }
+//                 }
+//             });
+//             // 开始拖拽
+//             dragControls.addEventListener('dragstart', function (event) {
+//                 controls.enabled = false;
+//             });
+//             // 拖拽结束
+//             dragControls.addEventListener('dragend', function (event) {
+//                 controls.enabled = true;
+//                 // console.log(objects)
+//             }); 
+//         }
 
 //主函数
 function threeStart() {
     initThree(1);
-    loadAutoScreen(camera, renderer);
-    
+    // loadAutoScreen(camera, renderer);
     render();
 }
 
@@ -588,6 +724,8 @@ function threeStart() {
 function render() {
     requestAnimationFrame(render);
     renderer.render(scene, camera);
+    controls.update();
+    
 }
 
 

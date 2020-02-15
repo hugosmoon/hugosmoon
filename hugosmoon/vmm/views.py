@@ -14,7 +14,7 @@ import time
 def home(request):
     return render(request, 'index.html')
 def test(request):
-    return render(request, 'test/test.html')
+    return render(request, 'test/test2.html')
 
 def tool_display(request):
     return render(request, 'tooldisplay/tooldisplay.html')

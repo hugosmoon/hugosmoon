@@ -159,15 +159,16 @@ let Main = {
                 });
                 return false;
             }
-            this.start_status=true;
-            this.end_status=false;
-            accelerate_num=-300;
             if(this.$refs.cutting_depth.value==0){
                 this.$alert('背吃刀量不能为0', '操作提示', {
                     confirmButtonText: '确定',
                 });
                 return false;
             }
+            this.start_status=true;
+            this.end_status=false;
+            accelerate_num=-300;
+            
             machine_status=1;
             aims_machine_speed=this.$refs.machine_speed.value;
             bcdl=this.$refs.cutting_depth.value;
