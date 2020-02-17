@@ -2,8 +2,11 @@
 <html lang="zh">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>未完成实验</title>
+    <title>首页</title>
      {% load static %}
+     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+     <script src="{% static 'import/jquery.cookie.js' %}"></script>
+     <script src="{% static 'main_js/login_verification.js' %}"></script>
     <!-- 模块css -->
     <link rel="stylesheet" type="text/css" href="{% static 'import/css/index.css' %}">
     <style>
@@ -27,7 +30,7 @@
               color: #333;
               text-align: center;
               line-height: 60px;
-              height: 1000px;
+              /* height: 100%; */
             }
             
             body > .el-container {
@@ -52,14 +55,17 @@
         
     
     <div id="app">
-            <el-container>
+            <el-container style="height:100%">
                     <el-header height='80px'><i class="el-icon-ship" style="margin-right: 20px;"></i></el-icon-picture-outline-round> Hugosmoon · VirtualMachining</el-header>
-                    <el-main height='500px'>
+                    <el-main style="height:100%">
+                      <br>
+                      <el-button  onclick="jumpto('/vmm/model_debugger/');">场景调试</el-button>
+                      <br><br>
                             <el-button  onclick="jumpto('/vmm/tool_display/');">车刀的主要几何角度</el-button>
                             <br>
                             <el-button  onclick="jumpto('/vmm/qxyl/');">切削力与切削用量的关系</el-button>
                     </el-main>
-                    <el-footer></el-footer>
+                    <!-- <el-footer></el-footer> -->
             </el-container>
         
       </div>

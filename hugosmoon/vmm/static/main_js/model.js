@@ -1,4 +1,4 @@
-// 引入文件之前必须定义的变量scene  renderer  camera  controls
+// 引入文件之前必须定义的变量scene  renderer  camera  controls  controller
 
 //初始化渲染器
 function initThree(debug) {
@@ -9,7 +9,7 @@ function initThree(debug) {
     renderer.setSize(window.innerWidth, window.innerHeight);//设置渲染的宽度和高度
     document.getElementById('render').appendChild(renderer.domElement);//将渲染器加在html中的div里面
 
-    renderer.setClearColor(0x333333, 1.0);//渲染的颜色设置
+    renderer.setClearColor(0x505050, 1.0);//渲染的颜色设置
     // renderer.shadowMap.enabled = true;//开启阴影，默认是关闭的，太影响性能
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;//阴影的一个类型
 
@@ -61,10 +61,10 @@ function initThree(debug) {
     let light5 = new THREE.AmbientLight(0xaaaaaa, 0.99);//环境光，如果不加，点光源照不到的地方就完全是黑色的
     scene.add(light5);
 
-    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    // controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-    // let controller = new THREE.OrbitControls(camera, renderer.domElement);
-    // controller.target = new THREE.Vector3(0, 0, 0);
+    controller = new THREE.OrbitControls(camera, renderer.domElement);
+    controller.target = new THREE.Vector3(0, 0, 0);
 
     //地面
     // let planeGeometry = new THREE.PlaneGeometry(50000, 50000, 20, 20);
@@ -94,10 +94,15 @@ function initThree(debug) {
     //     y_zhou.receiveShadow = true;//开启地面的接收阴影
     //     scene.add(y_zhou);//添加到场景中
     // }
-    let color=new THREE.Color(0x232323);
+
+    // let color=new THREE.Color(0x525252);
+    let color=new THREE.Color(0x595959);
     let helper = new THREE.GridHelper(50000, 50, color, color);
     helper.rotation.x=Math.PI*0.5;
     helper.position.z = -2000;
+    // helper.scale.x=0.1;
+    // helper.scale.y=0.1;
+    // helper.scale.z=0.1;
     scene.add(helper);
 
     if(debug==1){
@@ -186,6 +191,7 @@ function initObject(index) {
             metalness: models_info[index].metalness,
             // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
             roughness: models_info[index].roughness,
+            // opacity:0.5,
             // 设置环境贴图
             // envMap: textureCube,
             // 反射程度, 从 0.0 到1.0.默认0.5.
@@ -195,6 +201,7 @@ function initObject(index) {
             emissiveIntensity:models_info[index].emissiveIntensity,
             }),
     ];
+    // console.log(materials);
 
     let loader = new THREE.STLLoader();
     loader.load(models_info[index].url, function (geometry) {

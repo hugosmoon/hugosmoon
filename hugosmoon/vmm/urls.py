@@ -26,6 +26,12 @@ urlpatterns = [
     path('create_display_view/',views.create_display_view,name='create_display_view'),
     path('get_display_view/',views.get_display_view,name='get_display_view'),
     path('test/',views.test,name='test'),
+    path('login/',views.login_page,name='login_page'),
+    path('login_verification/',views.login_verification,name='login_verification'),
+    path('do_login/',views.do_login,name='do_login'),
+    path('adduser/',views.adduser,name='adduser'),
+    path('createuser/',views.createuser,name='createuser'),
+    path('admin_verification/',views.admin_verification,name='admin_verification'),
 
     
 ]

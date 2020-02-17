@@ -48,6 +48,7 @@ class Load_models_conf(models.Model):
 #文件夹
 class folder(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
+    owner_id=models.IntegerField(default=1,db_column="folder_id")
     folder_name = models.CharField(max_length=255, db_column="folder_name")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
@@ -65,6 +66,7 @@ class com_model(models.Model):
 #场景
 class views(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
+    owner_id=models.IntegerField(default=1,db_column="folder_id")
     view_name = models.CharField(max_length=255, db_column="view_name")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     parent_id=models.IntegerField(default=0,db_column="parent_id")
@@ -76,5 +78,16 @@ class display_views(models.Model):
     display_name = models.CharField(max_length=255, db_column="display_name")
     createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
+
+# 用户表
+class users(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    usertype=models.IntegerField(default=1,db_column="usertype")
+    username = models.CharField(max_length=255, db_column="username")
+    password = models.CharField(max_length=255, db_column="password")
+    createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
+    updatetime = models.DateTimeField(default=timezone.now, db_column="updatetime")
+    isdelete = models.BooleanField(default=False, db_column="is_delete")
+
 
 

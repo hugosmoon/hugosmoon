@@ -13,12 +13,14 @@
     <script src="{% static 'import/vue.js' %}"></script>
     <script src="{% static 'import/element_index.js' %}"></script>
     <script src="{% static 'import/three.js' %}"></script>
+    <!-- <script src="{% static 'import/three.module.js' %}"></script> -->
     <script src="{% static 'import/stats.js' %}"></script>
     <script src="{% static 'import/Setting.js' %}"></script>
     <script src="{% static 'import/OrbitControls.js' %}"></script>
     <script src="{% static 'import/dat.gui.min.js' %}"></script>
     <script src="{% static 'import/SceneUtils.js' %}"></script>
     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/jquery.cookie.js' %}"></script>
     <script src="{% static 'import/STLLoader.js' %}"></script>
     <!-- <script src="{% static 'import/dat.gui.js' %}"></script> -->
     <script src="{% static 'import/echarts.min.js' %}"></script>
@@ -30,6 +32,7 @@
     <script src="{% static 'import/DragControls.js' %}"></script>
     <!--可视化平移控件-->
     <script src="{% static 'import/TransformControls.js' %}"></script>
+    <script src="{% static 'main_js/login_verification.js' %}"></script>
     <script>Vue.config.productionTip = false;</script>
     
 </head>
@@ -78,7 +81,7 @@
                     
                     <div style="color: aqua;" v-html="model_information"></div>
                     
-                    <el-button  id="button1"  type="danger" v-on:click="delete_model" size="mini" :disabled="del_model_status" >删除选中模型</el-button>
+                    <el-button  id="button1"  type="danger" v-on:click="delete_model_confirm" size="mini" :disabled="del_model_status" >删除选中模型</el-button>
                     
                     <p id="title2" style="color: aqua;">添加模型</p>
                     <el-button type="primary" v-on:click="to_manage_models" size="mini">管理模型库</el-button>
@@ -111,9 +114,20 @@
                     <br>
                     <el-button style="margin-top: 20px;" type="info" v-on:click="view_display" size="mini" :disabled="display_status">预览场景</el-button id="button1"> 
                     <el-button style="margin-top: 20px;" type="success" v-on:click="save_model" size="mini" :disabled="save_status">存储场景</el-button id="button1"> 
+                    
                       
 
             </div>
+            <div class="left-top-2">
+                <!-- <i class="el-icon-back"></i>
+                <i class="el-icon-right"></i> -->
+                <el-button-group>
+                    <el-button type="danger" size="mini" icon="el-icon-arrow-left" round v-on:click="cancle_action" :disabled="cancle_action_status"></el-button>
+                    <el-button type="danger" size="mini" icon="el-icon-arrow-right" round v-on:click="redo_action" :disabled="redo_action_status"></el-button>
+                </el-button-group>
+                
+            </div>
+            <div class="left-top-3" v-html="save_information"></div>
         </div>
             
         </div>
@@ -123,5 +137,6 @@
     </div>
     <script src="{% static 'main_js/model_debugger.js' %}"></script>
     <script src="{% static 'main_js/model.js' %}"></script>
+    <script src="{% static 'main_js/update_models.js' %}"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 
 let display_view_id=20;
-let renderer, camera, scene;
+let renderer, camera, scene,controller;
 ////模型信息列表
 let models_info=[];
 ////模型实体列表
@@ -364,7 +364,7 @@ function render() {
     
     requestAnimationFrame(render);
     renderer.render(scene, camera);
-    controls.update();
+    // controls.update();
 
 }
 //加载棒料

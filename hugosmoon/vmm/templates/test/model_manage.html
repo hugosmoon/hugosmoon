@@ -15,7 +15,9 @@
    
     <!-- <script src="{% static 'import/SceneUtils.js' %}"></script> -->
     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'import/jquery.cookie.js' %}"></script>
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
+    <script src="{% static 'main_js/login_verification.js' %}"></script>
     
 </head>
 <body>
@@ -70,6 +72,7 @@
         </div>
     </div>
     <script>
+        let owner_id=$.cookie("userid")
         let Main = {
             data() {
                 return {
@@ -114,8 +117,14 @@
                     });
                 },
                 get_folders(){
-                    this.$http.get(
-                    '/vmm/get_folders/'
+                    this.$http.post(
+                    '/vmm/get_folders/',
+                    {
+                        owner_id:owner_id
+                    },
+                    { 
+                        emulateJSON: true 
+                    }
                     ).then(function (res) {
                         res.body.folders.forEach(folder => {
                             this.folders.push({value: folder.id,label: folder.folder_name});

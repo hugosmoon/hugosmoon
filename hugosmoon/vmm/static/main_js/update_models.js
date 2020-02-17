@@ -1,5 +1,4 @@
-// alert({{view_id}})
-function load_models(display_view_id){
+function update_models_info(){
     $.ajax({
         type: "POST",
         url: '/vmm/get_models_by_view/',
@@ -39,15 +38,44 @@ function load_models(display_view_id){
                 models_info[index].change_reflectivity(model.reflectivity)
                 
             }); 
-            for(let i=0;i<models_info.length;i++){
-                if(models_info[i]){
-                    initObject(i);
-                }
-            } 
         },
         error:function (message) {
             console.log("场景加载失败");
         }
     });
+    
+}
+
+function update_models(){
+    for(let i=0;i<models_info.length;i++){
+        if(models_info[i]){
+            // console.log(models_info[i]);
+            models[i].children[0].position.x=models_info[i].position_x+models_info[i].view_position_x;
+            models[i].children[0].position.y=models_info[i].position_y+models_info[i].view_position_y;
+            models[i].children[0].position.z=models_info[i].position_z+models_info[i].view_position_z;
+            models[i].children[0].rotation.x=models_info[i].rotation_x;
+            models[i].children[0].rotation.y=models_info[i].rotation_y;
+            models[i].children[0].rotation.z=models_info[i].rotation_z;
+            models[i].children[0].scale.x=models_info[i].scale_x;
+            models[i].children[0].scale.y=models_info[i].scale_y;
+            models[i].children[0].scale.z=models_info[i].scale_z;
+
+            models[i].children[0].material.color.r=models_info[i].materials_color_r;
+            models[i].children[0].material.color.g=models_info[i].materials_color_g;
+            models[i].children[0].material.color.b=models_info[i].materials_color_b;
+
+            models[i].children[0].material.emissive.r=models_info[i].emissive_r;
+            models[i].children[0].material.emissive.g=models_info[i].emissive_g;
+            models[i].children[0].material.emissive.b=models_info[i].emissive_b;
+
+            models[i].children[0].material.metalness=models_info[i].metalness;
+
+            models[i].children[0].material.roughness=models_info[i].roughness;
+
+            models[i].children[0].material.reflectivity=models_info[i].reflectivity;
+
+            models[i].children[0].material.emissiveIntensity=models_info[i].emissiveIntensity;
+        }
+    } 
 
 }

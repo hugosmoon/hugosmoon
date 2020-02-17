@@ -1,11 +1,11 @@
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render,HttpResponse,redirect
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model,views,display_views
+from vmm.models import Load_models_conf,folder,com_model,views,display_views,users
 import os
 import time
 
@@ -18,10 +18,92 @@ def test(request):
 
 def tool_display(request):
     return render(request, 'tooldisplay/tooldisplay.html')
+# 创建用户页面
+def adduser(request):
+    return render(request, 'user/adduser.html')
+    
+# 创建用户
+@csrf_exempt
+def createuser(request):
+    if request.method == 'POST':
+        print(request.POST)
+        username=request.POST.get('username')
+        # print("#"*20)
+        if username=="":
+            return HttpResponse('用户名不能为空')
+        password=request.POST.get('password')
+        if password == "":
+            return HttpResponse('密码不能为空')
+        usertype=request.POST.get('usertype')
+        if usertype != '1' and usertype != '0':
+            return HttpResponse('请选择正确的用户类型')
+        else:
+            # print(usertype)
+            usertype=int(usertype)
+        user_exist=users.objects.filter(isdelete=False,username=username)
+        # print(len(user_exist))
+        if len(user_exist) != 0:
+            return HttpResponse('用户名与已有用户重复')
+        users.objects.create(username=username,password=password,usertype=usertype)
+        return HttpResponse('用户创建成功')
+    return HttpResponse('用户创建失败')
+
+# 登录页面
+@csrf_exempt
+def login_page(request):
+    url="/vmm/index/"
+    if request.method == 'POST':
+        url=request.POST.get('url')
+    return render(request, 'user/login.html',{"url": url})
+# 登录
+@csrf_exempt
+def do_login(request): 
+    if request.method == 'POST':
+        # print(request.POST)
+        username=request.POST.get('username')
+        password=request.POST.get('password')
+        url=request.POST.get('url')
+        if username != "" and password != "" and url != "":
+            user=users.objects.get(isdelete=False,username=username)
+            if password==user.password:
+                rt = redirect(url) #跳转页面
+                rt.set_cookie('username', username)
+                rt.set_cookie('password', password)
+                rt.set_cookie('userid', user.id)
+                return rt
+    return HttpResponse("登录失败")
+
+# 登录验证
+@csrf_exempt
+def login_verification(request):
+    if request.method == 'POST':
+        # print(request.POST)
+        username=request.POST.get('username')
+        password=request.POST.get('password')
+        if username != "" and password != "":
+            user=users.objects.get(isdelete=False,username=username)   
+            if password==user.password:
+                return HttpResponse(True)
+        return HttpResponse(False)
+
+# 管理员验证
+@csrf_exempt
+def admin_verification(request):
+    if request.method == 'POST':
+        print(request.POST)
+        username=request.POST.get('username')
+        if username != "" :
+            user=users.objects.get(isdelete=False,username=username)   
+            print(user.usertype)
+            if user.usertype==0:
+                return HttpResponse(True)
+        return HttpResponse(False)
+
+
 @csrf_exempt
 def qxyl(request): 
     if request.method == 'POST':
-        print(request.POST)
+        # print(request.POST)
         main_angle=request.POST.get('main_angle')
         tool_minor_cutting_edge_angle=request.POST.get('tool_minor_cutting_edge_angle')
         edge_inclination_angle=request.POST.get('edge_inclination_angle')
@@ -202,19 +284,18 @@ def delete_model(request):
 @csrf_exempt
 def get_views(request):
     if request.method == 'POST':
-        parent_id=request.POST.get('parent_id')
-        get_views=views.objects.filter(isdelete=False,parent_id=parent_id).values()
+        parent_id=int(request.POST.get('parent_id'))
+        owner_id=int(request.POST.get('owner_id'))
+        if parent_id != 0:
+            get_views=views.objects.filter(isdelete=False,parent_id=parent_id).values()
+            data={}
+            data['views']=list(get_views)
+            return JsonResponse(data)
+
+        get_views=views.objects.filter(isdelete=False,parent_id=0,owner_id=owner_id).values()
         data={}
         data['views']=list(get_views)
         return JsonResponse(data)
-    # views=Load_models_conf.objects.values('view_name').annotate(nums=Count('model_name'))
-    # data={}
-    # data['views']=list(views)
-    # return JsonResponse(data)
-    get_views=views.objects.filter(isdelete=False,parent_id=0).values()
-    data={}
-    data['views']=list(get_views)
-    return JsonResponse(data)
 # 验证场景名是否存在
 @csrf_exempt
 def is_view_exist(request):
@@ -261,13 +342,16 @@ def create_folder(request):
         return HttpResponse('文件夹新建成功')
 
 #查询文件夹
+@csrf_exempt
 def get_folders(request):
-    folders=folder.objects.filter(isdelete=False).values()
-    # print(folders)
-    data={}
-    data['folders']=list(folders)
-    # print(data)
-    return JsonResponse(data)
+    if request.method == 'POST':
+        owner_id=request.POST.get('owner_id')
+        folders=folder.objects.filter(owner_id=owner_id,isdelete=False).values()
+        # print(folders)
+        data={}
+        data['folders']=list(folders)
+        # print(data)
+        return JsonResponse(data)
 
 #上传模型
 @csrf_exempt
@@ -337,6 +421,8 @@ def get_display_view(request):
         data={}
         data['views']=list(view)
         return JsonResponse(data)
+
+
 
 
 
