@@ -89,49 +89,62 @@ function initThree() {
                         // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
                         roughness: 0.45,
                         }),];
-    // points=create_vertices(1500,1500,3000).vertices;
+    points=create_vertices(1500,1500,3000).vertices;
     // modelww = createModel(points,material,720);
-    modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
+    // modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
+    modelww=create_cylinder(create_vertices(500,500,1000).vertices,material,1,1,1)
     scene.add(modelww);
+
+    // let a=[],b=[]
+    // for (let i=0;i<1000;i++){
+    //     a.push(i/10);
+    //     b.push([-1-i/10,1+i/10]);
+    // }
+    // aaa=createEndface([[a,b]],material)
+
+    // // let ppp=[[[100,200,300,400,500],[[-100,100],[-200,200],[-300,300],[-400,400],[-500,500]]],[[200,300,400],[[-10,10],[-10,10],[-10,10]]],[[200,300,400],[[15,20],[15,20],[15,20]]]]
+    // // [[200,300,400],[[-100,100],[-100,100],[-100,100]]]
+    // // aaa=createEndface(ppp,material)
+    // scene.add(aaa);
 }
 function render() {
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
 
-// //创建顶点
-// function create_vertices(r1,r2,h,num=720){
-//     let degree=(Math.PI/180)*360/num;
-//     let points=[]
-//     let vertices=[];
+//创建顶点
+function test_create_vertices(r1,r2,h,num=720){
+    let degree=(Math.PI/180)*360/num;
+    let points=[]
+    let vertices=[];
 
-//     vertices.push(new THREE.Vector3(0,0,0));
+    vertices.push(new THREE.Vector3(0,0,0));
 
-//     for(let i=0;i<num;i++){
+    for(let i=0;i<num;i++){
         
-//         points[i]=[];
-//         for(let m=0;m<51;m++){
-//             points[i][m]=[];
-//             points[i][m]['x']=r1*(1.2-Math.pow((m-25),2)/625)*Math.sin(i*degree);
-//             points[i][m]['y']=r1*(1.2-Math.pow((m-25),2)/625)*Math.cos(i*degree);
-//             points[i][m]['z']=h*m/50;
-//         }
-//     }
+        points[i]=[];
+        for(let m=0;m<51;m++){
+            points[i][m]=[];
+            points[i][m]['x']=r1*(1.2-Math.pow((m-25),2)/625)*Math.sin(i*degree);
+            points[i][m]['y']=r1*(1.2-Math.pow((m-25),2)/625)*Math.cos(i*degree);
+            points[i][m]['z']=h*m/50;
+        }
+    }
 
-//     for(let j=0;j<51;j++){
-//         for(let i=0;i<num;i++){
-//             vertices.push(new THREE.Vector3(points[i][j]['x'], points[i][j]['y'], points[i][j]['z']))
-//         }
-//     }
+    for(let j=0;j<51;j++){
+        for(let i=0;i<num;i++){
+            vertices.push(new THREE.Vector3(points[i][j]['x'], points[i][j]['y'], points[i][j]['z']))
+        }
+    }
 
-//     vertices.push(new THREE.Vector3(0,0,h));
+    vertices.push(new THREE.Vector3(0,0,h));
 
-//     let obj=new function(){
-//         this.vertices=vertices;
-//         this.num=num;   
-//     }
-//     return obj;
+    let obj=new function(){
+        this.vertices=vertices;
+        this.num=num;   
+    }
+    return obj;
     
-// }
+}
 
 

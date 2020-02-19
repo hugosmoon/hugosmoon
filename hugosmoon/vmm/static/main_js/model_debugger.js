@@ -90,7 +90,7 @@ let Main = {
             display_view_id:0,
             timeStamp_in:0,
             save_information:"",
-            // 自动保存文案计数器
+            // 自动保存计数
             auto_save_num:0,
         }
     },
@@ -99,6 +99,15 @@ let Main = {
         this.get_folders();
         this.timer = setInterval(this.auto_save, 20000);
         this.timer = setInterval(this.update_data, 500);
+        let self = this;
+        this.$nextTick(function () {
+            document.addEventListener('keyup', function (e) {
+            //此处填写你的业务逻辑即可
+            if (e.keyCode == 27) {
+                self.delte_attach();
+            }
+            })
+        });
     },
     methods: {
         update_data:function(){
@@ -122,28 +131,22 @@ let Main = {
                     this.redo_action_status=true;
                 }
             }
-            if(this.auto_save_num>0){
-                if(this.auto_save_num<7){
-                    this.save_information='自动保存中'+'-'.times(this.auto_save_num)+'*'.times(6-this.auto_save_num);
+            if(auto_save_status==1){
+                if(this.auto_save_num<5){
+                    this.save_information='自动保存'+'.'.times(this.auto_save_num);//+'*'.times(6-this.auto_save_num);
                 }
                 else{
                     this.save_information='保存完成';
                 }
                 this.auto_save_num+=1;
-                if(this.auto_save_num>11){
-                    this.save_information='';
+                if(this.auto_save_num>9){
+                    this.save_information='';  
+                }
+                if(this.auto_save_num==35){
+                    this.save_model(0);
                     this.auto_save_num=0;
                 }
-
-            }
-
-            
-        },
-        auto_save:function(){
-            if(auto_save_status==1){
-                this.save_model(0);
-            }
-
+            }    
         },
         get_views:function(){
             this.$http.post(
@@ -247,12 +250,12 @@ let Main = {
             current_model_index=sel;
             this.model_information=''
             // </td><td></td></tr></table>'
-            this.model_information+="<br>"+'模型尺寸：'+"<br>"
-            this.model_information+='<table'+" style='font-size: 12px'"+'><tr><td>'+'X:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.x*2).toFixed(3) +"</td>"
+            this.model_information+="<p style='font-size: 14px'>"+'模型尺寸：'+"<p>"
+            this.model_information+='<table'+" style='margin-top: -15px;font-size: 12px'"+'><tr><td>'+'X:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.x*2).toFixed(3) +"</td><td>——</td>"
             this.model_information+='<td> X/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.x).toFixed(3) +"</td></tr>"
-            this.model_information+='<tr><td>Y:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.y*2).toFixed(3) +"</td>"
+            this.model_information+='<tr><td>Y:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.y*2).toFixed(3) +"</td><td>——</td>"
             this.model_information+='<td> Y/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.y).toFixed(3) +"</td></tr>"
-            this.model_information+='<tr><td>Z:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +"</td>"
+            this.model_information+='<tr><td>Z:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z*2).toFixed(3) +"</td><td>——</td>"
             this.model_information+='<td> Z/2:'+'</td><td>'+(models[current_model_index].children[0].geometry.boundingBox.max.z).toFixed(3) +"</td></tr>"
 
             ////console.log(this.model_information);
@@ -455,8 +458,8 @@ let Main = {
                 ).then(function (res) {
                 // console.log(save_type);
                 if(save_type==0){
-                    this.save_information="自动保存中******";
-                    this.auto_save_num=1;
+                    // this.save_information="自动保存中******";
+                    // this.auto_save_num=1;
                 }
                 else{
                     this.$message({
@@ -554,8 +557,7 @@ let Main = {
             for (let i = 0; i < models_to_control.length; i++) {
                 // console.log(models[i].isObject3D)
                 if (models_to_control[i].isObject3D) {
-                    objects.push(models_to_control[i].children[0]);
-                    
+                    objects.push(models_to_control[i].children[0]);   
                 }
             }
             // 初始化拖拽控件
@@ -630,6 +632,15 @@ let Main = {
                 }
             }
                 
+        },
+        delte_attach:function(){
+            if(transformControls){
+                transformControls.detach();
+                if(model_gui){
+                    model_gui.close();
+                }
+            }
+            
         },
         add_model: function () {
             load_status=false;

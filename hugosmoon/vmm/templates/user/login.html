@@ -133,20 +133,50 @@
                     url:"/vmm/index/",
                 }
             },
+            mounted:function(){
+                let self = this;
+                this.$nextTick(function () {
+                    document.addEventListener('keyup', function (e) {
+                    //此处填写你的业务逻辑即可
+                    if (e.keyCode == 13) {
+                        self.login();
+                    }
+                    })
+                });
+            },
             methods: {
                 login:function(){
-                    // set_cookie(this.username,this.password)
-                    // setCookie('username',this.username);
-                    // setCookie('password',this.password)
-                    if(url!=""){
-                        this.url=url;
-                    }
-                    document.write("<form action='/vmm/do_login/' method=post name=form1 style='display:none'>");  
-                    document.write("<input type=hidden name='url' value='"+this.url+"'/>"); 
-                    document.write("<input type=hidden name='username' value='"+this.username+"'/>"); 
-                    document.write("<input type=hidden name='password' value='"+this.password+"'/>"); 
-                    document.write("</form>");  
-                    document.form1.submit();  
+                    this.$http.post(
+                    '/vmm/login_verification/',
+                    {
+                        username:this.username,
+                        password:this.password
+                    },
+                    { emulateJSON: true }
+                    ).then(function (res) {
+                        if(res.body=='True'){
+                            if(url!=""){
+                                this.url=url;
+                            }
+                            document.write("<form action='/vmm/do_login/' method=post name=form1 style='display:none'>");  
+                            document.write("<input type=hidden name='url' value='"+this.url+"'/>"); 
+                            document.write("<input type=hidden name='username' value='"+this.username+"'/>"); 
+                            document.write("<input type=hidden name='password' value='"+this.password+"'/>"); 
+                            document.write("</form>");  
+                            document.form1.submit();
+                        }
+                        else{
+                            this.$message({
+                                type: 'success',
+                                duration: 1000,
+                                position: 'top-left',
+                                message: '用户名或密码错误',
+                            });
+                        }
+
+                });
+
+                      
                 },
 
             }

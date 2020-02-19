@@ -14,7 +14,7 @@ import time
 def home(request):
     return render(request, 'index.html')
 def test(request):
-    return render(request, 'test/test2.html')
+    return render(request, 'test/test.html')
 
 def tool_display(request):
     return render(request, 'tooldisplay/tooldisplay.html')
@@ -64,13 +64,19 @@ def do_login(request):
         password=request.POST.get('password')
         url=request.POST.get('url')
         if username != "" and password != "" and url != "":
-            user=users.objects.get(isdelete=False,username=username)
-            if password==user.password:
-                rt = redirect(url) #跳转页面
-                rt.set_cookie('username', username)
-                rt.set_cookie('password', password)
-                rt.set_cookie('userid', user.id)
-                return rt
+            user=users.objects.filter(isdelete=False,username=username)
+            if len(user)==0:
+                return HttpResponse("账号不存在")
+            else:
+                # print(user[0].password)
+                if password==user[0].password:
+                    rt = redirect(url) #跳转页面
+                    rt.set_cookie('username', username)
+                    rt.set_cookie('password', password)
+                    rt.set_cookie('userid', user[0].id)
+                    return rt
+                else:
+                    return HttpResponse("密码错误")
     return HttpResponse("登录失败")
 
 # 登录验证
@@ -81,8 +87,10 @@ def login_verification(request):
         username=request.POST.get('username')
         password=request.POST.get('password')
         if username != "" and password != "":
-            user=users.objects.get(isdelete=False,username=username)   
-            if password==user.password:
+            user=users.objects.filter(isdelete=False,username=username)
+            if len(user)==0:
+                return HttpResponse(False)
+            if password==user[0].password:
                 return HttpResponse(True)
         return HttpResponse(False)
 
