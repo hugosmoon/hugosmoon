@@ -7,10 +7,10 @@ function create_tool(main_angle,tool_minor_cutting_edge_angle,edge_inclination_a
     a=a0+(a1-a0)*(main_angle-5)/70;
     w1=a*trig('cot',main_angle);
     c=(w-w1)*trig('tan',tool_minor_cutting_edge_angle);
-    let rqj_b=trig('tan',edge_inclination_angle)*0.7;
-    let qj_b=-trig('sin',rake_angle+0.01)*1.7;
-    let hj_b=-trig('sin',back_angle+0.01)*h*0.2;
-    let frhj_b=-trig('sin',secondary_edge_back_angl+0.01)*h*0.2;
+    let rqj_b=trig('tan',edge_inclination_angle);
+    let qj_b=-trig('sin',rake_angle+0.01)*3.5;
+    let hj_b=-trig('sin',back_angle+0.01)*h;
+    let frhj_b=-trig('sin',secondary_edge_back_angl+0.01)*h;
 
     let controlPoints=[];
     let faces=[];

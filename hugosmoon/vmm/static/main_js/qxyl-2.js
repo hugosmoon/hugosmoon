@@ -77,6 +77,16 @@ let cutting_force=0;//切削力
 //let stats = initStats();
 let chart_line1,chart_line2;
 
+// 实验数据保存
+let experiment_data_1="<html><head><meta charset='utf-8' /></head><body><table>";
+let experiment_data_2="";
+let experiment_data_3="<tr></tr><tr><th>序号</th><th>切削长度(mm)</th><th>切削力(N)</th></tr>";
+let experiment_data_4="</table></body></html>";
+let experiment_data_num=1;
+
+
+let exp_information="实验参数";
+
 //加载
 
 let Main = {
@@ -85,12 +95,19 @@ let Main = {
             check_pr: false,
             check_ps: false,
             check_p0: false,
+
+            progress_status:false,
+            progress_data:0,
+            // 显示遮罩
+            mask_status:true,
+
             value1: 0,
             value2: 1,
             value3: 0.3,
             start_status:false,
             end_status:true,
             adjustable:false,
+            exp_information:"",
             marks_machine_speed: {
                 0:'0',
                 400: '400',
@@ -122,34 +139,51 @@ let Main = {
         // this.get_display_info();
         initThree(0);
         loadAutoScreen(camera, renderer);
-        this.openFullScreen(200);
+        this.openFullScreen();
         create_bangliao();
         create_tool_to_scene();
         load_models(display_view_id);
         // initialization()
         init_chart();
         render();
+        this.timer = setInterval(this.update_data, 500);
     },
     methods: {
-        // 加载遮罩
-        openFullScreen:function(time) {
-            const loading = this.$loading({
-                lock: true,
-                text: '模型加载中',
-                background: 'rgba(0, 0, 0, 0.92)'
-            });
-            setTimeout(() => {
+        update_data:function(){
+            this.exp_information=exp_information;
+            if(this.mask_status){
                 if(load_status){
-                    loading.close();
+                    this.$refs.mask.style.height = 0 + 'px';
+                    this.$refs.mask.style.paddingLeft="0px";
+                    this.$refs.mask.children[0].style.marginTop="0px";
+                    this.progress_status=false;
+                    this.mask_status=false;
                 }
-                else {
-                    this.openFullScreen(200);
+                else{
+                    this.mask_status=true;
+                    this.openFullScreen();
                 }
-
-            }, time);
+            }
+        },
+        // 加载遮罩
+        openFullScreen:function() {
+            this.$refs.mask.style.height = document.getElementById('render').clientHeight + 'px';
+            this.$refs.mask.style.paddingLeft="40%";
+            this.$refs.mask.children[0].style.marginTop="200px";
+            this.progress_status=true;
+            this.progress_data=0;
+            let nu=Number(((loaded_models_num/load_models_num)*100).toFixed(0));
+            if(nu){
+                this.progress_data=nu;
+            }
+            else{
+                this.progress_data=0;
+            }
+            
         },
         greet: function (xx) {
             bcdl=this.$refs.cutting_depth.value;
+            jjl=this.$refs.feed.value;
         },
         start: function(){
             
@@ -216,6 +250,18 @@ let Main = {
                 cutting_force=Math.round((res.body),2);
                 // console.log('切削力:'+cutting_force);
                 });
+        },
+        download_data:function(){
+            if(experiment_data_2==""){
+                this.$message.error('尚无实验数据，请先进行实验操作');
+                return false;
+            }
+            var blob = new Blob([experiment_data_1+experiment_data_2+experiment_data_3+experiment_data_4], { type: "application/vnd.ms-excel" });
+            var a = document.createElement("a");
+            a.href=URL.createObjectURL(blob);
+            a.download="切削力实验数据-"+Date.now()+".xls";
+            console.log(a)
+            a.click();
         }
 
     }
@@ -341,6 +387,21 @@ function render() {
             models_control();
     
             if(cut_length>0&&machine_speed>0){
+                if(experiment_data_2==""){
+                    experiment_data_2+="<tr><th>刀具主偏角</th><th>"+main_angle+"°</th></tr>";
+                    experiment_data_2+="<tr><th>刀具副偏角</th><th>"+tool_minor_cutting_edge_angle+"°</th></tr>"
+                    experiment_data_2+="<tr><th>刀具刃倾角</th><th>"+edge_inclination_angle+"°</th></tr>"
+                    experiment_data_2+="<tr><th>刀具前角</th><th>"+rake_angle+"°</th></tr>"
+                    experiment_data_2+="<tr><th>刀具后角</th><th>"+back_angle+"°</th></tr>"
+                    experiment_data_2+="<tr><th>刀具副刃后角</th><th>"+secondary_edge_back_angl+"°</th></tr>"
+                    experiment_data_2+="<tr><th>机床主轴转速</th><th>"+machine_speed.toFixed(0)+"r/min</th></tr>"
+                    experiment_data_2+="<tr><th>背吃刀量</th><th>"+bcdl+"mm</th></tr>"
+                    experiment_data_2+="<tr><th>进给量</th><th>"+jjl+"mm/r</th></tr>"
+                    experiment_data_2+="<tr><th>工件材料</th><th>"+bangliao_material+"</th></tr>"
+                    experiment_data_2+="<tr><th>工件加工前直径</th><th>"+bangliao_r+"mm</th></tr>"
+                    experiment_data_2+="<tr><th>工件总长度</th><th>"+bangliao_length+"mm</th></tr>"
+
+                }
                 let x = (count != 0) ? Math.round(cut_length * 10) / 10 : 0;
                 let y = Number((cutting_force * (getNumberInNormalDistribution(1,0.03))).toFixed(2));
                 if(count%10==0){
@@ -348,16 +409,22 @@ function render() {
                         draw_chart(chart_line1,2000,x,y);
                     }
                     draw_chart(chart_line2,30,x,y);
+                    experiment_data_3+="<tr><th>"+experiment_data_num+"</th><th>"+x+"</th><th>"+y+"</th></tr>"
+                    experiment_data_num+=1;
                 }
                 count+=1;
             }
-    
         }
         catch(e){
             // console.log(e)
         }
 
     }
+    
+    exp_information="<h3>实验参数</h3><p><b>刀具参数</b></p>"+"<table style='margin-top: -10px;font-size: 13px';width:'200px'><tr><td>主偏角</td><td>副偏角</td><td>刃倾角</td><td>前角</td><td>后角</td><td>副刃后角</td></tr><tr>"+"<td>"+main_angle+"°</td>"+"<td>"+tool_minor_cutting_edge_angle+"°</td>"+"<td>"+edge_inclination_angle+"°</td>"+"<td>"+rake_angle+"°</td>"+"<td>"+back_angle+"°</td>"+"<td>"+secondary_edge_back_angl+"°</td></tr></table>"
+    exp_information+="<p><b>切削用量</b></p>"+"<table style='margin-top: -10px;font-size: 13px';width:'200px'><tr><td>机床转速</td><td>背吃刀量</td><td>进给量</td></tr><tr>"+"<td>"+machine_speed.toFixed(0)+"r/min</td>"+"<td>"+bcdl+"mm</td>"+"<td>"+jjl+"mm/r</td></tr></table>"
+    exp_information+="<p><b>被加工件参数</b></p>"+"<table style='margin-top: -10px;font-size: 13px';width:'200px'><tr><td>工件材料</td><td>加工前直径</td><td>工件总长度</td></tr><tr>"+"<td>"+bangliao_material+"</td>"+"<td>"+bangliao_r*2+"mm</td>"+"<td>"+bangliao_length+"mm</td></tr></table>"
+    
  
     
 

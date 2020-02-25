@@ -48,9 +48,10 @@ class Load_models_conf(models.Model):
 #文件夹
 class folder(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
-    owner_id=models.IntegerField(default=1,db_column="folder_id")
+    owner_id=models.IntegerField(default=1,db_column="owner_id")
     folder_name = models.CharField(max_length=255, db_column="folder_name")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
+    type = models.IntegerField(default=1,db_column="type")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="f_updatetime")
 
@@ -66,7 +67,7 @@ class com_model(models.Model):
 #场景
 class views(models.Model):
     id = models.AutoField(primary_key=True, db_column="id")
-    owner_id=models.IntegerField(default=1,db_column="folder_id")
+    owner_id=models.IntegerField(default=1,db_column="owner_id")
     view_name = models.CharField(max_length=255, db_column="view_name")
     createtime = models.DateTimeField(default=timezone.now, db_column="f_createtime")
     parent_id=models.IntegerField(default=0,db_column="parent_id")
@@ -88,6 +89,14 @@ class users(models.Model):
     createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
     updatetime = models.DateTimeField(default=timezone.now, db_column="updatetime")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
+
+# 用户访问日志
+class visit_log(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    page =models.IntegerField(db_column="page")
+    ip = models.CharField(max_length=255, db_column="ip") 
+    city = models.CharField(default="",max_length=255, db_column="city") 
+    createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
 
 
 

@@ -64,7 +64,11 @@ body {
     margin-right: 50px; */
 }
 #title1{
-    font-size: 22px;
+    font-size: 20px;
+    color: floralwhite;
+}
+.title1{
+    font-size: 20px;
     color: floralwhite;
 }
 #title2{
@@ -123,12 +127,16 @@ body {
     margin-top: 30px;
     margin-right: 30px;
     padding-bottom: 30px;
-    width: 450px;
+    width: 400px;
     padding-bottom: 30px;
     padding-top: 30px;
     padding-bottom: 30px;
     padding-left: 30px;
     padding-right: 30px;
+}
+.image__placeholder{
+    /* width: 100%;
+    margin-right: 2px; */
 }
 #container{
     margin-bottom: 30px;
@@ -156,3 +164,27 @@ body {
     padding-left: 20px;
     padding-right: 20px;
 }
+
+.index{
+    opacity: 0.8;
+    border-radius:5px;
+    background:rgba(255, 255, 255, 0.08);
+    position:absolute;
+    margin-top: 30px;
+    margin-left: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    cursor:pointer;
+}
+
+#mask{
+    width: 100%;
+    opacity: 0.92;
+    background-color: black;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    z-index: 998;
+  }

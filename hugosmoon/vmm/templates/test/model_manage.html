@@ -16,6 +16,9 @@
     <!-- <script src="{% static 'import/SceneUtils.js' %}"></script> -->
     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'import/jquery.cookie.js' %}"></script>
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <script src="{% static 'main_js/create_visit_log.js' %}"></script>
+    <script src="{% static 'main_js/error/view_exception.js' %}"></script>
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
     <script src="{% static 'main_js/login_verification.js' %}"></script>
     
@@ -178,5 +181,8 @@
         var Ctor = Vue.extend(Main)
         new Ctor().$mount('#app')
     </script>
+    <script>
+        create_visit_log(3);
+      </script>
 </body>
 </html>

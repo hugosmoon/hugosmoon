@@ -2,11 +2,22 @@
 <html lang="zh">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
     <title>首页</title>
      {% load static %}
+     <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
      <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
      <script src="{% static 'import/jquery.cookie.js' %}"></script>
+     <script src="{% static 'main_js/error/view_exception.js' %}"></script>
      <script src="{% static 'main_js/login_verification.js' %}"></script>
+     <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+     <script src="{% static 'main_js/create_visit_log.js' %}"></script>
+     <script src="{% static 'import/three.js' %}"></script>
+    <script src="{% static 'import/Setting.js' %}"></script>
+    <script src="{% static 'import/OrbitControls.js' %}"></script>
+
+
+     
     <!-- 模块css -->
     <link rel="stylesheet" type="text/css" href="{% static 'import/css/index.css' %}">
     <style>
@@ -52,11 +63,15 @@
     
 </head>
 <body >
-        
-    
+  <div id='render'></div>
+
     <div id="app">
-            <el-container style="height:100%">
-                    <el-header height='80px'><i class="el-icon-ship" style="margin-right: 20px;"></i></el-icon-picture-outline-round> Hugosmoon · VirtualMachining</el-header>
+      <div class="index" >
+        <p class='title1'>工具</p>
+        <el-button onclick="jumpto('/vmm/model_debugger/');" type="primary">场景编辑</el-button><br><br>
+        <el-button onclick="jumpto('/vmm/tool_display/');" type="primary">车刀的主要几何角度</el-button><br><br>
+        <el-button onclick="jumpto('/vmm/qxyl/');" type="primary">切削力与切削用量的关系</el-button>
+            <!-- <el-container style="height:100%">
                     <el-main style="height:100%">
                       <br>
                       <el-button  onclick="jumpto('/vmm/model_debugger/');">场景调试</el-button>
@@ -65,10 +80,11 @@
                             <br>
                             <el-button  onclick="jumpto('/vmm/qxyl/');">切削力与切削用量的关系</el-button>
                     </el-main>
-                    <!-- <el-footer></el-footer> -->
-            </el-container>
+            </el-container> -->
         
       </div>
+      
+  </div>
 </body>
 <script src="{% static 'import/vue.js' %}"></script>
 <script src="{% static 'import/element_index.js' %}"></script>
@@ -80,6 +96,10 @@
     function jumpto(url) {
          location.href=url;
     }
+  </script>
+  <script src="{% static 'main_js/moon.js' %}"></script>
+  <script>
+    create_visit_log(1);
   </script>
 </html>
 

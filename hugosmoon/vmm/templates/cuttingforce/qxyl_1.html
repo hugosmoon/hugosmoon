@@ -20,6 +20,9 @@
     <script src="{% static 'import/SceneUtils.js' %}"></script>
     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'import/jquery.cookie.js' %}"></script>
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <script src="{% static 'main_js/create_visit_log.js' %}"></script>
+    <script src="{% static 'main_js/error/view_exception.js' %}"></script>
     <script src="{% static 'import/ConvexGeometry.js' %}"></script>
     <!-- 轨迹球控件 -->
     <script src="{% static 'import/TrackballControls.js' %}"></script>
@@ -42,7 +45,7 @@
                 <template>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">主偏角</span>
-                        <el-slider ref="main_angle" v-model="value1" :marks="marks_main_angle" :min=5 :max=90 @input="greet" @change="greet"></el-slider>
+                        <el-slider ref="main_angle" v-model="value1" :marks="marks_main_angle" :min=30 :max=90 @input="greet" @change="greet"></el-slider>
                     </div>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">副偏角</span>
@@ -50,19 +53,19 @@
                     </div>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">刃倾角</span>
-                        <el-slider ref="edge_inclination_angle" v-model="value3" :marks="marks_edge_inclination_angle" :min=-15 :max=5 @input="greet" @change="greet"></el-slider>
+                        <el-slider ref="edge_inclination_angle" v-model="value3" :marks="marks_edge_inclination_angle" :min=-10 :max=5 @input="greet" @change="greet"></el-slider>
                     </div>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">前角</span>
-                        <el-slider ref="rake_angle" v-model="value4" :marks="marks_rake_angle" :min=-15 :max=45 @input="greet" @change="greet"></el-slider>
+                        <el-slider ref="rake_angle" v-model="value4" :marks="marks_rake_angle" :min=-5 :max=25 @input="greet" @change="greet"></el-slider>
                     </div>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">后角</span>
-                        <el-slider ref="back_angle" v-model="value5" :marks="marks_back_angle" :min=0 :max=20 @input="greet" @change="greet"></el-slider>
+                        <el-slider ref="back_angle" v-model="value5" :marks="marks_back_angle" :min=6 :max=12 @input="greet" @change="greet"></el-slider>
                     </div>
                     <div class="block con-ang">
                         <span class="demonstration" style="color:#C0C4CC">副刃后角</span>
-                        <el-slider ref="secondary_edge_back_angl" v-model="value6" :marks="marks_secondary_edge_back_angle" :min=0 :max=20 @input="greet" @change="greet"></el-slider>
+                        <el-slider ref="secondary_edge_back_angl" v-model="value6" :marks="marks_secondary_edge_back_angle" :min=6 :max=12 @input="greet" @change="greet"></el-slider>
                     </div>
                     <!--<div class="block con-ang">-->
                         <!--<span class="demonstration" style="color:#C0C4CC">刀尖圆弧半径</span>-->
@@ -73,7 +76,7 @@
             </div>
             <div id="pla_control">
                 <div id="control-inner">
-                    <p id="title1">棒料参数</p>
+                    <p id="title1">被加工件参数</p>
                 </div>
                 <div id="control-inner">
                     <el-select ref="bangliao_material" v-model="value" placeholder="请选择材料">
@@ -109,5 +112,8 @@
 </div>
 </div>
 <script src="{% static 'main_js/qxyl-1.js' %}"></script>
+<script>
+    create_visit_log(6);
+  </script>
 </body>
 </html>

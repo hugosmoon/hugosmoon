@@ -33,6 +33,11 @@ urlpatterns = [
     path('createuser/',views.createuser,name='createuser'),
     path('admin_verification/',views.admin_verification,name='admin_verification'),
 
+    # 异常处理
+    path('view_exception/',views.view_exception,name='view_exception'),
+    # 创建访问日志
+    path('create_visit_log/',views.create_visit_log,name='create_visit_log'),
+
     
 ]
 

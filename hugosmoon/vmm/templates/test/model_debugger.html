@@ -21,6 +21,9 @@
     <script src="{% static 'import/SceneUtils.js' %}"></script>
     <script src="{% static 'import/jquery-3.4.1.min.js' %}"></script>
     <script src="{% static 'import/jquery.cookie.js' %}"></script>
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <script src="{% static 'main_js/create_visit_log.js' %}"></script>
+    <script src="{% static 'main_js/error/view_exception.js' %}"></script>
     <script src="{% static 'import/STLLoader.js' %}"></script>
     <!-- <script src="{% static 'import/dat.gui.js' %}"></script> -->
     <script src="{% static 'import/echarts.min.js' %}"></script>
@@ -40,11 +43,17 @@
     <div id="Stats-output"></div>
     <div>
         <!--加载动画的div-->
+        <div id="mask" ref="mask"></div>
         <div id="render">
         </div>
         <div id="app">
+            <div id="mask" ref="mask">
+                <div ref="progress" style="width:20%; text-align:center;">
+                <p v-if="progress_status" style="color: blanchedalmond;">模型加载中</p>
+                <el-progress v-if="progress_status" :text-inside="true" :stroke-width="26" :percentage="progress_data"></el-progress>
+                </div>
+            </div>
             <div class="control">
-                
                     <el-button type="primary" v-on:click="add_view" :disabled="enter_view_name" size="mini">新建场景</el-button>
                     <el-button  type="primary" v-on:click="add_view" :disabled="child_view_status" size="mini">新建子场景</el-button>
                     <p id="title2" style="color: aqua;">选择场景</p>
@@ -139,5 +148,8 @@
     <script src="{% static 'main_js/model_debugger.js' %}"></script>
     <script src="{% static 'main_js/model.js' %}"></script>
     <script src="{% static 'main_js/update_models.js' %}"></script>
+    <script>
+        create_visit_log(2);
+      </script>
 </body>
 </html>

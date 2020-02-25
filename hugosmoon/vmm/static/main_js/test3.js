@@ -1,3 +1,12 @@
+import * as THREE from '/static/import/three.module.js';
+
+import { OrbitControls } from '/static/import/OrbitControls.js';
+import { GLTFLoader } from '/static/import/GLTFLoader.js';
+// import { RGBELoader } from '/static/import/RGBELoader.js';
+
+import { RoughnessMipmapper } from '/static/import/RoughnessMipmapper.js';
+// alert()
+
 let renderer, camera, scene;
 //hugosmoon
 
@@ -7,6 +16,7 @@ let mesh;
 let model;
 let material;
 let points;
+let gltf_obj;
 
 
 
@@ -37,9 +47,9 @@ function initThree() {
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 500000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
     //摄像机的位置
-    camera.position.x = -1470;
-    camera.position.y = -4680;
-    camera.position.z = 1100;
+    camera.position.x = 120;
+    camera.position.y = 170;
+    camera.position.z = 20;
     camera.up.x = 0;
     camera.up.y = 0;
     camera.up.z = 1;//摄像机的上方向是Z轴
@@ -57,26 +67,26 @@ function initThree() {
     light.shadow.mapSize.height = 8192;
     scene.add(light);
 
-    let light2 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    let light2 = new THREE.SpotLight(0xffffff, 5, 0);//点光源
     light2.position.set(80000,-80000,300);
     scene.add(light2);
 
-    let light3 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    let light3 = new THREE.SpotLight(0xffffff, 2, 0);//点光源
     light3.position.set(80000,80000,300);
-    scene.add(light3);
+    // scene.add(light3);
 
-    let light4 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    let light4 = new THREE.SpotLight(0xffffff, 2, 0);//点光源
     light4.position.set(-80000,-80000,300);
-    scene.add(light4);
+    // scene.add(light4);
 
-    let light6 = new THREE.SpotLight(0xffffff, 0.4, 0);//点光源
+    let light6 = new THREE.SpotLight(0xffffff, 2, 0);//点光源
     light6.position.set(-80000,80000,300);
-    scene.add(light6);
+    // scene.add(light6);
 
     let light5 = new THREE.AmbientLight(0xaaaaaa, 0.99);//环境光，如果不加，点光源照不到的地方就完全是黑色的
     scene.add(light5);
     
-    controller = new THREE.OrbitControls(camera, renderer.domElement);
+    controller = new OrbitControls(camera, renderer.domElement);
     controller.target = new THREE.Vector3(0, 0, 0);
 
 
@@ -93,7 +103,7 @@ function initThree() {
     // modelww = createModel(points,material,720);
     // modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
     modelww=create_cylinder(create_vertices(500,500,1000).vertices,material,1,1,1)
-    scene.add(modelww);
+    // scene.add(modelww);
 
     // let a=[],b=[]
     // for (let i=0;i<1000;i++){
@@ -106,6 +116,64 @@ function initThree() {
     // // [[200,300,400],[[-100,100],[-100,100],[-100,100]]]
     // // aaa=createEndface(ppp,material)
     // scene.add(aaa);
+
+    var gltfLoader = new GLTFLoader()
+
+    gltfLoader.load('/static/model/DamagedHelmet/DamagedHelmet.gltf', function(obj) {
+        gltf_obj=obj;
+        console.log(obj)
+        // gltf_obj.scene.position.z=40;
+        gltf_obj.scene.rotation.x=0.5*Math.PI;
+        gltf_obj.scene.rotation.y=0.65*Math.PI;
+        // scene.add(gltf_obj.scene);
+    // var object = scene.gltf // 模型对象
+    // scene.add(object) // 将模型添加到场景中
+    })
+
+    var roughnessMipmapper = new RoughnessMipmapper( renderer );
+
+    var loader = new GLTFLoader().setPath( '/static/model/DamagedHelmet/' );
+    loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+        gltf.scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+
+                roughnessMipmapper.generateMipmaps( child.material );
+
+            }
+
+        } );
+
+        scene.add( gltf.scene );
+
+        roughnessMipmapper.dispose();
+
+        render();
+
+    } );
+
+    gltfLoader.load('/static/model/ipod_scroll_wheel/scene.gltf', function(obj) {
+        gltf_obj=obj;
+        console.log(obj)
+        gltf_obj.scene.position.z=100;
+        gltf_obj.scene.rotation.x=0.5*Math.PI;
+        gltf_obj.scene.rotation.y=0.65*Math.PI;
+        // scene.add(gltf_obj.scene);
+    // var object = scene.gltf // 模型对象
+    // scene.add(object) // 将模型添加到场景中
+    })
+
+    gltfLoader.load('/static/model/buster_drone/scene.gltf', function(obj) {
+        gltf_obj=obj;
+        console.log(obj)
+        gltf_obj.scene.position.z=200;
+        gltf_obj.scene.rotation.x=0.5*Math.PI;
+        gltf_obj.scene.rotation.y=0.65*Math.PI;
+        // scene.add(gltf_obj.scene);
+    // var object = scene.gltf // 模型对象
+    // scene.add(object) // 将模型添加到场景中
+    })
 }
 function render() {
     requestAnimationFrame(render);
@@ -147,4 +215,6 @@ function test_create_vertices(r1,r2,h,num=720){
     
 }
 
+
+threeStart();
 

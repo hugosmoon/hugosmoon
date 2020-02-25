@@ -47,13 +47,13 @@ let drag_sig=0;
 let models_info_hstory=[];
 ////当前所在
 let action_anchor=0;
+let loading;
 
 
 
 
 let Main = {
     data() {
-        // this.openFullScreen(200);
         return {
             views_list:[],
             // view_name: '',
@@ -86,18 +86,26 @@ let Main = {
             save_status:true,
             cancle_action_status:true,
             redo_action_status:true,
+            progress_status:false,
+            progress_data:0,
+
+            // 显示遮罩
+            mask_status:false,
             
             display_view_id:0,
             timeStamp_in:0,
             save_information:"",
             // 自动保存计数
             auto_save_num:0,
+
+            // 记录当前的模型数量，监听模型数量变化
+            models_num_view:0,
         }
     },
     mounted:function(){
         this.get_views();
         this.get_folders();
-        this.timer = setInterval(this.auto_save, 20000);
+        // this.timer = setInterval(this.auto_save, 20000);
         this.timer = setInterval(this.update_data, 500);
         let self = this;
         this.$nextTick(function () {
@@ -146,7 +154,27 @@ let Main = {
                     this.save_model(0);
                     this.auto_save_num=0;
                 }
-            }    
+            }
+            if(this.mask_status){
+                if(load_status){
+                    this.$refs.mask.style.height = 0 + 'px';
+                    this.$refs.mask.style.paddingLeft="0px";
+                    this.$refs.mask.children[0].style.marginTop="0px";
+                    this.progress_status=false;
+                    this.mask_status=false;
+                }
+                else{
+                    this.mask_status=true;
+                    this.openFullScreen();
+                }
+            }
+            if(this.models_num_view<models.length&&load_status&&dragControls&&transformControls){
+                // console.log(12333)
+                // dragControls.deactivate();
+                // transformControls.detach();
+                this.models_num_view=models.length;
+                this.child_view_models_DragControls();  
+            }             
         },
         get_views:function(){
             this.$http.post(
@@ -204,7 +232,8 @@ let Main = {
                 this.$http.post(
                     '/vmm/is_view_exist/',
                     {
-                        view_name:value
+                        view_name:value,
+                        owner_id:owner_id
                     },
                     { emulateJSON: true }
                     ).then(function (res) {
@@ -221,7 +250,8 @@ let Main = {
                                 '/vmm/add_view/',
                                 {
                                     view_name:value,
-                                    parent_id:this.view_selected
+                                    parent_id:this.view_selected,
+                                    owner_id:owner_id
                                 },
                                 { emulateJSON: true }
                                 ).then(function (res) {
@@ -300,7 +330,8 @@ let Main = {
                     models_got=res.body.models;
                     load_models_num=models_got.length;
                     if(load_models_num>loaded_models_num){
-                        this.openFullScreen(200);
+                        this.mask_status=true;
+                        this.openFullScreen();
                     }
                     ////console.log(models_got);
                     models_got.forEach(model => {
@@ -339,12 +370,7 @@ let Main = {
                         models_info[p_index].change_scale_y(model.scale_y)
                         models_info[p_index].change_scale_z(model.scale_z)
                         
-                        ////console.log(models_info)
-                        // ////console.log('~~~') 
-                        ////////////////////////////////////////////////////////////////////////////////  
-                        // models_got_list.push({value: p_index,label: p_index+"-"+model.model_name})
                         initObject(p_index);
-                        // ////console.log(index)
                     });
                     history_push();        
                 });
@@ -430,12 +456,20 @@ let Main = {
         // 将当前子场景的模型添加自由移动
         child_view_models_DragControls:function(){
             let models_to_control=[]; 
+            // console.log(models)
             for(let i=0;i<models.length;i++){
                 if(models_info[i]&&models_info[i].view_id==current_view_id){
                     models_to_control.push(models[i]);
                 }
             }
+
             // console.log(models_to_control)
+            if(dragControls){
+                dragControls.deactivate();
+            }
+            if(transformControls){
+                transformControls.detach();
+            }
             this.initDragControls(models_to_control);
         },
         save_model:function(save_type){
@@ -468,6 +502,7 @@ let Main = {
                         position: 'top-left',
                         message: "保存完成"
                     });
+
                 }
                 
                 });
@@ -507,6 +542,10 @@ let Main = {
                 },
                 { emulateJSON: true }
             ).then(function (res){
+                if(transformControls){
+                    transformControls.detach();
+                }
+
                 ////console.log(res)
             })
 
@@ -560,6 +599,7 @@ let Main = {
                     objects.push(models_to_control[i].children[0]);   
                 }
             }
+            // console.log(objects)
             // 初始化拖拽控件
             dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
 
@@ -644,6 +684,7 @@ let Main = {
         },
         add_model: function () {
             load_status=false;
+            this.mask_status=true;
             this.openFullScreen(200);
             load_models_num=1;
             loaded_models_num=0;
@@ -684,6 +725,7 @@ let Main = {
                     initObject(index); 
                 }).then(function(){
                     history_push();
+                    
                 })    
             }
             else{
@@ -743,22 +785,13 @@ let Main = {
             window.open('/vmm/model_manage/');
         },
         // 加载遮罩
-        openFullScreen:function(time) {
-            const loading = this.$loading({
-                lock: true,
-                text: '模型加载中',
-                background: 'rgba(0, 0, 0, 0.92)'
-            });
-            setTimeout(() => {
-                if(load_status){
-                    loading.close();
-                    this.child_view_models_DragControls();
-                }
-                else {
-                    this.openFullScreen(200);
-                }
-
-            }, time);
+        openFullScreen:function() {
+            this.$refs.mask.style.height = document.getElementById('render').clientHeight + 'px';
+            this.$refs.mask.style.paddingLeft="40%";
+            this.$refs.mask.children[0].style.marginTop="200px";
+            this.progress_status=true;
+            this.progress_data=0;
+            this.progress_data=Number(((loaded_models_num/load_models_num)*100).toFixed(0));
         },
         view_display:function(){
             let inputValue='';
@@ -938,9 +971,9 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         this.x=x;
         this.y=y;
         this.z=z;
-        this.mini_x=0.01;
-        this.mini_y=0.01;
-        this.mini_z=0.01;
+        this.mini_x=0;
+        this.mini_y=0;
+        this.mini_z=0;
         this.rx=rx;
         this.ry=ry;
         this.rz=rz;
@@ -1127,28 +1160,31 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
         };
 
         this.move_x = function () {   
-            //console.log(controls.x)
-            if(!(isNaN(controls.x))&&!(isNaN(controls.mini_x))){
-                models[current_model_index].children[0].position.x=controls.x+controls.mini_x+models_info[current_model_index].view_position_x;
-                models_info[current_model_index].change_po_x(controls.x+controls.mini_x)
+            // console.log(controls.x)
+            if(!(isNaN(controls.x))){
+                models[current_model_index].children[0].position.x=controls.x+models_info[current_model_index].view_position_x;
+                models_info[current_model_index].change_po_x(controls.x)
+                transformControls.position.x=controls.x+models_info[current_model_index].view_position_x;
             }
             
             
         };
         this.move_y = function () {
             //console.log(controls.y)
-            if(!(isNaN(controls.y))&&!(isNaN(controls.mini_y))){
-                models[current_model_index].children[0].position.y=controls.y+controls.mini_y+models_info[current_model_index].view_position_y;
-                models_info[current_model_index].change_po_y(controls.y+controls.mini_y)
+            if(!(isNaN(controls.y))){
+                models[current_model_index].children[0].position.y=controls.y+models_info[current_model_index].view_position_y;
+                models_info[current_model_index].change_po_y(controls.y)
+                transformControls.position.y=controls.y+models_info[current_model_index].view_position_y;
             }
             
            
         };
         this.move_z = function () {
             //console.log(controls.z)
-            if(!(isNaN(controls.z))&&!(isNaN(controls.mini_z))){
-                models[current_model_index].children[0].position.z=controls.z+controls.mini_z+models_info[current_model_index].view_position_z;
-                models_info[current_model_index].change_po_z(controls.z+controls.mini_z)
+            if(!(isNaN(controls.z))){
+                models[current_model_index].children[0].position.z=controls.z+models_info[current_model_index].view_position_z;
+                models_info[current_model_index].change_po_z(controls.z)
+                transformControls.position.z=controls.z+models_info[current_model_index].view_position_z;
             }
             
         };
@@ -1156,12 +1192,12 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
     let f1 = model_gui;
     f1.add({m:''},'m').name(controls.model_name);
     // let f1_1 = f1.addFolder('位置设置');
-    f1.add(controls, 'x', -5000, 5000).name('X轴移动').onChange(controls.move_x).onFinishChange(history_push);
-    f1.add(controls, 'mini_x', -30, 30).step(0.01).name('X轴移动微调').onChange(controls.move_x).onFinishChange(history_push);
-    f1.add(controls, 'y', -5000, 5000).name('Y轴移动').onChange(controls.move_y).onFinishChange(history_push);
-    f1.add(controls, 'mini_y', -30, 30).step(0.01).name('Y轴移动微调').onChange(controls.move_y).onFinishChange(history_push);
-    f1.add(controls, 'z', -5000, 5000).name('Z轴移动').onChange(controls.move_z).onFinishChange(history_push);
-    f1.add(controls, 'mini_z', -30, 30).step(0.01).name('Z轴移动微调').onChange(controls.move_z).onFinishChange(history_push);
+    f1.add(controls, 'x', -5000, 5000).name('X轴移动').step(0.01).onChange(controls.move_x).onFinishChange(history_push);
+    // f1.add(controls, 'mini_x', -30, 30).step(0.01).name('X轴移动微调').onChange(controls.move_x).onFinishChange(history_push);
+    f1.add(controls, 'y', -5000, 5000).name('Y轴移动').step(0.01).onChange(controls.move_y).onFinishChange(history_push);
+    // f1.add(controls, 'mini_y', -30, 30).step(0.01).name('Y轴移动微调').onChange(controls.move_y).onFinishChange(history_push);
+    f1.add(controls, 'z', -5000, 5000).name('Z轴移动').step(0.01).onChange(controls.move_z).onFinishChange(history_push);
+    // f1.add(controls, 'mini_z', -30, 30).step(0.01).name('Z轴移动微调').onChange(controls.move_z).onFinishChange(history_push);
     let f1_2 = f1.addFolder('旋转设置');
     f1_2.add(controls, 'rx', -180, 180).name('X轴旋转度数').onChange(controls.rotate_x).onFinishChange(history_push);
     f1_2.add(controls, 'ry', -180, 180).name('Y轴旋转度数').onChange(controls.rotate_y).onFinishChange(history_push);

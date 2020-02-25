@@ -238,6 +238,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	}
 
 	activate();
+	// deactivate();
 
 	// API
 

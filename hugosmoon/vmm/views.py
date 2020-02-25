@@ -5,9 +5,10 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model,views,display_views,users
+from vmm.models import Load_models_conf,folder,com_model,views,display_views,users,visit_log
 import os
 import time
+from django.db.models import Q
 
 
  
@@ -309,7 +310,8 @@ def get_views(request):
 def is_view_exist(request):
     if request.method == 'POST':
         view_name=request.POST.get('view_name')
-        if len(views.objects.filter(view_name=view_name)) == 0:
+        owner_id=request.POST.get('owner_id')
+        if len(views.objects.filter(view_name=view_name,owner_id=owner_id)) == 0:
             return HttpResponse('false')
         return HttpResponse('true')
 
@@ -320,11 +322,12 @@ def is_view_exist(request):
 def add_view(request):
     if request.method == 'POST':
         view_name=request.POST.get('view_name')
-        parent_id=int(request.POST.get('parent_id'))  
-        get_views=list(views.objects.filter(view_name=view_name,isdelete=False).values())
+        parent_id=int(request.POST.get('parent_id'))
+        owner_id=int(request.POST.get('owner_id'))  
+        get_views=list(views.objects.filter(view_name=view_name,owner_id=owner_id,isdelete=False).values())
         # print(parent_id)
         if len(get_views) == 0:
-            views.objects.create(view_name=view_name,parent_id=parent_id)
+            views.objects.create(view_name=view_name,owner_id=owner_id,parent_id=parent_id)
             return HttpResponse('场景新建成功')
         return HttpResponse('场景新建失败')
 
@@ -354,7 +357,7 @@ def create_folder(request):
 def get_folders(request):
     if request.method == 'POST':
         owner_id=request.POST.get('owner_id')
-        folders=folder.objects.filter(owner_id=owner_id,isdelete=False).values()
+        folders=folder.objects.filter(Q(owner_id=owner_id,isdelete=False)|Q(type=0,isdelete=False)).values()
         # print(folders)
         data={}
         data['folders']=list(folders)
@@ -429,6 +432,23 @@ def get_display_view(request):
         data={}
         data['views']=list(view)
         return JsonResponse(data)
+
+# 浏览器版本异常
+def view_exception(request):
+    return render(request, 'error/view_exception.html')
+
+#创建访问日志
+@csrf_exempt
+def create_visit_log(request):
+    if request.method == 'POST':
+        page=int(request.POST.get('page'))
+        ip=request.POST.get('ip')
+        city=request.POST.get('city')
+        visit_log.objects.create(page=page,ip=ip,city=city)
+        return HttpResponse('success')
+
+
+
 
 
 

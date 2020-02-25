@@ -30,7 +30,7 @@ function initThree() {
     renderer.shadowMapType = THREE.PCFSoftShadowMap;//阴影的一个类型
 
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
     //摄像机的位置
     camera.position.x = 15;
@@ -44,18 +44,22 @@ function initThree() {
 
     scene = new THREE.Scene();
 
-    let light = new THREE.SpotLight(0xffffff, 1.2, 0);//点光源
+    let light = new THREE.SpotLight(0xffffff, 4, 0);//点光源
     light.position.set(40, 20, 80);
     light.castShadow = true;//开启阴影
     light.shadowMapWidth = 8192;//阴影的分辨率，可以不设置对比看效果
     light.shadowMapHeight = 8192;
     scene.add(light);
 
-    let light2 = new THREE.SpotLight(0xffffff, 0.6, 0);//点光源
+    let light2 = new THREE.SpotLight(0xffffff, 2, 0);//点光源
     light2.position.set(-300, -300, 250);
     scene.add(light2);
 
-    let light3 = new THREE.AmbientLight(0xaaaaaa, 0.6);//环境光，如果不加，点光源照不到的地方就完全是黑色的
+    let light4 = new THREE.SpotLight(0xffffff, 2, 0);//点光源
+    light4.position.set(300, 300, 250);
+    scene.add(light4);
+
+    let light3 = new THREE.AmbientLight(0xaaaaaa, 3);//环境光，如果不加，点光源照不到的地方就完全是黑色的
     scene.add(light3);
 
     cameraControl();
@@ -85,26 +89,53 @@ let plane;
 //初始化场景中的所有物体
 function initObject() {
 
-    //地面
-    let planeGeometry = new THREE.PlaneGeometry(100, 100, 20, 20);
-    let planeMaterial =
-        new THREE.MeshLambertMaterial({color: 0x333300})
-    plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.z = -5;
-    plane.receiveShadow = true;//开启地面的接收阴影
-    scene.add(plane);//添加到场景中
+    // //地面
+    // let planeGeometry = new THREE.PlaneGeometry(100, 100, 20, 20);
+    // let planeMaterial =
+    //     new THREE.MeshLambertMaterial({color: 0x333300})
+    // plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    // plane.position.z = -5;
+    // // plane.receiveShadow = true;//开启地面的接收阴影
+    // scene.add(plane);//添加到场景中
+
+    let color_h=new THREE.Color(0x595959);
+    let helper = new THREE.GridHelper(50000, 50, color_h, color_h);
+    helper.rotation.x=Math.PI*0.5;
+    helper.position.z = -2000;
+    // helper.scale.x=0.1;
+    // helper.scale.y=0.1;
+    // helper.scale.z=0.1;
+    scene.add(helper);
 
     //刀柄
 
     let boxgeom = new THREE.BoxGeometry(l, w, w)
+    // let materials = [
+    //     new THREE.MeshPhongMaterial({
+    //         opacity: 0.6,
+    //         color: 0x545454,
+    //         transparent: false,
+    //         specular: 0x545454,
+    //         metal: true
+    //     }),
+    // ];
+    let color=new THREE.Color(1,1,1)
     let materials = [
-        new THREE.MeshPhongMaterial({
-            opacity: 0.6,
-            color: 0x545454,
-            transparent: false,
-            specular: 0x545454,
-            metal: true
-        }),
+        new THREE.MeshPhysicalMaterial({
+            color:color,
+            // 材质像金属的程度. 非金属材料，如木材或石材，使用0.0，金属使用1.0，中间没有（通常）.
+            // 默认 0.5. 0.0到1.0之间的值可用于生锈的金属外观
+            metalness: 1.0,
+            // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
+            roughness: 0.4,
+            // 设置环境贴图
+            // envMap: textureCube,
+            // 反射程度, 从 0.0 到1.0.默认0.5.
+            // 这模拟了非金属材料的反射率。 当metalness为1.0时无效
+            // reflectivity: models_info[index].reflectivity,
+            // emissive:emissive_color,
+            // emissiveIntensity:models_info[index].emissiveIntensity,
+            }),
     ];
 
 
@@ -174,9 +205,9 @@ function initObject() {
     //三个参考面
 
     //Pr
-    let pr_Geometry = new THREE.PlaneGeometry(60, 60, 20, 20);
+    let pr_Geometry = new THREE.PlaneGeometry(30, 30, 20, 20);
     let pr_Material =
-        new THREE.MeshLambertMaterial({opacity: 0.5,color: 0x1C86EE,transparent: true})
+        new THREE.MeshLambertMaterial({opacity: 0.3,color: 0xff0000,transparent: true})
     pr_Material.side=THREE.DoubleSide;
 
     pr = new THREE.Mesh(pr_Geometry, pr_Material);
@@ -189,7 +220,7 @@ function initObject() {
     //Ps
     let ps_Geometry = new THREE.PlaneGeometry(30, 30, 20, 20);
     let ps_Material =
-        new THREE.MeshLambertMaterial({opacity: 0.5,color: 0x912CEE,transparent: true})
+        new THREE.MeshLambertMaterial({opacity: 0.3,color: 0x00ff00,transparent: true})
     ps_Material.side=THREE.DoubleSide;
 
     ps = new THREE.Mesh(ps_Geometry, ps_Material);
@@ -200,7 +231,7 @@ function initObject() {
     //P0
     let p0_Geometry = new THREE.PlaneGeometry(30, 30, 20, 20);
     let p0_Material =
-        new THREE.MeshLambertMaterial({opacity: 0.5,color: 0x7D26CD,transparent: true})
+        new THREE.MeshLambertMaterial({opacity: 0.3,color: 0x0000ff,transparent: true})
     p0_Material.side=THREE.DoubleSide;
 
     p0 = new THREE.Mesh(p0_Geometry, p0_Material);
@@ -256,14 +287,12 @@ var Main = {
             check_p0: false,
             value1: 45,
             value2: 10,
-            value3: -10,
-            value4: 15,
+            value3: 0,
+            value4: 5,
             value5: 10,
-            value6: 15,
+            value6: 10,
             value7: 1,
             marks_main_angle: {
-                10:'10°',
-                20:'20°',
                 30:'30°',
                 40: '40°',
                 50: '50°',
@@ -280,7 +309,6 @@ var Main = {
                 20: '20°'
             },
             marks_edge_inclination_angle: {
-                '-15': '-15°',
                 '-10': '-10°',
                 '-5': '-5°',
                 '0': '0°',
@@ -291,25 +319,25 @@ var Main = {
                 25: '25°'
             },
             marks_rake_angle: {
-                '-15': '-15°',
+                '-5': '-5°',
                 '0': '0°',
+                5: '5°',
+                10: '10°',
                 15: '15°',
-                30: '30°',
-                45: '45°',
+                20: '20°',
+                25: '25°',
             },
             marks_back_angle: {
-                '0': '0°',
-                5: '5°',
+                '6': '6',
+                8: '8',
                 10: '10°',
-                15: '15°',
-                20: '20°'
+                12: '12',
             },
             marks_secondary_edge_back_angle: {
-                '0': '0°',
-                5: '5°',
+                '6': '6',
+                8: '8',
                 10: '10°',
-                15: '15°',
-                20: '20°'
+                12: '12',
             },
             marks_tip_radius: {
 
@@ -328,10 +356,10 @@ var Main = {
             a=a0+(a1-a0)*(main_angle-5)/70;
             w1=a*trig('cot',main_angle);
             c=(w-w1)*trig('tan',this.$refs.tool_minor_cutting_edge_angle.value);
-            rqj_b=trig('tan',this.$refs.edge_inclination_angle.value)*0.7;
-            qj_b=-trig('sin',this.$refs.rake_angle.value+0.01)*1.7;
-            hj_b=-trig('sin',this.$refs.back_angle.value+0.01)*h*0.2;
-            frhj_b=-trig('sin',this.$refs.secondary_edge_back_angl.value+0.01)*h*0.2;
+            rqj_b=trig('tan',this.$refs.edge_inclination_angle.value);
+            qj_b=-trig('sin',this.$refs.rake_angle.value+0.01)*3.5;
+            hj_b=-trig('sin',this.$refs.back_angle.value+0.01)*h;
+            frhj_b=-trig('sin',this.$refs.secondary_edge_back_angl.value+0.01)*h;
             // 端点坐标赋值
             x0=0;
             y0=0;

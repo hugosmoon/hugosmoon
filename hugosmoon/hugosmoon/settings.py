@@ -25,7 +25,7 @@ SECRET_KEY = '21)neu*0g_rqth9nywjyvnk8zmc*-1f3@pui=kb8#+1bdofco('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1','39.105.8.210','39.100.66.11']
+ALLOWED_HOSTS = ['0.0.0.0','127.0.0.1','39.105.8.210','39.100.66.11','*']
 
 
 # Application definition
@@ -76,8 +76,14 @@ WSGI_APPLICATION = 'hugosmoon.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',  # 或者使用 mysql.connector.django
+        'NAME': 'hugosmoon',
+        'USER': 'root',
+        'PASSWORD': '1234',
+        'HOST':'localhost',
+        'PORT':'3306',
     }
 }
 
@@ -112,7 +118,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)

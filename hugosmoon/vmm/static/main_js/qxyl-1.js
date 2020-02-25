@@ -30,7 +30,7 @@ function initThree() {
     renderer.shadowMapType = THREE.PCFSoftShadowMap;//阴影的一个类型
 
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000);//perspective是透视摄像机，这种摄像机看上去画面有3D效果
 
     //摄像机的位置
     camera.position.x = 15;
@@ -85,14 +85,22 @@ let plane;
 //初始化场景中的所有物体
 function initObject() {
 
-    //地面
-    let planeGeometry = new THREE.PlaneGeometry(100, 100, 20, 20);
-    let planeMaterial =
-        new THREE.MeshLambertMaterial({color: 0x333300})
-    plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.position.z = -5;
-    plane.receiveShadow = true;//开启地面的接收阴影
-    scene.add(plane);//添加到场景中
+    // //地面
+    // let planeGeometry = new THREE.PlaneGeometry(100, 100, 20, 20);
+    // let planeMaterial =
+    //     new THREE.MeshLambertMaterial({color: 0x333300})
+    // plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    // plane.position.z = -5;
+    // plane.receiveShadow = true;//开启地面的接收阴影
+    // scene.add(plane);//添加到场景中
+    let color_h=new THREE.Color(0x595959);
+    let helper = new THREE.GridHelper(50000, 50, color_h, color_h);
+    helper.rotation.x=Math.PI*0.5;
+    helper.position.z = -2000;
+    // helper.scale.x=0.1;
+    // helper.scale.y=0.1;
+    // helper.scale.z=0.1;
+    scene.add(helper);
 
     //刀柄
 
@@ -265,10 +273,10 @@ var Main = {
             check_p0: false,
             value1: 45,
             value2: 10,
-            value3: -10,
-            value4: 15,
+            value3: 0,
+            value4: 5,
             value5: 10,
-            value6: 15,
+            value6: 10,
 
             bangliao_d: 80,
             bangdliao_length:600,
@@ -286,9 +294,7 @@ var Main = {
                 label: '可锻铸铁'
               }],
               value: '',
-            marks_main_angle: {
-                10:'10°',
-                20:'20°',
+              marks_main_angle: {
                 30:'30°',
                 40: '40°',
                 50: '50°',
@@ -305,7 +311,6 @@ var Main = {
                 20: '20°'
             },
             marks_edge_inclination_angle: {
-                '-15': '-15°',
                 '-10': '-10°',
                 '-5': '-5°',
                 '0': '0°',
@@ -316,25 +321,25 @@ var Main = {
                 25: '25°'
             },
             marks_rake_angle: {
-                '-15': '-15°',
+                '-5': '-5°',
                 '0': '0°',
+                5: '5°',
+                10: '10°',
                 15: '15°',
-                30: '30°',
-                45: '45°',
+                20: '20°',
+                25: '25°',
             },
             marks_back_angle: {
-                '0': '0°',
-                5: '5°',
+                '6': '6',
+                8: '8',
                 10: '10°',
-                15: '15°',
-                20: '20°'
+                12: '12',
             },
             marks_secondary_edge_back_angle: {
-                '0': '0°',
-                5: '5°',
+                '6': '6',
+                8: '8',
                 10: '10°',
-                15: '15°',
-                20: '20°'
+                12: '12',
             },
             marks_tip_radius: {
 
@@ -370,10 +375,10 @@ var Main = {
             a=a0+(a1-a0)*(main_angle-5)/70;
             w1=a*trig('cot',main_angle);
             c=(w-w1)*trig('tan',this.$refs.tool_minor_cutting_edge_angle.value);
-            rqj_b=trig('tan',this.$refs.edge_inclination_angle.value)*0.7;
-            qj_b=-trig('sin',this.$refs.rake_angle.value+0.01)*1.7;
-            hj_b=-trig('sin',this.$refs.back_angle.value+0.01)*h*0.2;
-            frhj_b=-trig('sin',this.$refs.secondary_edge_back_angl.value+0.01)*h*0.2;
+            rqj_b=trig('tan',this.$refs.edge_inclination_angle.value);
+            qj_b=-trig('sin',this.$refs.rake_angle.value+0.01)*3.5;
+            hj_b=-trig('sin',this.$refs.back_angle.value+0.01)*h;
+            frhj_b=-trig('sin',this.$refs.secondary_edge_back_angl.value+0.01)*h;
             // 端点坐标赋值
             x0=0;
             y0=0;

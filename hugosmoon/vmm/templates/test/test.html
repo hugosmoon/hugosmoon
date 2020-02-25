@@ -27,11 +27,14 @@
     <script src="{% static 'import/echarts-gl.min.js' %}"></script>
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
     <script src="{% static 'import/ConvexGeometry.js' %}"></script>
+    <script src="{% static 'import/GLTFLoader.js' %}"></script>
+    <!-- <script src="{% static 'import/RoughnessMipmapper.js' %}" type="module"></script> -->
+    
     
     
     
 </head>
-<body onload="threeStart()">
+<body>
     <div id="Stats-output"></div>
     
 
@@ -40,8 +43,11 @@
         <div id="render">
         </div>
     </div>
+    <script>
+       
+    </script>
     <script src="{% static 'main_js/create_cylinder.js' %}"></script>
-    <script src="{% static 'main_js/test3.js' %}"></script>
+    <script src="{% static 'main_js/test3.js' %}"  type="module"></script>
     <script src="{% static 'main_js/createModel.js' %}"></script>
 </body>
 </html>
