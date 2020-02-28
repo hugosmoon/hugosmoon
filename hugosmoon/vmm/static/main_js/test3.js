@@ -1,11 +1,11 @@
-import * as THREE from '/static/import/three.module.js';
+// import * as THREE from '/static/import/three.module.js';
 
-import { OrbitControls } from '/static/import/OrbitControls.js';
-import { GLTFLoader } from '/static/import/GLTFLoader.js';
-// import { RGBELoader } from '/static/import/RGBELoader.js';
+// import { OrbitControls } from '/static/import/OrbitControls.js';
+// import { GLTFLoader } from '/static/import/GLTFLoader.js';
+// // import { RGBELoader } from '/static/import/RGBELoader.js';
 
-import { RoughnessMipmapper } from '/static/import/RoughnessMipmapper.js';
-// alert()
+// import { RoughnessMipmapper } from '/static/import/RoughnessMipmapper.js';
+// // alert()
 
 let renderer, camera, scene;
 //hugosmoon
@@ -17,10 +17,11 @@ let model;
 let material;
 let points;
 let gltf_obj;
+var lathe
 
 
 
-
+threeStart();
 //主函数
 function threeStart() {
     initThree();
@@ -86,8 +87,7 @@ function initThree() {
     let light5 = new THREE.AmbientLight(0xaaaaaa, 0.99);//环境光，如果不加，点光源照不到的地方就完全是黑色的
     scene.add(light5);
     
-    controller = new OrbitControls(camera, renderer.domElement);
-    controller.target = new THREE.Vector3(0, 0, 0);
+    
 
 
     let color=new THREE.Color(1,1,1);
@@ -99,81 +99,94 @@ function initThree() {
                         // 材料的粗糙程度. 0.0表示平滑的镜面反射，1.0表示完全漫反射. 默认 0.5
                         roughness: 0.45,
                         }),];
-    points=create_vertices(1500,1500,3000).vertices;
-    // modelww = createModel(points,material,720);
-    // modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
-    modelww=create_cylinder(create_vertices(500,500,1000).vertices,material,1,1,1)
-    // scene.add(modelww);
 
-    // let a=[],b=[]
-    // for (let i=0;i<1000;i++){
-    //     a.push(i/10);
-    //     b.push([-1-i/10,1+i/10]);
-    // }
-    // aaa=createEndface([[a,b]],material)
+    var points = [];
+    for ( var i = 1; i < 10; i++ ) {
+        // points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+        points.push( new THREE.Vector2(i,i));
+    }
+    var geometry = new THREE.LatheBufferGeometry( points );
+    var material = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+    lathe = new THREE.Mesh( geometry, material );
+    scene.add( lathe );
 
-    // // let ppp=[[[100,200,300,400,500],[[-100,100],[-200,200],[-300,300],[-400,400],[-500,500]]],[[200,300,400],[[-10,10],[-10,10],[-10,10]]],[[200,300,400],[[15,20],[15,20],[15,20]]]]
-    // // [[200,300,400],[[-100,100],[-100,100],[-100,100]]]
-    // // aaa=createEndface(ppp,material)
-    // scene.add(aaa);
+    controller = new THREE.OrbitControls(camera, renderer.domElement);
+    controller.target = new THREE.Vector3(0, 0, 0);
+    // points=create_vertices(1500,1500,3000).vertices;
+    // // modelww = createModel(points,material,720);
+    // // modelww = create_cylinder(create_vertices(500,500,2000).vertices,material,1,0,1)
+    // modelww=create_cylinder(create_vertices(500,500,1000).vertices,material,1,1,1)
+    // // scene.add(modelww);
 
-    var gltfLoader = new GLTFLoader()
+    // // let a=[],b=[]
+    // // for (let i=0;i<1000;i++){
+    // //     a.push(i/10);
+    // //     b.push([-1-i/10,1+i/10]);
+    // // }
+    // // aaa=createEndface([[a,b]],material)
 
-    gltfLoader.load('/static/model/DamagedHelmet/DamagedHelmet.gltf', function(obj) {
-        gltf_obj=obj;
-        console.log(obj)
-        // gltf_obj.scene.position.z=40;
-        gltf_obj.scene.rotation.x=0.5*Math.PI;
-        gltf_obj.scene.rotation.y=0.65*Math.PI;
-        // scene.add(gltf_obj.scene);
-    // var object = scene.gltf // 模型对象
-    // scene.add(object) // 将模型添加到场景中
-    })
+    // // // let ppp=[[[100,200,300,400,500],[[-100,100],[-200,200],[-300,300],[-400,400],[-500,500]]],[[200,300,400],[[-10,10],[-10,10],[-10,10]]],[[200,300,400],[[15,20],[15,20],[15,20]]]]
+    // // // [[200,300,400],[[-100,100],[-100,100],[-100,100]]]
+    // // // aaa=createEndface(ppp,material)
+    // // scene.add(aaa);
 
-    var roughnessMipmapper = new RoughnessMipmapper( renderer );
+    // var gltfLoader = new GLTFLoader()
 
-    var loader = new GLTFLoader().setPath( '/static/model/DamagedHelmet/' );
-    loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+    // gltfLoader.load('/static/model/DamagedHelmet/DamagedHelmet.gltf', function(obj) {
+    //     gltf_obj=obj;
+    //     console.log(obj)
+    //     // gltf_obj.scene.position.z=40;
+    //     gltf_obj.scene.rotation.x=0.5*Math.PI;
+    //     gltf_obj.scene.rotation.y=0.65*Math.PI;
+    //     // scene.add(gltf_obj.scene);
+    // // var object = scene.gltf // 模型对象
+    // // scene.add(object) // 将模型添加到场景中
+    // })
 
-        gltf.scene.traverse( function ( child ) {
+    // var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-            if ( child.isMesh ) {
+    // var loader = new GLTFLoader().setPath( '/static/model/DamagedHelmet/' );
+    // loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
-                roughnessMipmapper.generateMipmaps( child.material );
+    //     gltf.scene.traverse( function ( child ) {
 
-            }
+    //         if ( child.isMesh ) {
 
-        } );
+    //             roughnessMipmapper.generateMipmaps( child.material );
 
-        scene.add( gltf.scene );
+    //         }
 
-        roughnessMipmapper.dispose();
+    //     } );
 
-        render();
+    //     scene.add( gltf.scene );
 
-    } );
+    //     roughnessMipmapper.dispose();
 
-    gltfLoader.load('/static/model/ipod_scroll_wheel/scene.gltf', function(obj) {
-        gltf_obj=obj;
-        console.log(obj)
-        gltf_obj.scene.position.z=100;
-        gltf_obj.scene.rotation.x=0.5*Math.PI;
-        gltf_obj.scene.rotation.y=0.65*Math.PI;
-        // scene.add(gltf_obj.scene);
-    // var object = scene.gltf // 模型对象
-    // scene.add(object) // 将模型添加到场景中
-    })
+    //     render();
 
-    gltfLoader.load('/static/model/buster_drone/scene.gltf', function(obj) {
-        gltf_obj=obj;
-        console.log(obj)
-        gltf_obj.scene.position.z=200;
-        gltf_obj.scene.rotation.x=0.5*Math.PI;
-        gltf_obj.scene.rotation.y=0.65*Math.PI;
-        // scene.add(gltf_obj.scene);
-    // var object = scene.gltf // 模型对象
-    // scene.add(object) // 将模型添加到场景中
-    })
+    // } );
+
+    // gltfLoader.load('/static/model/ipod_scroll_wheel/scene.gltf', function(obj) {
+    //     gltf_obj=obj;
+    //     console.log(obj)
+    //     gltf_obj.scene.position.z=100;
+    //     gltf_obj.scene.rotation.x=0.5*Math.PI;
+    //     gltf_obj.scene.rotation.y=0.65*Math.PI;
+    //     // scene.add(gltf_obj.scene);
+    // // var object = scene.gltf // 模型对象
+    // // scene.add(object) // 将模型添加到场景中
+    // })
+
+    // gltfLoader.load('/static/model/buster_drone/scene.gltf', function(obj) {
+    //     gltf_obj=obj;
+    //     console.log(obj)
+    //     gltf_obj.scene.position.z=200;
+    //     gltf_obj.scene.rotation.x=0.5*Math.PI;
+    //     gltf_obj.scene.rotation.y=0.65*Math.PI;
+    //     // scene.add(gltf_obj.scene);
+    // // var object = scene.gltf // 模型对象
+    // // scene.add(object) // 将模型添加到场景中
+    // })
 }
 function render() {
     requestAnimationFrame(render);

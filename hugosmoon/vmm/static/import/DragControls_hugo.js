@@ -67,19 +67,21 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
-		if ( _selected && scope.enabled ) {
+		//  因为两个移动插件之间存在功能上的重叠，所以禁用了drag功能
 
-			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+		// if ( _selected && scope.enabled ) {
 
-				_selected.position.copy( _intersection.sub( _offset ) );
+		// 	if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-			}
+		// 		_selected.position.copy( _intersection.sub( _offset ) );
 
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
+		// 	}
 
-			return;
+		// 	scope.dispatchEvent( { type: 'drag', object: _selected } );
 
-		}
+		// 	return;
+
+		// }
 
 		_raycaster.setFromCamera( _mouse, _camera );
 
@@ -116,7 +118,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	}
 
 	function onDocumentMouseDown( event ) {
-
+		
 		event.preventDefault();
 
 		_raycaster.setFromCamera( _mouse, _camera );
@@ -133,7 +135,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			}
 
-			_domElement.style.cursor = 'move';
+			// _domElement.style.cursor = 'move';
 
 			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
 

@@ -1,4 +1,4 @@
-// 引入文件之前必须定义的变量scene  renderer  camera  controls  controller
+// 引入文件之前必须定义的变量scene  renderer  camera   controller
 
 //初始化渲染器
 function initThree(debug) {

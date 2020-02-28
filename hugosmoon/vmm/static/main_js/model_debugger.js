@@ -1,3 +1,6 @@
+// 用户的id
+let owner_id=$.cookie("userid")
+
 //模型的编号，自增
 let index=0;
 //当前被选中的模型编号
@@ -24,18 +27,21 @@ let models=[];
 // //当前子场景模型列表
 // let models_in_childView_list=[];
 
-let renderer, camera, scene,controls,dragControls,transformControls,controller;
+// 渲染器、相机、场景、
+let renderer, camera, scene,dragControls,transformControls,controller;
 // let gui = new dat.GUI();
 let model_gui;
 let child_view_gui;
 
+// 当有模型加载时，需要加载的模型数量、已加载模型的数量、模型加载过程是否正在进行
 let load_models_num;
 let loaded_models_num=0;
 let load_status=false;
 
 //时间戳，作为数据更新的版本，以此作为基础来建立vue内外的通信
 let timeStamp_out=0;
-let owner_id=$.cookie("userid")
+
+
 
 // 模型拖动状态,两种拖拽方式
 let drag_status=0;
@@ -103,19 +109,14 @@ let Main = {
         }
     },
     mounted:function(){
+        initThree(1);
+        loadAutoScreen(camera, renderer);
+        this.render();
         this.get_views();
         this.get_folders();
-        // this.timer = setInterval(this.auto_save, 20000);
         this.timer = setInterval(this.update_data, 500);
-        let self = this;
-        this.$nextTick(function () {
-            document.addEventListener('keyup', function (e) {
-            //此处填写你的业务逻辑即可
-            if (e.keyCode == 27) {
-                self.delte_attach();
-            }
-            })
-        });
+        this.listen_button();
+        
     },
     methods: {
         update_data:function(){
@@ -532,7 +533,6 @@ let Main = {
                     arr.splice(index, 1);
                 }
             });
-            // remove({value: current_model_index,label: models_info[current_model_index].name})
             models_info[current_model_index]=null;
             this.$http.post(
                 '/vmm/delete_model/',
@@ -543,10 +543,9 @@ let Main = {
                 { emulateJSON: true }
             ).then(function (res){
                 if(transformControls){
-                    transformControls.detach();
+                    this.models_num_view=0;
+                    
                 }
-
-                ////console.log(res)
             })
 
         },
@@ -607,53 +606,92 @@ let Main = {
 
             // 鼠标略过
             dragControls.addEventListener('hoveron', function (event) {
+                // console.log(event)
                 
                 if(drag_status==0){
-                    transformControls.attach(event.object);
+                    for(let i=0;i<models.length;i++){
+                        if(models[i]){
+                            if(event.object.id==models[i].children[0].id){
+                                models[i].children[0].material.metalness=0.4;
+                                models[i].children[0].material.roughness=1;
+                                models[i].children[0].material.emissive.r=0;
+                                models[i].children[0].material.emissive.g=0;
+                                models[i].children[0].material.emissive.b=1;
+                                models[i].children[0].material.color.r=1;
+                                models[i].children[0].material.color.g=1;
+                                models[i].children[0].material.color.b=1;
+                                models[i].children[0].material.emissiveIntensity=1;
+                            }
+                            else{
+                                models[i].children[0].material.emissive.r=models_info[i].emissive_r;
+                                models[i].children[0].material.emissive.g=models_info[i].emissive_g;
+                                models[i].children[0].material.emissive.b=models_info[i].emissive_b;
+                                models[i].children[0].material.color.r=models_info[i].materials_color_r;
+                                models[i].children[0].material.color.g=models_info[i].materials_color_g;
+                                models[i].children[0].material.color.b=models_info[i].materials_color_b;
+                                models[i].children[0].material.metalness=models_info[i].metalness;
+                                models[i].children[0].material.roughness=models_info[i].roughness;
+                                models[i].children[0].material.emissiveIntensity=models_info[i].emissiveIntensity;
+                            }
+                        }
+                    }
+                }
+                
+            });
+            dragControls.addEventListener('hoveroff', function (event) {
+                // console.log(event)
+                
+                if(drag_status==0){
+                    // transformControls.attach(event.object);
                     // console.log(drag_status)
                     // console.log(event.object)
+                    for(let i=0;i<models.length;i++){
+                        if(models[i]&&event.object.id==models[i].children[0].id){
+                            models[i].children[0].material.emissive.r=models_info[i].emissive_r;
+                            models[i].children[0].material.emissive.g=models_info[i].emissive_g;
+                            models[i].children[0].material.emissive.b=models_info[i].emissive_b;
+                            models[i].children[0].material.color.r=models_info[i].materials_color_r;
+                            models[i].children[0].material.color.g=models_info[i].materials_color_g;
+                            models[i].children[0].material.color.b=models_info[i].materials_color_b;
+                            models[i].children[0].material.metalness=models_info[i].metalness;
+                            models[i].children[0].material.roughness=models_info[i].roughness;
+                            models[i].children[0].material.emissiveIntensity=models_info[i].emissiveIntensity;
+                        }
+                    }
+                }
+                
+            });
+            // 点击选中模型
+            dragControls.addEventListener('dragstart', function (event) {
+                // console.log(event)
+                if(drag_status==0){
                     for(let i=0;i<models.length;i++){
                         if(models[i]&&event.object.id==models[i].children[0].id){
                             timeStamp_out=Date.now();
                             current_model_index=i;
                         }
                     }
+                    transformControls.attach(event.object);
                 }
-                
             });
-            // 开始拖拽
-            dragControls.addEventListener('dragstart', function (event) {
-                if(drag_form_status==1){
-                    drag_sig=1;
-                }
-                else{
-                    drag_sig=0;
-                }
-                drag_status=1;
-                transformControls.attach(event.object);
-                controller.enabled = false;
-            });
-            // 拖拽结束
-            dragControls.addEventListener('dragend', function (event) {
-                transformControls.attach(event.object);
-                // console.log(drag_status)
-                controller.enabled = true;
-                // console.log('x:'+event.object.position.x)
-                // console.log("物体移动"+event.object.position.x+event.object.position.y+event.object.position.z)
-                if(drag_sig==0){
-                    update_modelsinfo(event.object.position.x,event.object.position.y,event.object.position.z)
-                }
-                drag_status=0;
-                
 
-            }); 
+            // dragControls.addEventListener('dragend', function (event) {
+            //     transformControls.attach(event.object);
+            //     // console.log(drag_status)
+            //     controller.enabled = true;
+            //     // console.log('x:'+event.object.position.x)
+            //     // console.log("物体移动"+event.object.position.x+event.object.position.y+event.object.position.z)
+            //     if(drag_sig==0){
+            //         update_modelsinfo(event.object.position.x,event.object.position.y,event.object.position.z)
+            //     }
+            //     drag_status=0;
+            // }); 
             function update_modelsinfo(x,y,z){
                 if(models_info[current_model_index]){
                     models_info[current_model_index].position_x=x;
                     models_info[current_model_index].position_y=y;
                     models_info[current_model_index].position_z=z;
                     history_push();
-
                     change_model(
                         models_info[current_model_index].model_name,
                         models_info[current_model_index].position_x,models_info[current_model_index].position_y,models_info[current_model_index].position_z,
@@ -670,8 +708,7 @@ let Main = {
                         models_info[current_model_index].emissiveIntensity,
                         models_info[current_model_index].reflectivity);
                 }
-            }
-                
+            }                
         },
         delte_attach:function(){
             if(transformControls){
@@ -679,8 +716,7 @@ let Main = {
                 if(model_gui){
                     model_gui.close();
                 }
-            }
-            
+            }            
         },
         add_model: function () {
             load_status=false;
@@ -700,11 +736,6 @@ let Main = {
                 alert("请选择模型")
                 return false;
             }
-            // if(this.model_in_folder_material==0){
-            //     alert("请指定模型材质")
-            //     return false;
-            // }
-            
             if(this.model_in_folder_selected!=''){
                 this.$http.post(
                     '/vmm/get_model_info_by_id/',
@@ -724,8 +755,7 @@ let Main = {
                     this.model_name='';
                     initObject(index); 
                 }).then(function(){
-                    history_push();
-                    
+                    history_push();                   
                 })    
             }
             else{
@@ -749,7 +779,6 @@ let Main = {
                     ////console.log(folder.folder_name);
                     this.folder_list.push({value: folder.id,label: folder.folder_name});
                 })
-
             });
         },
         get_models_by_folder:function(){
@@ -765,7 +794,6 @@ let Main = {
                     res.body.models.forEach(model => {
                         this.model_in_folder_list.push({value: model.id,label: model.model_name});
                 })
-
             });
         },
         //根据准备添加的模型的id获取模型的信息
@@ -824,8 +852,7 @@ let Main = {
                                 if(res.body=="success"){
                                     window.open('/vmm/view_display/'+this.display_view_id);
                                 }    
-                        });
-                        
+                        });                        
                       }).catch(() => {
                         this.$message({
                           type: 'info',
@@ -834,8 +861,7 @@ let Main = {
                       });
                 });   
         },
-        cancle_action:function(){
-            
+        cancle_action:function(){            
             if(action_anchor<=0){
                 this.cancle_action_status=true;
                 return false;
@@ -843,7 +869,6 @@ let Main = {
             action_anchor=action_anchor-1;
             this.update_models_info_by_action_anchor(action_anchor);
             update_models();
-
         },
         redo_action:function(){
             if(action_anchor>=models_info_hstory.length-1){
@@ -851,11 +876,8 @@ let Main = {
                 return false;
             }
             action_anchor=action_anchor+1;
-            this.update_models_info_by_action_anchor(action_anchor);
-            
+            this.update_models_info_by_action_anchor(action_anchor);       
             update_models();
-
-
         },
         update_models_info_by_action_anchor:function(anchor){
             // console.log("更改设置")
@@ -888,6 +910,23 @@ let Main = {
                     models_info[i].change_reflectivity(models_info_hstory[anchor][i].reflectivity)
                 }    
             }    
+        },
+        render:function(){
+            requestAnimationFrame(this.render);
+            renderer.render(scene, camera);
+        },
+        // 监听键盘
+        listen_button:function(){
+            let self = this;
+            console.log(self)
+            this.$nextTick(function () {
+                document.addEventListener('keyup', function (e) {
+                    //esc键
+                    if (e.keyCode == 27) {
+                        self.delte_attach();
+                    }
+                })
+            });
         }
 
     }
@@ -895,69 +934,6 @@ let Main = {
 
 let Ctor = Vue.extend(Main)
 new Ctor().$mount('#app')
-
-// function initDragControls(models_to_control){
-//             // 初始化轨迹球控件
-//             // controls = new THREE.TrackballControls(camera, renderer.domElement);
-//             // 添加平移控件
-//             let transformControls = new THREE.TransformControls(camera, renderer.domElement);
-//             scene.add(transformControls);
-
-//             // 过滤不是 Mesh 的物体,例如辅助网格
-//             let objects = [];
-//             for (let i = 0; i < models_to_control.length; i++) {
-//                 // console.log(models[i].isObject3D)
-//                 if (models_to_control[i].isObject3D) {
-//                     objects.push(models_to_control[i].children[0]);
-                    
-//                 }
-//             }
-//             // 初始化拖拽控件
-//             let dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
-
-//             // console.log(objects[0][0])
-
-//             // 鼠标略过
-//             dragControls.addEventListener('hoveron', function (event) {
-//                 transformControls.attach(event.object);
-//                 // console.log(event.object)
-                
-//                 for(let i=0;i<models.length;i++){
-//                     if(models[i]&&event.object.id==models[i].children[0].id){
-
-//                         console.log('index:'+i)
-//                         console.log(models[i].children[0].id)
-//                         console.log(event.object.id)
-//                     }
-//                 }
-//             });
-//             // 开始拖拽
-//             dragControls.addEventListener('dragstart', function (event) {
-//                 controls.enabled = false;
-//             });
-//             // 拖拽结束
-//             dragControls.addEventListener('dragend', function (event) {
-//                 controls.enabled = true;
-//                 // console.log(objects)
-//             }); 
-//         }
-
-//主函数
-function threeStart() {
-    initThree(1);
-    loadAutoScreen(camera, renderer);
-    render();
-}
-
-//动画
-function render() {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-    // controls.update();
-    
-}
-
-
 
 //调整模型位置和角度
 function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalness,roughness,model_red,model_green,model_blue,emissive_r,emissive_g,emissive_b,emissiveIntensity,reflectivity){
@@ -1218,6 +1194,7 @@ function change_model(model_name,x,y,z,rx,ry,rz,scale_x,scale_y,scale_z,metalnes
     f1_4_2.add(controls, 'emissive_color_number').name('色值设置').onFinishChange(controls.change_emissive_color_number).onFinishChange(history_push);
     f1_4_2.add(controls, 'emissiveIntensity', 0, 1).step(0.01).name('发光材质不透明度').onChange(controls.change_emissiveIntensity).onFinishChange(history_push);
 }
+// 调整子场景的位置
 function change_child_view(child_view_name,x,y,z){
     if(child_view_gui){
         child_view_gui.destroy();
@@ -1291,6 +1268,7 @@ function change_child_view(child_view_name,x,y,z){
     child_view_gui.add(controls, 'all_mov_z', -25000, 25000).name('整体位置-Z').onChange(controls.change_all_mov_z).onFinishChange(history_push);
 }
 
+// 添加场景修改历史，最多支持100步
 function history_push(){
     if(action_anchor<models_info_hstory.length-1){
         models_info_hstory.splice(action_anchor+1);
