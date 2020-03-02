@@ -40,16 +40,29 @@
         <div id="render">
         </div>
         <div id="app">
-            <div id="lef_top_label">
-                <p id="title2"></p>
+            <div class="right-top" id="buttons"> 
             </div>
         </div>
             
         </div>
     </div>
+    <script>
+        let code="{{code}}";
+        let aaaa =code.split('###');
+        let bbbb = '';
+        for(let i=0;i<aaaa.length;i+=2){
+            bbbb+=aaaa[i];
+        }
+        code=bbbb;
+        code = code.replace(/~~~/g, "")
+        code = code.replace(/\s*/g,"");
+        let arrEntities={'#x27':"'",'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'}; 
+        code = code.replace(/&(#x27|lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
+    </script>
     <script src="{% static 'main_js/model.js' %}"></script>
     <script src="{% static 'main_js/view_display.js' %}"></script>
     <script src="{% static 'main_js/update_models.js' %}"></script>
+    <script src="{% static 'main_js/program/view_run.js' %}"></script>
 
     <script>
         let display_view_id={{view_id}};
@@ -61,6 +74,18 @@
         let load_models_num;
         let loaded_models_num=0;
         let load_status=false;
+
+
+
+
+
+
+
+
+
+
+
+
         let Main = {
             data() {
                 return {
@@ -75,7 +100,6 @@
                 this.openFullScreen(200);
                 load_models(display_view_id)
                 render();
-                this.timer = setInterval(this.update, 2000);
             },
             methods: {
                 update:function(){
@@ -93,7 +117,7 @@
                     ).then(function (res) {
                         this.display_name=res.body.views[0].display_name;
                         console.log(this.display_name)
-                        $('#title2').html(this.display_name)
+                        // $('#title2').html(this.display_name)
                         $("title").html(this.display_name);
                     });
                 },
@@ -121,18 +145,20 @@
         new Ctor().$mount('#app')
         //动画
         function render() {
+            if(load_status){
+                run.update_time_step();
+                eval(run.code.l);
+            }
+           
             requestAnimationFrame(render);
             renderer.render(scene, camera);
             // controls.update();
         }
-        
-        
-        
-        
+   
     </script>
     <script>
-        create_visit_log(4);
-      </script>
+        create_visit_log(9);
+    </script>
     
     
 </body>

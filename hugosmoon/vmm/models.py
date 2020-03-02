@@ -10,6 +10,7 @@ class Load_models_conf(models.Model):
     model_id = models.IntegerField(default=0,db_column="model_id")
     # view_name = models.CharField(max_length=255, db_column="view_name")
     serial = models.IntegerField(default=0,db_column="serial")
+    model_type = models.IntegerField(default=0,db_column="model_type")
     model_name= models.CharField(default='',max_length=255, db_column="model_name")
     model_url=models.CharField(default='',max_length=255, db_column="model_url")
     position_x=models.FloatField(db_column="position_x")
@@ -97,6 +98,14 @@ class visit_log(models.Model):
     ip = models.CharField(max_length=255, db_column="ip") 
     city = models.CharField(default="",max_length=255, db_column="city") 
     createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
+
+# 场景编程代码
+class view_program(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    view_id=models.IntegerField(default=0,db_column="view_id")
+    code = models.TextField(blank = True,db_column="code")
+    createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
+    isdelete = models.BooleanField(default=False, db_column="is_delete")
 
 
 

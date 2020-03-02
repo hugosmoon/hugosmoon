@@ -37,7 +37,13 @@ urlpatterns = [
     path('view_exception/',views.view_exception,name='view_exception'),
     # 创建访问日志
     path('create_visit_log/',views.create_visit_log,name='create_visit_log'),
+    # 打开编程页面
+    path('view_program_page/',views.view_program_page,name='view_program_page'),
+    # 保存代码
+    path('save_code/',views.save_code,name='save_code'),
 
+     # 执行代码的页面
+    re_path('^view_run/(?P<view_id>[0-9]+)/',views.view_run,name='view_run'),
     
 ]
 

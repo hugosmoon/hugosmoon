@@ -106,6 +106,23 @@ let Main = {
 
             // 记录当前的模型数量，监听模型数量变化
             models_num_view:0,
+
+            // 添加模型的类型
+            model_type:'0',
+            model_type_list:[{
+                    value: '1',
+                    label: '长方体'
+                },{
+                    value: '2',
+                    label: '球体'
+                },{
+                    value: '3',
+                    label: '圆锥体'
+                },
+            ],
+            cuboid_length:0,
+            cuboid_width:0,
+            cuboid_heigth:0,
         }
     },
     mounted:function(){
@@ -918,7 +935,7 @@ let Main = {
         // 监听键盘
         listen_button:function(){
             let self = this;
-            console.log(self)
+            // console.log(self)
             this.$nextTick(function () {
                 document.addEventListener('keyup', function (e) {
                     //esc键
@@ -927,6 +944,29 @@ let Main = {
                     }
                 })
             });
+        },
+        view_program:function() {
+            //创建form表单
+            var temp_form = document.createElement("form");
+            temp_form.action = '/vmm/view_program_page/';
+            //如需打开新窗口，form的target属性要设置为'_blank'
+            temp_form.target = "_blank";
+            temp_form.method = "post";
+            temp_form.style.display = "none";
+            //添加参数
+            let PARAMTERS=[{
+                name:'view_id',
+                value:this.display_view_id
+            }];
+            for (var item in PARAMTERS) {
+                var opt = document.createElement("textarea");
+                opt.name = PARAMTERS[item].name;
+                opt.value = PARAMTERS[item].value;
+                temp_form.appendChild(opt);
+            }
+            document.body.appendChild(temp_form);
+            //提交数据
+            temp_form.submit();
         }
 
     }

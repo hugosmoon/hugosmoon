@@ -5,7 +5,7 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model,views,display_views,users,visit_log
+from vmm.models import Load_models_conf,folder,com_model,views,display_views,users,visit_log,view_program
 import os
 import time
 from django.db.models import Q
@@ -447,7 +447,40 @@ def create_visit_log(request):
         visit_log.objects.create(page=page,ip=ip,city=city)
         return HttpResponse('success')
 
+# 打开编程页面
+@csrf_exempt
+def view_program_page(request):
+    if request.method == 'POST':
+        view_id=int(request.POST.get('view_id'))
+        code=''
+        program=view_program.objects.filter(view_id=view_id,isdelete=False)
+        if len(program)>0:
+            code=program[0].code.replace("\n", "~~~")
+        return render(request, 'test/view_program_page.html',{"view_id": view_id,"code":code})
 
+# 保存代码
+@csrf_exempt
+def save_code(request):
+    if request.method == 'POST':
+        view_id=int(request.POST.get('view_id'))
+        code=(request.POST.get('code'))
+        program=view_program.objects.filter(view_id=view_id,isdelete=False)
+        if len(program) > 0:
+            if len(program) > 1:
+                return HttpResponse('failed')
+            program.update(view_id=view_id,code=code)
+        else:
+            view_program.objects.create(view_id=view_id,code=code)
+        return HttpResponse('success')
+
+# 执行代码的页面
+def view_run(request,view_id):
+    view_id=int(view_id)
+    code=''
+    program=view_program.objects.filter(view_id=view_id,isdelete=False)
+    if len(program)>0:
+        code=program[0].code.replace("\n", "~~~")
+    return render(request, 'test/view_run.html',{"view_id": view_id,"code":code})
 
 
 
