@@ -1,15 +1,40 @@
 
-        let TIME_STEP;
+        //过滤注释
+        let aaaa =code.split('###');
+        let bbbb = '';
+        for(let i=0;i<aaaa.length;i+=2){
+            bbbb+=aaaa[i];
+        }
+        code=bbbb;
+
+        //过滤换行及空格
+        code = code.replace(/~~~/g, "")
+        code = code.replace(/\s*/g,"");
+        //转义字符
+        let arrEntities={'#x27':"'",'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'}; 
+        code = code.replace(/&(#x27|lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
+
+
+        //默认定义21个按钮对象
         let B=[];
         for(let i=0;i<21;i++){
             B[i]=new BUTTON(i);
         }
+        //模型对象数组
         let M=[];
+        //总控制对象
         let run=new RUN(code);
 
+        //初始化全局变量
+        let TIME_STEP=run.time_step;
+        let GAME_TITLE="HUGOSMOON - "+Date.now();
+
+        // 执行前两块代码
         eval(run.code.v);
         eval(run.code.b);
-        TIME_STEP=run.time_step;
+
+        
+
         function RUN(code){
             let code_list=code.split('**@**');
             let serial_list = code_list[0].split('-');
@@ -59,6 +84,14 @@
                     z:1
                 }
                 this.visible=true;
+                this.color={
+                    r:0,
+                    g:0,
+                    b:0
+                }
+
+
+
                 this.set_visible=function(bool){
                     models[this.serial].children[0].visible=bool;
                     this.visible=bool;
@@ -153,6 +186,20 @@
                     }
                 }
 
+                // 设置颜色
+                this.set_color=function(r,g,b){
+                    models[this.serial].children[0].material.color={
+                        r:r/255,
+                        g:g/255,
+                        b:b/255
+                    }
+                    this.color={
+                        r:r/255,
+                        g:g/255,
+                        b:b/255
+                    }
+                }
+
         }
 
         function BUTTON(id){
@@ -163,6 +210,7 @@
                 eval(code);
             }
             this.init=function(str){
+                $("#buttons").show()
                 this.text=str;
                 $("#buttons").append("<el-button type='primary' id='"+this.id+"'>"+this.text+"</el-button>")
                 if(id%2==0){
