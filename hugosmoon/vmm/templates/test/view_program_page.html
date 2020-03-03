@@ -170,11 +170,36 @@
                                 type: 'success'
                                 });
                             }
-                            
+                            else{
+                                this.$message({
+                                message: '代码保存异常',
+                                type: 'error'
+                                });
+                            }
                         });
                 },
                 to_run_page:function(){
-                    window.open('/vmm/view_run/'+this.view_id+'/');
+                    this.$http.post(
+                        '/vmm/save_code/',
+                        {
+                            view_id:this.view_id,
+                            code:this.code_serial+"**@**"+this.code
+                        },
+                        { emulateJSON: true }
+                        ).then(function (res) {
+                            // console.log(res)
+                            if(res.body=="success"){
+                                window.open('/vmm/view_run/'+this.view_id+'/');
+                            }
+                            else{
+                                this.$message({
+                                message: '代码保存异常',
+                                type: 'error'
+                                });
+                            }
+                            
+                        });
+                   
                 },
 
             }
