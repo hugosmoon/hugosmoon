@@ -53,7 +53,7 @@
                       <h2><a style="color: cornflowerblue;" v-on:click="syntax_description=!syntax_description">基本语法>>></a></h2>
                       <div v-if="syntax_description">
                       <p><b>基本的代码结构</b></p>
-                      <p>###代码块可为空，但是结构必须保证###</p>
+                      <p>###各部分代码块可为空，但是结构必须保证###</p>
                       <p>START_VAR</p>
                       <p>###定义变量的代码块###</p>
                       <p>END_VAR</p>
@@ -67,7 +67,7 @@
                       <p>1、变量必须以V_开头，无需声明指令，类似python，如：V_length=10;</p>
                       <p>2、对缩进没有要求</p>
                       <p>3、每一条指令必须以 ; 结尾</p>
-                      <p>4、字符串类型只能用单引号 ''</p>
+                      <p>4、字符串类型只能用单引号,如 'str'</p>
                       <p>5、注释: ###这个内容将被注释###</p>
                       <p>6、支持if语句，形如：if(M[1].position.x>10){M[1].move(0,3)}</p>
                       <p>7、选择模型：M[serial];其中serial为左侧列表中的模型序号</p>
@@ -199,7 +199,7 @@
                             }
                             
                         });
-                   
+                    
                 },
 
             }

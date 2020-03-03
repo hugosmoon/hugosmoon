@@ -40,7 +40,7 @@
         <div id="render">
         </div>
         <div id="app">
-            <div class="right-top" id="buttons"> 
+            <div style="display:none;" class="right-top" id="buttons"> 
             </div>
         </div>
             
@@ -48,16 +48,6 @@
     </div>
     <script>
         let code="{{code}}";
-        let aaaa =code.split('###');
-        let bbbb = '';
-        for(let i=0;i<aaaa.length;i+=2){
-            bbbb+=aaaa[i];
-        }
-        code=bbbb;
-        code = code.replace(/~~~/g, "")
-        code = code.replace(/\s*/g,"");
-        let arrEntities={'#x27':"'",'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'}; 
-        code = code.replace(/&(#x27|lt|gt|nbsp|amp|quot);/ig,function(all,t){return arrEntities[t];});
     </script>
     <script src="{% static 'main_js/model.js' %}"></script>
     <script src="{% static 'main_js/view_display.js' %}"></script>
@@ -82,7 +72,7 @@
                 }
             },
             mounted:function(){
-                this.get_display_info();
+                $("title").html(GAME_TITLE);
                 initThree(0);
                 loadAutoScreen(camera, renderer);
                 this.openFullScreen(200);
@@ -95,20 +85,22 @@
                     update_models();
                     update_models_info();
                 },
-                get_display_info:function(){
-                    this.$http.post(
-                    '/vmm/get_display_view/',
-                    {
-                        display_view_id:display_view_id
-                    },
-                    { emulateJSON: true }
-                    ).then(function (res) {
-                        this.display_name=res.body.views[0].display_name;
-                        console.log(this.display_name)
-                        // $('#title2').html(this.display_name)
-                        $("title").html(this.display_name);
-                    });
-                },
+                // get_display_info:function(){
+                //     this.$http.post(
+                //     '/vmm/get_display_view/',
+                //     {
+                //         display_view_id:display_view_id
+                //     },
+                //     { emulateJSON: true }
+                //     ).then(function (res) {
+                //         console.log(tres)
+                //         this.display_name=res.body.views[0].display_name;
+                //         console.log(this.display_name)
+                //         // $('#title2').html(this.display_name)
+                //         $("title").html(this.display_name);
+                //     });
+                // },
+
                 // 加载遮罩
                 openFullScreen:function(time) {
                     const loading = this.$loading({
