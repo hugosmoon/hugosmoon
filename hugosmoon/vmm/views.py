@@ -201,6 +201,98 @@ def cuttingforce_cal(request):
 
     return HttpResponse(cutting_force)
 
+# 计算切削温度
+def cutting_temp_cal(request):
+    # 接收基础参数
+    if request.method == 'POST':
+        workpiece_material = request.POST.get('workpiece_material')
+        feed_rate = float(request.POST.get('feed_rate'))
+        cutting_depth = float(request.POST.get('cutting_depth'))
+        cutting_speed = float(request.POST.get('cutting_speed'))
+        tool_cutting_edge_angle = (request.POST.get('tool_cutting_edge_angle'))
+        rake_angle = (request.POST.get('rake_angle'))
+        tool_cutting_edge_inclination_angle = (request.POST.get('tool_cutting_edge_inclination_angle'))
+        corner_radius = (request.POST.get('corner_radius'))
+        cutting_fluid=request.POST.get('cutting_fluid')
+
+
+    else:
+        return HttpResponse(False)
+
+    #计算各种修正参数
+    k0 = 220 + 0.4 * cutting_speed
+    k_tool_cutting_edge_angle = 0
+    k_rake_angle = 0
+    k_workpiece_material = 0
+
+    x=0.26+feed_rate*0.15
+    cutting_fluid_arg=1
+
+
+    # 主偏角
+    if (tool_cutting_edge_angle == "30"):
+        k_tool_cutting_edge_angle = 1
+    elif (tool_cutting_edge_angle == "45"):
+        k_tool_cutting_edge_angle = 1.05
+    elif (tool_cutting_edge_angle == "60"):
+        k_tool_cutting_edge_angle = 1.15
+    elif (tool_cutting_edge_angle == "75"):
+        k_tool_cutting_edge_angle = 1.2
+    elif (tool_cutting_edge_angle == "90"):
+        k_tool_cutting_edge_angle = 1.25
+
+    # 前角
+    if (rake_angle == "-15"):
+        k_rake_angle = 1.2
+    elif (rake_angle == "-10"):
+        k_rake_angle = 1.15
+    elif (rake_angle == "0"):
+        k_rake_angle = 1.1
+    elif (rake_angle == "10"):
+        k_rake_angle = 1.05
+    elif (rake_angle == "20"):
+        k_rake_angle = 1
+
+
+
+    #根据工件材料确定参数
+    if (workpiece_material == "45_steel"):
+        k_workpiece_material = 1
+    elif (workpiece_material == "stainless_steel"):
+        k_workpiece_material = 1.3
+    elif (workpiece_material == "gray_iron"):
+        k_workpiece_material = 0.8
+    elif (workpiece_material == "malleable_cast_iron"):
+        k_workpiece_material = 0.85
+
+    # 切削液条件
+    if cutting_fluid=="water_based_cutting_fluid":
+        cutting_fluid_arg=0.55
+    elif cutting_fluid=="oil_based_cutting_fluid":
+        cutting_fluid_arg = 0.88
+
+    temp=(random.uniform(0.97, 1.03))*k0*k_tool_cutting_edge_angle*k_rake_angle*k_workpiece_material*math.pow(cutting_speed,x)*math.pow(cutting_depth,0.04)*math.pow(feed_rate,0.14)*cutting_fluid_arg
+
+    return HttpResponse(temp)
+
+#计算表面粗糙度
+def cutting_roughness_cal(request):
+    # 接收基础参数
+    if request.method == 'POST':
+        feed_rate = float(request.POST.get('feed_rate'))
+        cutting_depth = float(request.POST.get('cutting_depth'))
+        cutting_speed = float(request.POST.get('cutting_speed'))
+        tool_cutting_edge_angle = float(request.POST.get('tool_cutting_edge_angle'))
+        tool_minor_cutting_edge_angle = float(request.POST.get('tool_minor_cutting_edge_angle'))
+        corner_radius = float(request.POST.get('corner_radius'))
+
+        R=(random.uniform(1, 1.3))*(math.pow(feed_rate, 2)/(8*corner_radius))*(1/((1/(math.tan(tool_cutting_edge_angle)))+(1/(math.tan(tool_minor_cutting_edge_angle)))))*math.pow(cutting_depth, 0.04)*(1+1/(math.pow((cutting_speed-30), 2)+1))
+        # R=(random.uniform(1, 1.4))*(math.pow(feed_rate, 2)/(8*corner_radius))
+        # R=corner_radius
+
+        return HttpResponse(R)
+
+
 #将模型的配置信息存入数据库  
 @csrf_exempt
 def save_models(request):

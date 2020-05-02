@@ -324,14 +324,14 @@ function render() {
     
             if(cut_length>0){
                 bangliao[2].children[0].material.roughness=0.45;
+                
                 if(cut_length<bcdl*trig('cot',main_angle)){
-                    // console.log('b:'+Date.now());
                     bangliao2_r2=bangliao_r1-cut_length*trig('tan',main_angle);
                     let vertices_arr=[];
                     vertices_arr[0]=create_vertices(bangliao_r1,bangliao_r1,bangliao_length-cut_length).vertices;
                     vertices_arr[1]=create_vertices(bangliao_r1,bangliao2_r2,cut_length).vertices;
-                    vertices_arr[2]=create_vertices(bangliao_r2,bangliao_r2,0.1).vertices;
-                    vertices_arr[3]=create_vertices(bangliao_r2,bangliao_r2,0.1).vertices;
+                    vertices_arr[2]=create_vertices(bangliao2_r2,bangliao2_r2,cut_length).vertices;
+                    vertices_arr[3]=create_vertices(bangliao2_r2,bangliao2_r2,cut_length).vertices;
                     // vertices_arr[3]=create_vertices(bangliao2_r2,bangliao2_r2,0.3).vertices;
                     for(let i=0;i<4;i++){
                         bangliao[i].children.forEach(function (e) {
@@ -351,8 +351,8 @@ function render() {
                         let vertices_arr=[];
                         vertices_arr[0]=create_vertices(bangliao_r1,bangliao_r1,bangliao_length-cut_length).vertices;
                         vertices_arr[1]=create_vertices(bangliao_r1,bangliao_r2,cut_length).vertices;
-                        vertices_arr[2]=create_vertices(bangliao_r2,bangliao_r2,0.01).vertices;
-                        vertices_arr[3]=create_vertices(bangliao_r2,bangliao_r2,0.01).vertices;
+                        vertices_arr[2]=create_vertices(bangliao_r2,bangliao_r2,cut_length).vertices;
+                        vertices_arr[3]=create_vertices(bangliao_r2,bangliao_r2,cut_length).vertices;
                         // vertices_arr[3]=create_vertices(bangliao_r2,bangliao_r2,0.3).vertices;
                         for(let i=0;i<4;i++){
                             bangliao[i].children.forEach(function (e) {
@@ -582,7 +582,7 @@ function models_control()
 // 图表初始化
 function init_chart(){
     //图表
-    chart_line1=new chart_line('container','dark',0.5,'#6cb041','切削长度-主切削力曲线','切削长度','主切削力','mm','N',true,true,true,true,false,true);
+    chart_line1=new chart_line('container','dark',0.5,'#6cb041','','切削长度','主切削力','mm','N',true,true,true,true,false,true);
     chart_line1.update();
     chart_line2=new chart_line('container2','dark',1,'#9999ff','','切削长度','主切削力','mm','N',true,true,true,true,true,false);
     chart_line2.update();
