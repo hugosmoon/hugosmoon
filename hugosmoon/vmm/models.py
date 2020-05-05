@@ -107,5 +107,20 @@ class view_program(models.Model):
     createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
     isdelete = models.BooleanField(default=False, db_column="is_delete")
 
+# 会话数据埋点
+class conversation_log(models.Model):
+    id = models.AutoField(primary_key=True, db_column="id")
+    stunum = models.CharField(max_length=255, default='', db_column="stunum")
+    stuname = models.CharField(max_length=255, default='', db_column="stuname")
+    conversation = models.CharField(max_length=255, default='', db_column="conversation")
+    start_time = models.CharField(max_length=255, default='', db_column="start_time")
+    end_time = models.CharField(max_length=255, default='', db_column="end_time")
+
+    # page =models.IntegerField(db_column="page")
+    # ip = models.CharField(max_length=255, db_column="ip") 
+    # city = models.CharField(default="",max_length=255, db_column="city") 
+    # createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
+
+
 
 
