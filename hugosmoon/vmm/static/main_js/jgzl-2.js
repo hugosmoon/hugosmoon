@@ -62,7 +62,7 @@ let frame_time=20;//当前时间戳
 
 let cut_corner_end=false;//切削棒料角是否结束，与棒料2的长度及两端半径确定有关
 
-let cutting_force=0;//切削力
+let cutting_roughnes=0;//切削力
 
 // bangliao_r1=parseFloat(GetQueryString('bangliao_r'));
 // bangliao_length=parseFloat(GetQueryString('bangliao_length'));
@@ -80,7 +80,7 @@ let chart_line1,chart_line2;
 // 实验数据保存
 let experiment_data_1="<html><head><meta charset='utf-8' /></head><body><table>";
 let experiment_data_2="";
-let experiment_data_3="<tr></tr><tr><th>序号</th><th>切削长度(mm)</th><th>切削力(N)</th></tr>";
+let experiment_data_3="<tr></tr><tr><th>序号</th><th>切削长度(mm)</th><th>表面粗糙度(mm)</th></tr>";
 let experiment_data_4="</table></body></html>";
 let experiment_data_num=1;
 
@@ -208,7 +208,7 @@ let Main = {
             bcdl=this.$refs.cutting_depth.value;
             jjl=this.$refs.feed.value;
             this.adjustable = true;
-            this.getforce();
+            this.get_cutting_roughness();
         },
         end:function () {
             this.start_status=false;
@@ -217,7 +217,7 @@ let Main = {
         },
         reload: function () {
             // location.reload();
-            document.write("<form action='/vmm/qxyl/' method=post name=form1 style='display:none'>");  
+            document.write("<form action='/vmm/jgzl/' method=post name=form1 style='display:none'>");  
             document.write("<input type=hidden name='main_angle' value='"+main_angle+"'/>"); 
             document.write("<input type=hidden name='tool_minor_cutting_edge_angle' value='"+tool_minor_cutting_edge_angle+"'/>"); 
             document.write("<input type=hidden name='edge_inclination_angle' value='"+edge_inclination_angle+"'/>"); 
@@ -227,28 +227,30 @@ let Main = {
             document.write("<input type=hidden name='bangliao_r' value='"+bangliao_r+"'/>"); 
             document.write("<input type=hidden name='bangliao_length' value='"+bangliao_length+"'/>"); 
             document.write("<input type=hidden name='daojujiaodubuchang' value='"+daojujiaodubuchang+"'/>"); 
-            document.write("<input type=hidden name='bangliao_material' value='"+bangliao_material+"'/>");  
+            document.write("<input type=hidden name='bangliao_material' value='"+bangliao_material+"'/>"); 
+            document.write("<input type=hidden name='corner_radius' value='"+corner_radius+"'/>"); 
             document.write("</form>");  
             document.form1.submit();  
         },
-        // 更新切削力
-        getforce: function () {
-            //let abc = "12345";
-            //发送 post 请求
+        // 更新表面粗糙度
+        get_cutting_roughness: function () {
             this.$http.post(
-                '/vmm/cuttingforce_cal/',
+                '/vmm/cutting_roughness_cal/',
                 {
-                    bangliao_material: bangliao_material,
                     feed_rate: this.$refs.feed.value,
                     cutting_depth: this.$refs.cutting_depth.value,
                     cutting_speed: aims_machine_speed * bangliao_r1 * Math.PI / 1000,
                     tool_cutting_edge_angle: main_angle,
                     rake_angle: rake_angle,
+                    corner_radius:corner_radius,
+                    tool_minor_cutting_edge_angle:tool_minor_cutting_edge_angle,
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                cutting_force=Math.round((res.body),2);
-                // console.log('切削力:'+cutting_force);
+
+                    // cutting_roughnes=Math.round((res.body),2);
+                    cutting_roughnes=res.body;
+                    // console.log(cutting_roughnes)
                 });
         },
         download_data:function(){
@@ -394,6 +396,7 @@ function render() {
                     experiment_data_2+="<tr><th>刀具前角</th><th>"+rake_angle+"°</th></tr>"
                     experiment_data_2+="<tr><th>刀具后角</th><th>"+back_angle+"°</th></tr>"
                     experiment_data_2+="<tr><th>刀具副刃后角</th><th>"+secondary_edge_back_angl+"°</th></tr>"
+                    experiment_data_2+="<tr><th>刀具刀尖圆弧半径</th><th>"+corner_radius+"mm</th></tr>"
                     experiment_data_2+="<tr><th>机床主轴转速</th><th>"+machine_speed.toFixed(0)+"r/min</th></tr>"
                     experiment_data_2+="<tr><th>背吃刀量</th><th>"+bcdl+"mm</th></tr>"
                     experiment_data_2+="<tr><th>进给量</th><th>"+jjl+"mm/r</th></tr>"
@@ -403,7 +406,7 @@ function render() {
 
                 }
                 let x = (count != 0) ? Math.round(cut_length * 10) / 10 : 0;
-                let y = Number((cutting_force * (getNumberInNormalDistribution(1,0.03))).toFixed(2));
+                let y = Number((cutting_roughnes * (getNumberInNormalDistribution(1,0.03))).toFixed(4));
                 if(count%10==0){
                     if(count%50==0){
                         draw_chart(chart_line1,2000,x,y);
@@ -582,9 +585,9 @@ function models_control()
 // 图表初始化
 function init_chart(){
     //图表
-    chart_line1=new chart_line('container','dark',0.5,'#6cb041','','切削长度','主切削力','mm','N',true,true,true,true,false,true);
+    chart_line1=new chart_line('container','dark',0.5,'#6cb041','','切削长度','表面粗糙度','mm','mm',true,true,true,true,false,true);
     chart_line1.update();
-    chart_line2=new chart_line('container2','dark',1,'#9999ff','','切削长度','主切削力','mm','N',true,true,true,true,true,false);
+    chart_line2=new chart_line('container2','dark',1,'#9999ff','','切削长度','表面粗糙度','mm','mm',true,true,true,true,true,false);
     chart_line2.update();
 }
 //绘制图像

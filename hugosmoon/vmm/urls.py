@@ -8,7 +8,11 @@ urlpatterns = [
     path('index/', views.home,name='home'),
     path('tool_display/', views.tool_display,name='tool_display'),
     path('qxyl/', views.qxyl,name='qxyl'),
+    path('jgzl/', views.jgzl,name='jgzl'),
+    path('qxwd/', views.qxwd,name='qxwd'),
     path('cuttingforce_cal/',views.cuttingforce_cal,name='cuttingforce_cal'),
+    path('cutting_temp_cal/',views.cutting_temp_cal,name='cutting_temp_cal'),
+    path('cutting_roughness_cal/',views.cutting_roughness_cal,name='cutting_roughness_cal'),
     url(r'model_debugger/',views.model_debugger,name='model_debugger'),
     path('save_models/',views.save_models,name='save_models'),
     path('get_models_by_view/',views.get_models_by_view,name='get_models_by_view'),
@@ -44,6 +48,9 @@ urlpatterns = [
 
      # 执行代码的页面
     re_path('^view_run/(?P<view_id>[0-9]+)/',views.view_run,name='view_run'),
+
+    # 用户会话埋点
+    re_path('create_conversation_log/',views.create_conversation_log,name='create_conversation_log'),
     
 ]
 

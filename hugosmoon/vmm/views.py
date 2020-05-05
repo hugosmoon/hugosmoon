@@ -5,7 +5,7 @@ import math
 import random
 import json
 from django.db.models import Sum, Count
-from vmm.models import Load_models_conf,folder,com_model,views,display_views,users,visit_log,view_program
+from vmm.models import Load_models_conf,folder,com_model,views,display_views,users,visit_log,view_program,conversation_log
 import os
 import time
 from django.db.models import Q
@@ -123,9 +123,48 @@ def qxyl(request):
         bangliao_length=request.POST.get('bangliao_length')
         daojujiaodubuchang=request.POST.get('daojujiaodubuchang')
         bangliao_material=request.POST.get('bangliao_material')
-        print(bangliao_material)
         return render(request, 'cuttingforce/qxyl_2.html',{"main_angle": main_angle,"tool_minor_cutting_edge_angle": tool_minor_cutting_edge_angle,"edge_inclination_angle": edge_inclination_angle,"rake_angle": rake_angle,"back_angle": back_angle,"secondary_edge_back_angl": secondary_edge_back_angl,"bangliao_r": bangliao_r,"bangliao_length": bangliao_length,"daojujiaodubuchang": daojujiaodubuchang,"bangliao_material": bangliao_material})
     return render(request, 'cuttingforce/qxyl_1.html')
+
+
+@csrf_exempt
+def jgzl(request): 
+    if request.method == 'POST':
+        # print(request.POST)
+        main_angle=request.POST.get('main_angle')
+        tool_minor_cutting_edge_angle=request.POST.get('tool_minor_cutting_edge_angle')
+        edge_inclination_angle=request.POST.get('edge_inclination_angle')
+        rake_angle=request.POST.get('rake_angle')
+        back_angle=request.POST.get('back_angle')
+        secondary_edge_back_angl=request.POST.get('secondary_edge_back_angl')
+        bangliao_r=request.POST.get('bangliao_r')
+        bangliao_length=request.POST.get('bangliao_length')
+        daojujiaodubuchang=request.POST.get('daojujiaodubuchang')
+        bangliao_material=request.POST.get('bangliao_material')
+        corner_radius=request.POST.get('corner_radius')
+
+        return render(request, 'cuttingquality/jgzl_2.html',{"main_angle": main_angle,"tool_minor_cutting_edge_angle": tool_minor_cutting_edge_angle,"edge_inclination_angle": edge_inclination_angle,"rake_angle": rake_angle,"back_angle": back_angle,"secondary_edge_back_angl": secondary_edge_back_angl,"bangliao_r": bangliao_r,"bangliao_length": bangliao_length,"daojujiaodubuchang": daojujiaodubuchang,"bangliao_material": bangliao_material,"corner_radius":corner_radius})
+    return render(request, 'cuttingquality/jgzl_1.html')
+
+@csrf_exempt
+def qxwd(request): 
+    if request.method == 'POST':
+        # print(request.POST)
+        main_angle=request.POST.get('main_angle')
+        tool_minor_cutting_edge_angle=request.POST.get('tool_minor_cutting_edge_angle')
+        edge_inclination_angle=request.POST.get('edge_inclination_angle')
+        rake_angle=request.POST.get('rake_angle')
+        back_angle=request.POST.get('back_angle')
+        secondary_edge_back_angl=request.POST.get('secondary_edge_back_angl')
+        bangliao_r=request.POST.get('bangliao_r')
+        bangliao_length=request.POST.get('bangliao_length')
+        daojujiaodubuchang=request.POST.get('daojujiaodubuchang')
+        bangliao_material=request.POST.get('bangliao_material')
+        return render(request, 'cuttingtemperature/qxwd_2.html',{"main_angle": main_angle,"tool_minor_cutting_edge_angle": tool_minor_cutting_edge_angle,"edge_inclination_angle": edge_inclination_angle,"rake_angle": rake_angle,"back_angle": back_angle,"secondary_edge_back_angl": secondary_edge_back_angl,"bangliao_r": bangliao_r,"bangliao_length": bangliao_length,"daojujiaodubuchang": daojujiaodubuchang,"bangliao_material": bangliao_material})
+    return render(request, 'cuttingtemperature/qxwd_1.html')
+                            
+
+
 def model_debugger(request):
     return render(request, 'test/model_debugger.html')
 def model_manage(request):
@@ -202,10 +241,11 @@ def cuttingforce_cal(request):
     return HttpResponse(cutting_force)
 
 # 计算切削温度
+@csrf_exempt
 def cutting_temp_cal(request):
     # 接收基础参数
     if request.method == 'POST':
-        workpiece_material = request.POST.get('workpiece_material')
+        workpiece_material = request.POST.get('bangliao_material')
         feed_rate = float(request.POST.get('feed_rate'))
         cutting_depth = float(request.POST.get('cutting_depth'))
         cutting_speed = float(request.POST.get('cutting_speed'))
@@ -214,7 +254,6 @@ def cutting_temp_cal(request):
         tool_cutting_edge_inclination_angle = (request.POST.get('tool_cutting_edge_inclination_angle'))
         corner_radius = (request.POST.get('corner_radius'))
         cutting_fluid=request.POST.get('cutting_fluid')
-
 
     else:
         return HttpResponse(False)
@@ -230,28 +269,34 @@ def cutting_temp_cal(request):
 
 
     # 主偏角
-    if (tool_cutting_edge_angle == "30"):
+    tool_cutting_edge_angle=float(tool_cutting_edge_angle)
+    if (tool_cutting_edge_angle <= 30):
         k_tool_cutting_edge_angle = 1
-    elif (tool_cutting_edge_angle == "45"):
-        k_tool_cutting_edge_angle = 1.05
-    elif (tool_cutting_edge_angle == "60"):
-        k_tool_cutting_edge_angle = 1.15
-    elif (tool_cutting_edge_angle == "75"):
+    elif (tool_cutting_edge_angle <45):
+        k_tool_cutting_edge_angle = 1-0.05*(45-tool_cutting_edge_angle)/15
+    elif (tool_cutting_edge_angle <60):
+        k_tool_cutting_edge_angle = 1.05-0.1*(60-tool_cutting_edge_angle)/15
+    elif (tool_cutting_edge_angle < 75):
+        k_tool_cutting_edge_angle = 1.15-0.05*(75-tool_cutting_edge_angle)/15
+    elif (tool_cutting_edge_angle <= 90):
+        k_tool_cutting_edge_angle = 1.2-0.05*(90-tool_cutting_edge_angle)/15
+    else:
         k_tool_cutting_edge_angle = 1.2
-    elif (tool_cutting_edge_angle == "90"):
-        k_tool_cutting_edge_angle = 1.25
 
     # 前角
-    if (rake_angle == "-15"):
+    rake_angle=float(rake_angle)
+    if (rake_angle <= -15):
         k_rake_angle = 1.2
-    elif (rake_angle == "-10"):
-        k_rake_angle = 1.15
-    elif (rake_angle == "0"):
-        k_rake_angle = 1.1
-    elif (rake_angle == "10"):
-        k_rake_angle = 1.05
-    elif (rake_angle == "20"):
-        k_rake_angle = 1
+    elif (rake_angle < -10):
+        k_rake_angle = 1.2+0.05*(rake_angle+10)/5
+    elif (rake_angle < 0):
+        k_rake_angle = 1.15+0.05*(rake_angle)/10
+    elif (rake_angle < 10):
+        k_rake_angle = 1.05+0.1*(rake_angle-10)/10
+    elif (rake_angle <= 20):
+        k_rake_angle = 1+0.1*(rake_angle-20)/10
+    else:
+        k_rake_angle=1
 
 
 
@@ -276,6 +321,7 @@ def cutting_temp_cal(request):
     return HttpResponse(temp)
 
 #计算表面粗糙度
+@csrf_exempt
 def cutting_roughness_cal(request):
     # 接收基础参数
     if request.method == 'POST':
@@ -573,6 +619,23 @@ def view_run(request,view_id):
     if len(program)>0:
         code=program[0].code.replace("\n", "~~~")
     return render(request, 'test/view_run.html',{"view_id": view_id,"code":code})
+
+# 用户会话埋点
+@csrf_exempt
+def create_conversation_log(request):
+    if request.method == 'POST':
+        conversation=str(request.POST.get('conversation'))
+        stunum=str(request.POST.get('stunum'))
+        stuname=str(request.POST.get('stuname'))
+        conversation_logs=conversation_log.objects.filter(conversation=conversation)
+        if len(conversation_logs)>0:
+            conversation_logs.update(end_time=str(int(time.time())))
+            return HttpResponse('update_success')
+        else:
+            conversation_log.objects.create(conversation=conversation,start_time=str(int(time.time())),stunum=stunum,stuname=stuname)
+            return HttpResponse('create_success')
+
+        
 
 
 

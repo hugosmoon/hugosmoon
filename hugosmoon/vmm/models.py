@@ -115,6 +115,7 @@ class conversation_log(models.Model):
     conversation = models.CharField(max_length=255, default='', db_column="conversation")
     start_time = models.CharField(max_length=255, default='', db_column="start_time")
     end_time = models.CharField(max_length=255, default='', db_column="end_time")
+    # createtime = models.DateTimeField(default=timezone.now, db_column="createtime")
 
     # page =models.IntegerField(db_column="page")
     # ip = models.CharField(max_length=255, db_column="ip") 

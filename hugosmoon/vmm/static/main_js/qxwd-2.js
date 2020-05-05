@@ -80,7 +80,7 @@ let chart_line1,chart_line2;
 // 实验数据保存
 let experiment_data_1="<html><head><meta charset='utf-8' /></head><body><table>";
 let experiment_data_2="";
-let experiment_data_3="<tr></tr><tr><th>序号</th><th>切削长度(mm)</th><th>切削力(N)</th></tr>";
+let experiment_data_3="<tr></tr><tr><th>序号</th><th>切削长度(mm)</th><th>刀尖处切削温度(°C)</th></tr>";
 let experiment_data_4="</table></body></html>";
 let experiment_data_num=1;
 
@@ -208,7 +208,7 @@ let Main = {
             bcdl=this.$refs.cutting_depth.value;
             jjl=this.$refs.feed.value;
             this.adjustable = true;
-            this.getforce();
+            this.get_cutting_temp();
         },
         end:function () {
             this.start_status=false;
@@ -217,7 +217,7 @@ let Main = {
         },
         reload: function () {
             // location.reload();
-            document.write("<form action='/vmm/qxyl/' method=post name=form1 style='display:none'>");  
+            document.write("<form action='/vmm/qxwd/' method=post name=form1 style='display:none'>");  
             document.write("<input type=hidden name='main_angle' value='"+main_angle+"'/>"); 
             document.write("<input type=hidden name='tool_minor_cutting_edge_angle' value='"+tool_minor_cutting_edge_angle+"'/>"); 
             document.write("<input type=hidden name='edge_inclination_angle' value='"+edge_inclination_angle+"'/>"); 
@@ -231,12 +231,12 @@ let Main = {
             document.write("</form>");  
             document.form1.submit();  
         },
-        // 更新切削力
-        getforce: function () {
+        // 更新切削温度
+        get_cutting_temp: function () {
             //let abc = "12345";
             //发送 post 请求
             this.$http.post(
-                '/vmm/cuttingforce_cal/',
+                '/vmm/cutting_temp_cal/',
                 {
                     bangliao_material: bangliao_material,
                     feed_rate: this.$refs.feed.value,
@@ -244,10 +244,11 @@ let Main = {
                     cutting_speed: aims_machine_speed * bangliao_r1 * Math.PI / 1000,
                     tool_cutting_edge_angle: main_angle,
                     rake_angle: rake_angle,
+                    tool_cutting_edge_inclination_angle:edge_inclination_angle,
                 },
                 { emulateJSON: true }
                 ).then(function (res) {
-                cutting_force=Math.round((res.body),2);
+                    cutting_temp=Math.round((res.body),2);
                 // console.log('切削力:'+cutting_force);
                 });
         },
@@ -403,7 +404,7 @@ function render() {
 
                 }
                 let x = (count != 0) ? Math.round(cut_length * 10) / 10 : 0;
-                let y = Number((cutting_force * (getNumberInNormalDistribution(1,0.03))).toFixed(2));
+                let y = Number((cutting_temp * (getNumberInNormalDistribution(1,0.03))).toFixed(2));
                 if(count%10==0){
                     if(count%50==0){
                         draw_chart(chart_line1,2000,x,y);
@@ -582,9 +583,9 @@ function models_control()
 // 图表初始化
 function init_chart(){
     //图表
-    chart_line1=new chart_line('container','dark',0.5,'#6cb041','','切削长度','主切削力','mm','N',true,true,true,true,false,true);
+    chart_line1=new chart_line('container','dark',0.5,'#6cb041','','切削长度','切削温度','mm','°C',true,true,true,true,false,true);
     chart_line1.update();
-    chart_line2=new chart_line('container2','dark',1,'#9999ff','','切削长度','主切削力','mm','N',true,true,true,true,true,false);
+    chart_line2=new chart_line('container2','dark',1,'#9999ff','','切削长度','切削温度','mm','°C',true,true,true,true,true,false);
     chart_line2.update();
 }
 //绘制图像
