@@ -202,3 +202,104 @@ body {
     padding-left: 20px;
     padding-right: 20px;
   }
+
+  .pad{
+      /* opacity: 0.9; */
+    border-radius:5px;
+    background:rgba(178, 191, 248, 0.5);
+    padding-bottom: 20px;
+    padding-top: 40px;
+    padding-left: 40px;
+    padding-right: 40px;
+
+  }
+  .pad.login{
+    position:absolute;
+    top: 400px;
+    left: 41%;
+    width: 18%;
+  }
+  .pad.left{
+    position:absolute;
+    top: 150px;
+    left: 50px;
+    width: 300px;
+  }
+  .new-index{
+    position:absolute;
+    top: 80px;
+
+   
+    
+  }
+
+  
+  .page-backgroud{
+    opacity: 0.35;
+  }
+  .page-title{
+    position:absolute;
+    top: 0px;
+    left: 50px;
+    width: 500px;
+    font-size: 30px;
+    font-weight: bold;
+    color: aliceblue;
+  }
+  .page-name{
+    position:absolute;
+    top: 47px;
+    right: 50px;
+    font-size: 16px;
+    color: aliceblue;
+  }
+  .page-left{
+    border-radius:5px;
+    background:rgba(178, 191, 248, 0.5);
+    
+    position:absolute;
+    top: 400px;
+    left: 41%;
+    width: 18%;
+
+    padding-bottom: 20px;
+    padding-top: 40px;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  /* .new-index-pad{
+    position:absolute;
+    padding-bottom: 20px;
+    padding-top: 40px;
+    padding-left: 40px;
+    padding-right: 40px;
+    width: 30%;
+    
+  } */
+
+  .new-index-pad{
+    cursor: pointer;
+    border-radius:5px;
+    background:rgba(1, 12, 25, 0.6);
+    opacity: 0.9;
+    width: 30vw;
+    height: 22vw;
+    float: left;
+    margin-bottom: 1vw;
+    margin-left: 1vw;
+    padding-right: 1vw;
+    padding-left: 1vw;
+    padding-bottom: 1vw;
+    padding-top: 1vw;
+
+  }
+  .new-index-pad:hover
+  { 
+  background:rgb(31, 126, 189);
+  opacity: 0.9;
+  }
+
+  .experiment-title{
+    font-size:18px;
+    color: rgb(230, 225, 225);
+  }

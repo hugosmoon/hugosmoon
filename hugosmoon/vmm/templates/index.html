@@ -20,50 +20,69 @@
      
     <!-- 模块css -->
     <link rel="stylesheet" type="text/css" href="{% static 'import/css/index.css' %}">
-    <style>
-            .el-header, .el-footer {
-              background-color: #B3C0D1;
-              color: #333;
-              text-align: center;
-              font-size: 28px;
-              line-height: 80px;
-            }
-            
-            .el-aside {
-              background-color: #D3DCE6;
-              color: #333;
-              text-align: center;
-              line-height: 200px;
-            }
-            
-            .el-main {
-              background-color: #E9EEF3;
-              color: #333;
-              text-align: center;
-              line-height: 60px;
-              /* height: 100%; */
-            }
-            
-            body > .el-container {
-              margin-bottom: 40px;
-            }
-            
-            .el-container:nth-child(5) .el-aside,
-            .el-container:nth-child(6) .el-aside {
-              line-height: 260px;
-            }
-            
-            .el-container:nth-child(7) .el-aside {
-              line-height: 320px;
-            }
-            .el-button{
-                width: 250px;
-            }
-          </style>
+    
     
 </head>
-<body >
-  <div id='render'></div>
+<body style=" cursor:default;">
+  <div style="background:rgba(0,0,0,1);">
+    <div class="page-backgroud" style="opacity: 0.25;height: 100vh;">
+        <img src="/static/images/login_cover.jpg" width="100%">
+    </div>
+  </div>
+  <div class="page-title">
+    <p>机械加工虚拟仿真实验室  </p>
+  </div>
+  <div class="page-name" id="user_name"> 
+    <p >用户名显示异常</p>
+  </div>
+  
+
+  <div class="new-index">
+    <hr style=" height:2px;border:none;border-top:2px dotted #4a4b4b;" />
+    <br>
+
+    <div id="app">
+        <!-- <el-button onclick="jumpto('/vmm/model_debugger/');" type="primary">场景编辑</el-button><br><br>
+        <el-button onclick="jumpto('/vmm/tool_display/');" type="primary">车刀的主要几何角度</el-button><br><br>
+        <el-button onclick="jumpto('/vmm/qxyl/');" type="primary">切削力与切削用量的关系</el-button> -->
+      <!-- <div class="new-index-pad">
+        <img src="/static/images/login_cover.jpg" width="100%">
+      </div>
+      <br>
+      <div class="new-index-pad">
+        <img src="/static/images/login_cover.jpg" width="100%">
+      </div> -->
+
+
+        <div class="new-index-pad"  onclick="window.open('/vmm/qxyl/')">
+          <img src="/static/images/qxl-1.jpg" width="100%">
+          <p class="experiment-title">切削用量对切削力的影响</p>
+        </div>
+        <div class="new-index-pad" onclick="window.open('/vmm/qxwd/')">
+          <img src="/static/images/qxwd-1.jpeg" width="100%">
+          <p class="experiment-title">切削用量对切削温度的影响</p>
+        </div>
+        <div class="new-index-pad"  onclick="window.open('/vmm/jgzl/')">
+          <img src="/static/images/login_cover.jpg" width="100%">
+          <p class="experiment-title">切削用量对加工表面粗糙度的影响</p>
+        </div>
+     
+        <div class="new-index-pad" onclick="window.open('/vmm/tool_display/')">
+          <img src="/static/images/cdjd.png" width="100%">
+          <p class="experiment-title">车刀的主要几何角度</p>
+        </div>
+        <div class="new-index-pad" onclick="window.open('/vmm/model_debugger/')">
+          <img src="/static/images/mxts.png" width="100%">
+          <p class="experiment-title">模型调试</p>
+        </div>
+    </div> 
+  </div>
+
+
+ 
+
+
+  <!-- <div id='render'></div>
 
     <div id="app">
       <div class="index" >
@@ -71,30 +90,26 @@
         <el-button onclick="jumpto('/vmm/model_debugger/');" type="primary">场景编辑</el-button><br><br>
         <el-button onclick="jumpto('/vmm/tool_display/');" type="primary">车刀的主要几何角度</el-button><br><br>
         <el-button onclick="jumpto('/vmm/qxyl/');" type="primary">切削力与切削用量的关系</el-button>
-            <!-- <el-container style="height:100%">
-                    <el-main style="height:100%">
-                      <br>
-                      <el-button  onclick="jumpto('/vmm/model_debugger/');">场景调试</el-button>
-                      <br><br>
-                            <el-button  onclick="jumpto('/vmm/tool_display/');">车刀的主要几何角度</el-button>
-                            <br>
-                            <el-button  onclick="jumpto('/vmm/qxyl/');">切削力与切削用量的关系</el-button>
-                    </el-main>
-            </el-container> -->
-        
       </div>
       
-  </div>
+  </div> -->
 </body>
 <script src="{% static 'import/vue.js' %}"></script>
 <script src="{% static 'import/element_index.js' %}"></script>
 <script>
+    $("#user_name").html('<a>hello,'+$.cookie('username')+' </a>'+"&ensp;&ensp;<a style='color: rgb(100, 100, 255);cursor: pointer;' onclick='logout()'>  退出登录</a>")
     new Vue({
       el: '#app',
     })
 
     function jumpto(url) {
          location.href=url;
+    }
+    function logout(){
+      jumpto('/vmm/login');
+      $.removeCookie('username',{ path: '/' });
+      $.removeCookie('password',{ path: '/' });
+      $.removeCookie('userid',{ path: '/' });
     }
   </script>
   <script src="{% static 'main_js/moon.js' %}"></script>

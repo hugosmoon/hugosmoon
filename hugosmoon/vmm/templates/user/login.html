@@ -55,73 +55,52 @@
     </style>
     
 </head>
-<body>
+<body >
     <!--加载动画的div-->
-    <div id="app">
+    <!-- <div style="background:rgb(38, 40, 94)">
+        <div class="page-backgroud" style="height: 100vh;">
+            <img src="/static/images/login_cover.jpg" alt="Pulpit rock" width="100%">
+        </div>
+    </div> -->
+    <div style="background:rgba(0,0,0,1);">
+        <div class="page-backgroud" style="opacity: 0.35;height: 100vh;">
+            <img src="/static/images/login_cover.jpg" width="100%">
+        </div>
+      </div>
+    
+    <!-- <div class="login">123</div> -->
+    <div class="pad login" id="app">
         <!-- <div style="margin-left: 35%;">
             <div style="width: 100%;"> -->
-        <el-container>
-            <el-header>机械类虚拟实验系统</el-header>
-        </el-container>
+        
         <div>
             <div>
+                
                 <el-row>
-                    <el-col :span="24"><div class="grid-content bg-purple-dark"></div></el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                        </div>
-                    </el-col>
-                    <el-col :span="6">
-                        <div class="grid-content bg-purple-light">
+                   
                             <el-input id="name"  v-model="username" placeholder="请输入帐号">
                                 <template slot="prepend">帐号</template>
                             </el-input>
-                        </div>
-                    </el-col>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                            
-                        </div>
-                    </el-col>
+                
                 </el-row>
                 <el-row>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                        </div>
-                    </el-col>
-                    <el-col :span="6">
-                        <div class="grid-content bg-purple-light">
+                    
                             <el-input id="password" v-model="password" type="password" placeholder="请输入密码">
                                 <template slot="prepend">密码</template>
                             </el-input>
-                        </div>
-                    </el-col>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                            
-                        </div>
-                    </el-col>
+                       
                 </el-row>
                 <el-row>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                        </div>
-                    </el-col>
-                    <el-col :span="6">
-                        <div class="grid-content bg-purple-light">
+                    
                             <el-button id="login" v-on:click="login" style="width:100%" type="primary">登录</el-button>
-                        </div>
-                    </el-col>
-                    <el-col :span="9">
-                        <div class="grid-content bg-purple">
-                            
-                        </div>
-                    </el-col>
+                        
                 </el-row>
             </div>
         </div>
+    </div>
+    <div class="page-title">
+        <p>机械加工虚拟仿真实验室</p>
+
     </div>
     <script>
         let url='{{url}}';

@@ -5,7 +5,7 @@
     {% load static %}
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="icon" href="{% static 'logo.ico' %}">
-    <title>切削用量和切削力的关系</title>
+    <title>切削用量对切削温度的影响</title>
     <!-- 引入样式 -->
     <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
     <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
@@ -31,7 +31,7 @@
     <script src="{% static 'import/vue-resource.min.js' %}"></script>
     <!-- 轨迹球控件 -->
     <script src="{% static 'import/TrackballControls.js' %}"></script>
-    <script src="{% static 'main_js/login_verification.js' %}"></script>
+    <!-- <script src="{% static 'main_js/login_verification.js' %}"></script> -->
     
     
 </head>
@@ -127,7 +127,8 @@
     <script src="{% static 'main_js/chart_line.js' %}"></script>
     <script src="{% static 'main_js/create_cylinder.js' %}"></script>
     <script src="{% static 'main_js/tool.js' %}"></script>
-    <script src="{% static 'main_js/qxyl-2.js' %}"></script>
+    <script src="{% static 'main_js/qxwd-2.js' %}"></script>
+    <!-- <script src="{% static 'main_js/conversation_log.js' %}"></script> -->
     <script>
         create_visit_log(7);
     </script>

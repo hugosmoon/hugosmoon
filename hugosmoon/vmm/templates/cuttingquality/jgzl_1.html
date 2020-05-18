@@ -5,7 +5,7 @@
     {% load static %}
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel="icon" href="{% static 'logo.ico' %}">
-    <title>切削用量和表面粗糙度的关系</title>
+    <title>切削用量对加工表面粗糙度的影响</title>
     <!-- 引入样式 -->
     <link rel="stylesheet" href="{% static 'import/css/index.css' %}">
     <link rel="stylesheet" href="{% static 'main_css/main.css' %}">
@@ -67,10 +67,10 @@
                         <span class="demonstration" style="color:#C0C4CC">副刃后角</span>
                         <el-slider ref="secondary_edge_back_angl" v-model="value6" :marks="marks_secondary_edge_back_angle" :min=6 :max=12 @input="greet" @change="greet"></el-slider>
                     </div>
-                    <!--<div class="block con-ang">-->
-                        <!--<span class="demonstration" style="color:#C0C4CC">刀尖圆弧半径</span>-->
-                        <!--<el-slider v-model="value7" :marks="marks_tip_radius" :step="0.01" :min=0.25 :max=2></el-slider>-->
-                    <!--</div>-->
+                    <div class="block con-ang">
+                        <span class="demonstration" style="color:#C0C4CC">刀尖圆弧半径</span>
+                        <el-slider ref="corner_radius" v-model="value7" :marks="marks_tip_radius" :step="0.01" :min=0.25 :max=2></el-slider>
+                    </div>
                 </template>
                 
             </div>
@@ -111,7 +111,8 @@
         </div>
 </div>
 </div>
-<script src="{% static 'main_js/qxyl-1.js' %}"></script>
+<script src="{% static 'main_js/jgzl-1.js' %}"></script>
+<!-- <script src="{% static 'main_js/conversation_log.js' %}"></script> -->
 <script>
     create_visit_log(6);
   </script>
