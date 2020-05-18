@@ -283,7 +283,7 @@ body {
     background:rgba(1, 12, 25, 0.6);
     opacity: 0.9;
     width: 30vw;
-    height: 22vw;
+    height: 20vw;
     float: left;
     margin-bottom: 1vw;
     margin-left: 1vw;
@@ -295,7 +295,7 @@ body {
   }
   .new-index-pad:hover
   { 
-  background:rgb(31, 126, 189);
+  background:rgb(67, 164, 230);
   opacity: 0.9;
   }
 
